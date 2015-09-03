@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Login">
+	
+    <select id="selectAcct" resultType="com.cyberone.scourt.model.Acct">
+        SELECT
+		    acctId
+		    ,acctNm
+		    ,bizSct
+		    ,acctGrpCd
+		    ,acctSt
+		    ,deptCd
+		    ,oflvCd
+		    ,acctPw
+		    ,mobile
+		    ,telephone
+		    ,email
+		    ,regr
+		    ,regDtime
+		    ,modr
+		    ,modDtime
+        FROM AcctTbl A
+        WHERE 1 = 1
+        <if test="acctId != null and acctId != ''">
+            AND A.acctId = #{acctId}
+        </if>
+        <if test="acctPw != null and acctPw != ''">
+            AND A.acctPw = #{acctPw}
+        </if>
+        <if test="acctSt != null and acctSt != ''">
+            AND A.acctSt = #{acctSt}
+        </if>
+        <if test="deptCd != null and deptCd != ''">
+            AND A.deptCd = #{deptCd}
+        </if>
+        <if test="oflvCd != null and oflvCd != ''">
+            AND A.oflvCd = #{oflvCd}
+        </if>
+        <if test="acctSt != null and acctSt != ''">
+            AND A.acctSt = #{acctSt}
+        </if>
+    </select>
+	
+    <select id="selectAcctGrp" resultType="com.cyberone.scourt.model.AcctGrp">
+        SELECT * FROM AcctGrpTbl
+        WHERE acctGrpCd = #{acctGrpCd}
+    </select>
+
+    <select id="selectMenu" resultType="com.cyberone.scourt.model.Menu">
+        SELECT * FROM MenuTbl
+        WHERE useYn = 'y'
+        ORDER BY prtsCd ASC, menuCd ASC
+    </select>
+
+    <select id="selectMenuAuth" resultType="com.cyberone.scourt.model.MenuAuth">
+        SELECT * FROM MenuAuthTbl
+        WHERE acctId = #{acctId}
+    </select>
+	
+</mapper>

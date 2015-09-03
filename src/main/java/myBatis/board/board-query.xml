@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Board">
+	
+    <sql id="countQueryTop">
+        SELECT COUNT(*) as records FROM (
+    </sql>
+
+    <!-- 메일템플릿 목록조회 -->
+    <sql id="whereOrderLimit">
+        ORDER BY A.bbsId DESC
+        LIMIT #{limit}, #{rows}
+    </sql>
+    
+    <sql id="sqlBoard">
+        SELECT
+            A.bbsId
+            ,A.bbsTit
+            ,A.bbsCont
+            ,A.qryCnt
+            ,A.bbsSct
+            ,A.fileYn
+            ,A.regr
+            ,A.modr
+            ,A.regDtime
+            ,A.modDtime
+        FROM BoardTbl A
+        WHERE 1 = 1
+        <if test="bbsId != null and bbsId > 0">
+            AND A.bbsId = #{bbsId}
+        </if>
+        <if test="bbsSct != null and bbsSct != ''">
+            AND A.bbsSct = #{bbsSct}
+        </if>
+        <if test="searchWord != null and searchWord != ''">
+            AND bbsTit LIKE CONCAT('%', #{ searchWord }, '%')
+        </if>
+        AND A.delYn = 'n'
+        
+    </sql>
+
+    <select id="selectBoardList" resultType="java.util.HashMap">
+        <include refid="sqlBoard"/>
+        <include refid="whereOrderLimit"/>
+    </select>
+
+    <select id="selectBoardList-Count" resultType="com.cyberone.scourt.model.Board">
+        <include refid="countQueryTop" />
+        <include refid="sqlBoard"/>
+        ) B
+    </select>
+
+    <select id="selectBoard" resultType="java.util.HashMap">
+        <include refid="sqlBoard"/>
+    </select>
+	
+    <insert id="insertBoard">
+        INSERT INTO BoardTbl(bbsId, bbsSct, bbsTit, bbsCont, 
+        <if test="fileYn != null">fileYn,</if> 
+        <if test="delYn != null">delYn,</if>
+        regr, regDtime, modr, modDtime)
+        VALUES (#{bbsId}, #{bbsSct}, #{bbsTit}, #{bbsCont},
+        <if test="fileYn != null">#{fileYn},</if> 
+        <if test="delYn != null">#{delYn},</if>
+        #{regr}, #{regDtime}, #{modr}, #{modDtime})
+        <selectKey keyProperty="bbsId" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID() AS bbsId
+        </selectKey>
+    </insert>
+
+	<update id="updateBoard">
+        UPDATE BoardTbl SET
+            <if test="bbsTit != null"> bbsTit = #{bbsTit}, </if>
+            <if test="bbsCont != null"> bbsCont = #{bbsCont}, </if>
+            <if test="fileYn != null"> fileYn = #{fileYn}, </if>
+            <if test="delYn != null"> delYn = #{delYn}, </if>
+            modr = #{modr},
+            modDtime = #{modDtime}          
+        WHERE bbsId = #{bbsId}
+    </update>
+	
+    <insert id="insertAppxFile">
+        INSERT INTO AppxFileTbl(refCd, fileTp, fileLoc, fileOrgNm, fileSavNm, regr, regDtime, modr, modDtime)
+        VALUES (#{refCd}, #{fileTp}, #{fileLoc}, #{fileOrgNm}, #{fileSavNm}, #{regr}, #{regDtime}, #{modr}, #{modDtime})
+    </insert>
+
+    <update id="updateAppxFile">
+        UPDATE AppxFileTbl
+           SET 
+               <if test="refCd != null"> refCd = #{refCd},</if>
+               <if test="fileTp != null"> fileTp = #{fileTp},</if>
+               <if test="delYn != null"> delYn = #{delYn},</if>
+               <if test="fileLoc != null"> fileLoc = #{fileLoc},</if>
+               <if test="fileOrgNm != null"> fileOrgNm = #{fileOrgNm},</if>
+               <if test="fileSavNm != null"> fileSavNm = #{fileSavNm},</if>
+               <if test="regr != null"> regr = #{regr},</if>
+               <if test="regDtime != null"> regDtime = #{regDtime},</if>
+               <if test="modr != null"> modr = #{modr},</if>
+               <if test="modDtime != null"> modDtime = #{modDtime},</if>
+               fileId = fileId
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="fileTp != null and fileTp != ''">
+                AND fileTp = #{fileTp}
+            </if>
+            <if test="fileId != null and fileId > 0">
+                AND fileId = #{fileId}
+            </if>        
+            <if test="refCd != null and refCd > 0">
+                AND refCd = #{refCd}
+            </if>
+        </trim>        
+           
+    </update>
+	
+    <select id="selectAppxFile" resultType="com.cyberone.scourt.model.AppxFile">
+        SELECT * FROM AppxFileTbl
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="refCd != null and refCd > 0">
+                AND refCd = #{refCd}
+            </if>
+            <if test="fileTp != null and fileTp != ''">
+                AND fileTp = #{fileTp}
+            </if>
+            <if test="fileId != null and fileId > 0">
+                AND fileId = #{fileId}
+            </if>
+        </trim>
+        ORDER BY fileId Asc
+    </select>
+	
+    <insert id="insertAttachments">
+        INSERT INTO AttachTbl(<if test="bbsId != null">bbsId,</if> imageurl, filename, filesize, originalurl, thumburl, bbsSct, regDtime)
+        VALUES (<if test="bbsId != null">#{bbsId},</if> #{imageurl}, #{filename}, #{filesize}, #{originalurl}, #{thumburl}, #{bbsSct}, #{regDtime})
+        <selectKey keyProperty="seqno" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID() AS seqno
+        </selectKey>
+    </insert>
+	
+    <select id="selectAttachments" resultType="java.util.HashMap">
+        SELECT * FROM AttachTbl
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="seqno != null and seqno > 0">
+                AND seqno = #{seqno}
+            </if>
+            <if test="bbsId != null and bbsId > 0">
+                AND bbsId = #{bbsId}
+            </if>
+            <if test="filename != null and filename != ''">
+                AND filename = #{filename}
+            </if>
+        </trim>
+        ORDER BY seqno Asc
+    </select>
+	
+    <update id="updateAttachments">
+        UPDATE AttachTbl
+           SET bbsId = #{bbsId}
+        WHERE seqno = #{seqno}
+    </update>
+	
+    <delete id="deleteAttachments">
+        DELETE FROM AttachTbl
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="seqno != null and seqno > 0">
+                AND seqno = #{seqno}
+            </if>
+            <if test="bbsId != null and bbsId > 0">
+                AND bbsId = #{bbsId}
+            </if>
+            <if test="filename != null and filename != ''">
+                AND filename = #{filename}
+            </if>
+        </trim>
+    </delete>
+    
+    <update id="updateQryCnt">
+        UPDATE BoardTbl SET
+            qryCnt = qryCnt + 1
+        WHERE bbsId = #{bbsId}
+    </update>
+    	
+</mapper>

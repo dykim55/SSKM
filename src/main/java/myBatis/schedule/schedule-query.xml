@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Schedule">
+	
+    <select id="selectScheduleList" resultType="java.util.HashMap">
+        SELECT
+            A.schdSeq,
+            A.schdSct,
+            A.regr,
+            A.regDtime,
+            A.modr,
+            A.modDtime,
+            A.schdCont AS title,
+            TRIM(CONCAT(DATE_FORMAT(A.strtDate, '%Y-%m-%d'), ' ', IFNULL(DATE_FORMAT(A.strtTime, '%H:%i'),''))) AS start,
+            TRIM(CONCAT(DATE_FORMAT(A.endDate, '%Y-%m-%d'), ' ', IFNULL(DATE_FORMAT(A.endTime, '%H:%i'),''))) AS end            
+        FROM ScheduleTbl A
+        WHERE 1 = 1
+            AND schdSct = '1'
+        <if test="schdSeq != null and schdSeq > 0">
+            AND schdSeq = #{schdSeq}
+        </if>
+        <if test="searchMonth != null and searchMonth != ''">
+            AND #{searchMonth} BETWEEN DATE_FORMAT(A.strtDate, '%Y-%m') AND DATE_FORMAT(A.endDate, '%Y-%m')
+        </if>
+    </select>
+
+	<select id="selectSchedule" resultType="java.util.HashMap">
+        SELECT
+            A.schdSeq,
+            A.schdSct,
+            A.regr,
+            A.regDtime,
+            A.modr,
+            A.modDtime,
+            A.schdCont AS title,
+            DATE_FORMAT(A.strtDate, '%Y-%m-%d') AS startDate,
+            IFNULL(DATE_FORMAT(A.strtTime, '%H:%i'),'00:00') AS startTime,
+            DATE_FORMAT(A.endDate, '%Y-%m-%d') AS endDate,
+            IFNULL(DATE_FORMAT(A.endTime, '%H:%i'),'00:00') AS endTime
+        FROM ScheduleTbl A
+        WHERE 1 = 1
+            AND schdSct = #{schdSct}
+            AND schdSeq = #{schdSeq}
+    </select>
+	
+    <update id="updateSchedule">
+        UPDATE ScheduleTbl
+           SET 
+               <if test="schdSct != null"> schdSct = #{schdSct},</if>
+               <if test="strtDate != null"> strtDate = #{strtDate},</if>
+               <if test="endDate != null"> endDate = #{endDate},</if>
+               <if test="strtTime != null"> strtTime = #{strtTime},</if>
+               <if test="endTime != null"> endTime = #{endTime},</if>
+               <if test="schdCont != null"> schdCont = #{schdCont},</if>
+               <if test="regr != null"> regr = #{regr},</if>
+               <if test="regDtime != null"> regDtime = #{regDtime},</if>
+               <if test="modr != null"> modr = #{modr},</if>
+               <if test="modDtime != null"> modDtime = #{modDtime},</if>
+               schdSeq = schdSeq
+           WHERE schdSeq = #{schdSeq}
+    </update>
+	
+    <insert id="insertSchedule">
+        INSERT INTO ScheduleTbl(schdSct, strtDate, endDate, strtTime, endTime, schdCont, regr, regDtime, modr, modDtime)
+        VALUES (#{schdSct}, #{strtDate}, #{endDate}, #{strtTime}, #{endTime}, #{schdCont}, #{regr}, #{regDtime}, #{modr}, #{modDtime})
+    </insert>
+
+    <delete id="deleteSchedule">
+        DELETE FROM ScheduleTbl
+        WHERE schdSeq = #{schdSeq}
+    </delete>
+	
+</mapper>

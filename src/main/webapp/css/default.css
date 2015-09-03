@@ -1,0 +1,62 @@
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,textarea,p,blockquote,th,td,input,select,textarea,button{margin:0;padding:0}
+input,select,textarea,button {vertical-align:middle}
+body {font-family:'맑은 고딕','NanumGothicWeb','Malgun Gothic';position:relative;background:#fff;-webkit-text-size-adjust: none}
+
+.board_pane table,
+.board_pane button{font-size:12px}
+.board_pane table{margin:0 0 0 0px;border:0;}
+.board_pane th,
+.board_pane td{padding:3px 8px 3px 8px;border:0;font-size:12px;}
+.board_pane th{color:#333;background-color: aliceblue;}
+.board_pane td{color:#666}
+.board_pane thead th{border-bottom:0px solid #ccc;}
+.board_pane tbody th{border-bottom:0px solid #ddd;text-align: left;width:90px;}
+.board_pane tfoot th{border-bottom:0px solid #ddd}
+.board_pane tbody td{border-bottom:0px solid #ddd}
+.board_pane tfoot td{border-bottom:0px solid #ddd;font-weight:bold;color:#333}
+.board_pane select{margin:0px;display:inline-block;padding:4px 0px 4px 0px;}
+.board_pane table{margin:0px;}
+
+
+
+#navigation {
+    width: auto;
+    height: 50px;
+    margin: 0;
+    padding: 0;
+    background: #436D8B;
+} 
+#navigation ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+} 
+#navigation ul li {
+    display: inline;
+    margin: 0px;
+} 
+#navigation ul li a {
+    height:33px;
+    display: block;
+    float: left;
+    padding: 17px 15px 0 15px;
+    font: bold 12px Arial;
+    color: #FFF;
+    text-decoration: none;
+    background: #436D8B;
+} 
+
+#navigation ul li a:hover {
+    color:#134264;
+    background: #B8AC87;
+}
+
+#navigation ul li#active a {
+    color:#134264;
+    background: #B8AC87;
+}   
+
+#navigation ul li .active {
+    color:#134264;
+    background: #B8AC87;
+}   
