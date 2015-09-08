@@ -137,7 +137,7 @@ public class BoardController {
         String sBbsSct = Constants.getBbsSct(request.getServletPath());
 
         String sTitle = request.getParameter("p_title");
-        String sContent = request.getParameter("p_content");
+        String sContent = request.getParameter("tx_content");
         if (StringUtil.isEmpty(sTitle)) {
         	throw new BizException("제목을 입력하십시요.");
         }

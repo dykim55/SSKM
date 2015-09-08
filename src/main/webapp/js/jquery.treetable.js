@@ -165,6 +165,13 @@
       return this.expand();
     };
 
+    Node.prototype.pathName = function() {
+        if (this.parentId != null) {
+          return this.parentNode().pathName() + "," + this.treeCell[0].textContent.trim();
+        }
+        return this.treeCell[0].textContent.trim();
+      };
+    
     Node.prototype.setParent = function(node) {
       if (this.parentId != null) {
         this.tree[this.parentId].removeChild(this);
@@ -571,7 +578,20 @@
         throw new Error("Unknown node '" + id + "'");
       }
 
+      $(".selected").not(this).removeClass("selected");
+      node.row.addClass('selected');
       return this;
+    },
+
+    pathName: function(id) {
+        var node = this.data("treetable").tree[id];
+        if (node) {
+            return node.pathName();
+        } else {
+        	return "";	
+            //throw new Error("Unknown node '" + id + "'");
+        }
+        return "";
     },
 
     sortBranch: function(node, columnOrFunction) {

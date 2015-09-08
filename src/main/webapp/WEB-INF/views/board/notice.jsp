@@ -84,7 +84,7 @@ function searchSub() {
             for (HashMap<String, Object> map : bbsList) { %>
             <tr>
                 <td><%=nTotalRecord - m++ %></td>
-                <td style="font-weight: bold;"><a style="color: #3577c8;" href="/noticeDtl?page=<%=nPage%>&searchWord=<%=sSearchWord%>&bbs=<%=map.get("bbsId")%>"><%=StringUtil.convertString(map.get("bbsTit")) %></a></td>
+                <td style="font-weight: bold;"><a style="color: #3577c8;" href="/noticeDtl?page=<%=nPage%>&searchWord=<%=sSearchWord%>&bbs=<%=map.get("bbsId")%>"><%=StringUtil.replaceHtml(StringUtil.convertString(map.get("bbsTit"))) %></a></td>
                 <td><%=StringUtil.convertDate(map.get("regDtime"),"yyyy-MM-dd HH:mm:ss") %></td>
                 <td><%=StringUtil.convertString(map.get("fileYn")) %></td>
                 <td><%=StringUtil.convertString(map.get("qryCnt")) %></td>

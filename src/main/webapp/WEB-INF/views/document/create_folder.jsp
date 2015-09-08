@@ -10,6 +10,8 @@
     if (StringUtil.isEmpty(schedule)) {
     	schedule = new HashMap<String, Object>(); 
     }
+    
+    String sCtgSct = request.getParameter("gubun");
 %>
 
 <script type="text/javascript">
@@ -19,13 +21,10 @@ CREATE_FOLDER = (function() {
 	var bProcessing = false;
 	
     return {
-        done: function(Dlg) {
-            if (bProcessing) return;    
-            bProcessing = true;
-            return new FormData(Dlg.find("#schd_frm")[0]);
-        },
         init: function(Dlg, parent) {
         	_Dlg = Dlg;
+        	stop();
+        	_Dlg.find("#path_name").html($("#product-tree").treetable('pathName', parent));
         	
         	_Dlg.find("#h_parent").val(parent);
         	
@@ -41,9 +40,20 @@ CREATE_FOLDER = (function() {
                         $.ajax({
                             url: "product/folder_register",
                             dataType: 'json',
-                            data : {"parent": $("#h_parent").val(), "name" : $("#folder_name").val() },
+                            data : {gubun: "<%=sCtgSct%>", parent: $("#h_parent").val(), name: $("#folder_name").val() },
                             success: function(data, text, request) {
-                                console.log(data);
+								$("#product-tree-div").load("/tree_pane", {"gubun": data.gubun}, function() {
+								    $("#product-tree tr").each(function() {
+								    	stop();
+								    	console.log($(this)[0].getAttribute('data-tt-id'));
+								    	if ($(this)[0].getAttribute('data-tt-id')==data.id) {
+								    	    $(".selected").not(this).removeClass("selected");
+								    	    $(this).addClass("selected");
+								    		return false;
+								    	}
+									});
+								});
+								_Dlg.dialog("close");
                             }
                         });
                     	
@@ -81,6 +91,12 @@ CREATE_FOLDER = (function() {
                     <col width="80"><col width="*">
                 </colgroup>
                 <tbody>
+                    <tr>
+                        <th>폴더위치</th>
+                        <td class="left">
+                            <span id="path_name"></span>
+                        </td>
+                    </tr>
                     <tr>
                         <th>폴더명</th>
                         <td class="left">

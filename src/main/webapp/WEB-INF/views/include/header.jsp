@@ -53,15 +53,15 @@ $(document).ready(function(){
     <div id="navigation">
         <ul style="float:left;">
             <li><a href="/notice">공지사항</a></li>
-            <li><a href="/product" style="background: red;">보안컨설팅 산출물</a></li>
-            <li><a href="/raws">정보보호 법제도</a></li>
-            <li><a href="/securityNews">보안뉴스</a></li>
-            <li><a href="/securityTrend">보안동향</a></li>
-            <li><a href="/privacy">개인정보관리</a></li>
+            <li><a href="/product?gubun=2001" >보안관제/운영</a></li>
+            <li><a href="/product?gubun=3001">보안진단</a></li>
+            <li><a href="/product?gubun=4001">정보보호 관리체계</a></li>
+            <li><a href="/product?gubun=5001">정보보호 정책/지침</a></li>
+            <li><a href="/product?gubun=6001">정보보호 동향</a></li>
+            <li><a href="/product?gubun=7001">보안뉴스</a></li>
             <li><a href="/schedule">일정관리</a></li>
-            <li><a href="/config/"  style="background: red;">계정관리</a></li>
-            <li><a href="/rssFeedMng">RSS관리</a></li>
-            <li><a href="/config/"  style="background: red;">감사로그</a></li>
+            <li><a href="/rssFeedMng">인수인계</a></li>
+            <li><a href="/account">계정관리</a></li>
         </ul>
     <% if (userInfo != null) { %>
         <ul id="accoutDiv" style="float: right;">

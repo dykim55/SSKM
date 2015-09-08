@@ -17,19 +17,19 @@ public class LoginDao {
 	private SqlSession sqlSession;
 
 	public Acct verifyAccount(HashMap<String, Object> paramMap) throws Exception {
-		return sqlSession.selectOne("Login.verifyAccount", paramMap);
+		return sqlSession.selectOne("Account.verifyAccount", paramMap);
 	}
 
 	public Acct selectAcct(HashMap<String, Object> paramMap) throws Exception {
-		return sqlSession.selectOne("Login.selectAcct", paramMap);
+		return sqlSession.selectOne("Account.selectAcct", paramMap);
 	}
 
 	public AcctGrp selectAcctGrp(HashMap<String, Object> paramMap) throws Exception {
-		return sqlSession.selectOne("Login.selectAcctGrp", paramMap);
+		return sqlSession.selectOne("Account.selectAcctGrp", paramMap);
 	}
 
 	public MenuAuth selectMenuAuth(HashMap<String, Object> paramMap) throws Exception {
-		return sqlSession.selectOne("Login.selectMenuAuth", paramMap);
+		return sqlSession.selectOne("Account.selectMenuAuth", paramMap);
 	}
 	
 }

@@ -1,7 +1,54 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="Login">
+<mapper namespace="Account">
 	
+    <sql id="countQueryTop">
+        SELECT COUNT(*) as records FROM (
+    </sql>
+
+    <sql id="sqlAccount">
+        SELECT
+		    A.acctId
+		    ,A.acctNm
+		    ,A.bizSct
+		    ,A.acctGrpCd
+		    ,A.acctSt
+		    ,A.deptCd
+		    ,A.oflvCd
+		    ,A.acctPw
+		    ,A.mobile
+		    ,A.telephone
+		    ,A.email
+		    ,A.regr
+		    ,A.regDtime
+		    ,A.modr
+		    ,A.modDtime
+        FROM AcctTbl A
+        WHERE 1 = 1
+        <if test="acctId != null and acctId > 0">
+            AND A.acctId = #{acctId}
+        </if>
+        <if test="acctGrpCd != null and acctGrpCd > 0">
+            AND A.acctGrpCd = #{acctGrpCd}
+        </if>
+        <if test="acctNm != null and acctNm != ''">
+            AND acctNm LIKE CONCAT('%', #{ acctNm }, '%')
+        </if>
+        AND A.acctSt != '9'
+    </sql>
+
+	<select id="selectAccountList" resultType="java.util.HashMap">
+        <include refid="sqlAccount"/>
+        ORDER BY A.acctNm ASC
+        LIMIT #{limit}, #{rows}
+    </select>
+
+    <select id="selectAccountList-Count" resultType="com.cyberone.scourt.model.Acct">
+        <include refid="countQueryTop" />
+        <include refid="sqlAccount"/>
+        ) B
+    </select>
+
     <select id="selectAcct" resultType="com.cyberone.scourt.model.Acct">
         SELECT
 		    acctId
@@ -56,5 +103,25 @@
         SELECT * FROM MenuAuthTbl
         WHERE acctId = #{acctId}
     </select>
+    
+    <select id="selectAcctGrpTree" resultType="java.util.HashMap">
+    
+		SELECT ag.acctGrpCd, ag.acctGrpNm, ag.acctPrntCd, level
+		FROM (
+		    SELECT connect_by_acctGrp() AS id, @level AS level, @inclause AS inclause
+		    FROM (
+		        SELECT 
+		            @start_with := 0,
+		            @id := @start_with,
+		            @level := 0,
+		            @inclause := ''
+		    ) vars, AcctGrpTbl
+		    WHERE @id IS NOT NULL
+		) A
+		LEFT JOIN AcctGrpTbl ag ON ag.acctGrpCd = A.id
+		WHERE A.id IS NOT NULL
+    
+    </select>
+    
 	
 </mapper>

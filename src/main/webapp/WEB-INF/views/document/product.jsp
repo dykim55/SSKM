@@ -12,7 +12,7 @@
 @SuppressWarnings("unchecked")
 List<HashMap<String, Object>> ctgList = (List<HashMap<String, Object>>)request.getAttribute("ctgList");
 
-
+String sCtgSct = request.getParameter("gubun");
 %>
 
 <script type="text/javascript">
@@ -29,54 +29,23 @@ $(document).ready(function() {
     	    $(".selected").not(this).removeClass("selected");
     	    $(this).toggleClass("selected");
     	}
-    });
-
-    // Drag & Drop Example Code
-    $("#product-tree .file, #product-tree .folder").draggable({
-		helper: "clone",
-		opacity: .75,
-		refreshPositions: true, // Performance?
-		revert: "invalid",
-		revertDuration: 300,
-		scroll: true
+    	
+		$("#product-grid-div").load("/file_pane", {"parent": this.getAttribute('data-tt-id')}, function() {
+	    	console.log(this.getAttribute('data-tt-id'));
+		});
     });
 
     $("#product-tree .folder").each(function() {
-        $(this).parents("#product-tree tr").droppable({
-			accept: ".file, .folder",
-			drop: function(e, ui) {
-				var droppedEl = ui.draggable.parents("tr");
-				$("#product-tree").treetable("move", droppedEl.data("ttId"), $(this).data("ttId"));
-			},
-			hoverClass: "accept",
-			over: function(e, ui) {
-				var droppedEl = ui.draggable.parents("tr");
-				if(this != droppedEl[0] && !$(this).is(".expanded")) {
-					$("#product-tree").treetable("expandNode", $(this).data("ttId"));
-				}
-			}
-		});
 	});
     
-    $("form#reveal").submit(function() {
-		var nodeId = $("#revealNodeId").val();
-	    try {
-	        $("#product-tree").treetable("reveal", nodeId);
-	    } catch(error) {
-	        alert(error.message);
-	    }
-	    return false;
-	});
-
     function initContextMenu() {    
         jQuery("tr", "#product-tree").contextMenu('contextFolder', {
             bindings: {
                 'createFolder': function(t) {
-                	console.log(t.getAttribute('data-tt-id'));
                 	createFolder(t.getAttribute('data-tt-id'));
                 },
                 'fileUpload': function(t) {
-                	fileUpload();
+                	fileUpload(t.getAttribute('data-tt-id'));
                 }
             },
             onContextMenu : function(e, menu) {
@@ -92,30 +61,26 @@ $(document).ready(function() {
 });
 
 function createFolder(parent) {
-    console.log('createFolder');
-    DIALOG.Open().load("/product/create_folder", {}, function() {
+    DIALOG.Open().load("/product/create_folder", {gubun : "<%=sCtgSct%>"}, function() {
         CREATE_FOLDER.init($(this), parent);
     });
-
 }
 
-function fileUpload() {
-    console.log('fileUpload');
-}
-
-function searchSub() {
-    document.searchForm.submit();
+function fileUpload(parent) {
+    DIALOG.Open().load("/product/upload_file", {}, function() {
+    	UPLOAD_FILE.init($(this), parent);
+    });
 }
 
 </script>
 
-<div id="main" style="background: #fff;max-width: 360px;padding: 20px;" onselectstart="return false" ondragstart="return false">
+<div id="product-tree-div" style="background: #fff;max-width: 360px;padding: 20px;" onselectstart="return false" ondragstart="return false">
 
     <table id="product-tree">
         <tbody>
     <% if (ctgList.size() > 0) {
            for (HashMap<String, Object> map : ctgList) { %>
-            <tr data-tt-id='<%=map.get("ctgId") %>' data-tt-parent-id='<%=map.get("ctgParent") %>' >
+            <tr data-tt-id='<%=map.get("ctgId") %>' <% if ((Integer)map.get("ctgParent") > 0) { %> data-tt-parent-id='<%=map.get("ctgParent") %>' <% } %>>
                 <td>
                     <span class='folder'><%=StringUtil.convertString(map.get("ctgNm")) %></span>
                 </td>
@@ -126,12 +91,23 @@ function searchSub() {
     </table>
 
 </div>
+
+<div id="product-grid-div" style="background: #fff;width: 800px;padding: 20px;" onselectstart="return false" ondragstart="return false">
+</div>
   
 <div class="contextMenu" id="contextFolder">
     <ul style="width: 100px;">
         <li id="createFolder">
             <i class="fa fa-folder-o"></i>
             <span style="font-size:12px; font-family:맑은 고딕">폴더 생성</span>
+        </li>
+        <li id="modifyFolder">
+            <i class="fa fa-pencil-square-o"></i>
+            <span style="font-size:12px; font-family:맑은 고딕">폴더 수정</span>
+        </li>
+        <li id="deleteFolder">
+            <i class="fa fa-trash-o"></i>
+            <span style="font-size:12px; font-family:맑은 고딕">폴더 삭제</span>
         </li>
         <li id="fileUpload">
             <i class="fa fa-upload"></i>
