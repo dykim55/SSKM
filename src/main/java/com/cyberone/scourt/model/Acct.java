@@ -19,6 +19,8 @@ public class Acct extends Paging {
 	private Date regDtime;
 	private String modr;
 	private Date modDtime;
+	
+	private int authGrp;
 
 	public String getAcctId() {
 		return acctId;
@@ -109,6 +111,12 @@ public class Acct extends Paging {
 	}
 	public void setModDtime(Date modDtime) {
 		this.modDtime = modDtime;
+	}
+	public int getAuthGrp() {
+		return authGrp;
+	}
+	public void setAuthGrp(int authGrp) {
+		this.authGrp = authGrp;
 	}	
 	
 }

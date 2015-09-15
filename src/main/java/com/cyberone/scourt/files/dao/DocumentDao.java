@@ -1,4 +1,4 @@
-package com.cyberone.scourt.document.dao;
+package com.cyberone.scourt.files.dao;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +42,10 @@ public class DocumentDao {
 	
 	public int insertDcmtFile(HashMap<String, Object> paramMap) throws Exception {
 		return sqlSession.insert("Document.insertDcmtFile", paramMap);
+	}
+
+	public List<HashMap<String, Object>> selectMenu(HashMap<String, Object> paramMap) throws Exception {
+		return sqlSession.selectList("Document.selectMenu", paramMap);
 	}
 	
 }

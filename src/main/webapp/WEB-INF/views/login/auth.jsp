@@ -40,7 +40,7 @@ String sCode = StringUtil.nullToStr((String)request.getAttribute("code"));
     <article>
         <div>
             <div id="login">
-                <form action="/loginForm" name="loginFrm" method="post">
+                <form action="/verify_account" name="loginFrm" method="post">
                 <p><input type="text" style="width:150px" id="loginId" name="loginId" value="" placeholder="아이디를 입력하세요"></p>
                 <p><input type="password" style="width:150px" id="loginPw" name="loginPw" placeholder="비밀번호를 입력하세요"></p>
                 </form>

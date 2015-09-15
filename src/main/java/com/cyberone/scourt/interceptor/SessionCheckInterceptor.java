@@ -21,8 +21,7 @@ public class SessionCheckInterceptor extends HandlerInterceptorAdapter {
 		}
 		String requestedUrl = request.getRequestURI().substring(contextNameLength);
 
-    	if (requestedUrl.indexOf("loginForm") > -1 ||
-    		requestedUrl.indexOf("auth") > -1) {
+    	if (requestedUrl.indexOf("verify_account") > -1 || requestedUrl.indexOf("login") > -1) {
     		return true;
     	}
 

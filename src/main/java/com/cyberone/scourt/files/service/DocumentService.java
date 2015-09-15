@@ -1,4 +1,4 @@
-package com.cyberone.scourt.document.service;
+package com.cyberone.scourt.files.service;
 
 import java.io.File;
 import java.util.Date;
@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.cyberone.scourt.document.dao.DocumentDao;
 import com.cyberone.scourt.exception.BizException;
+import com.cyberone.scourt.files.dao.DocumentDao;
 import com.cyberone.scourt.model.Product;
 import com.cyberone.scourt.model.UserInfo;
 import com.cyberone.scourt.utils.StringUtil;
@@ -114,4 +114,7 @@ public class DocumentService {
 		return fileCount;
 	}
 	
+	public List<HashMap<String, Object>> selectMenu(HashMap<String, Object> paramMap) throws Exception {
+		return docDao.selectMenu(paramMap);
+	}
 }

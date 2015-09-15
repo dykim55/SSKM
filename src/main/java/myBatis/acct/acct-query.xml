@@ -12,6 +12,7 @@
 		    ,A.acctNm
 		    ,A.bizSct
 		    ,A.acctGrpCd
+		    ,(SELECT acctGrpNm FROM AcctGrpTbl WHERE acctGrpCd = A.acctGrpCd) as acctGrpNm
 		    ,A.acctSt
 		    ,A.deptCd
 		    ,A.oflvCd
@@ -23,14 +24,22 @@
 		    ,A.regDtime
 		    ,A.modr
 		    ,A.modDtime
+		    ,(SELECT acctPrntCd FROM AcctGrpTbl WHERE acctGrpCd = A.acctGrpCd) as authGrp
         FROM AcctTbl A
         WHERE 1 = 1
         <if test="acctId != null and acctId > 0">
             AND A.acctId = #{acctId}
         </if>
-        <if test="acctGrpCd != null and acctGrpCd > 0">
+        <choose>
+            <when test="acctGrpCd == 0">
+          	AND A.acctGrpCd IN (SELECT acctGrpCd FROM AcctGrpTbl WHERE acctPrntCd = #{authGrp})
+            </when>
+            <when test="acctGrpCd > 0">
             AND A.acctGrpCd = #{acctGrpCd}
-        </if>
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
         <if test="acctNm != null and acctNm != ''">
             AND acctNm LIKE CONCAT('%', #{ acctNm }, '%')
         </if>
@@ -66,6 +75,7 @@
 		    ,regDtime
 		    ,modr
 		    ,modDtime
+		    ,(SELECT acctPrntCd FROM AcctGrpTbl WHERE acctGrpCd = A.acctGrpCd) as authGrp
         FROM AcctTbl A
         WHERE 1 = 1
         <if test="acctId != null and acctId != ''">
@@ -92,6 +102,45 @@
         SELECT * FROM AcctGrpTbl
         WHERE acctGrpCd = #{acctGrpCd}
     </select>
+
+    <select id="selectAcctGrpList" resultType="com.cyberone.scourt.model.AcctGrp">
+        SELECT * FROM AcctGrpTbl
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="acctPrntCd != null">
+                AND acctPrntCd = #{acctPrntCd}
+            </if>
+        </trim>
+        ORDER BY acctGrpNm ASC 
+    </select>
+
+    <insert id="insertAcctGrp">
+        INSERT INTO AcctGrpTbl(
+        <if test="acctGrpNm != null">acctGrpNm,</if>
+        <if test="acctGrpDesc != null">acctGrpDesc,</if>
+        <if test="acctPrmsMenus != null">acctPrmsMenus,</if>
+        <if test="acctPrntCd != null">acctPrntCd,</if>
+        regr, regDtime, modr, modDtime)
+        VALUES (
+        <if test="acctGrpNm != null">#{acctGrpNm},</if> 
+        <if test="acctGrpDesc != null">#{acctGrpDesc},</if>
+        <if test="acctPrmsMenus != null">#{acctPrmsMenus},</if>
+        <if test="acctPrntCd != null">#{acctPrntCd},</if>
+        #{regr}, #{regDtime}, #{modr}, #{modDtime})
+        <selectKey keyProperty="acctGrpCd" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID() AS acctGrpCd
+        </selectKey>
+    </insert>
+
+	<update id="updateAcctGrp">
+        UPDATE AcctGrpTbl SET
+            <if test="acctGrpNm != null"> acctGrpNm = #{acctGrpNm}, </if>
+            <if test="acctGrpDesc != null"> acctGrpDesc = #{acctGrpDesc}, </if>
+            <if test="acctPrmsMenus != null"> acctPrmsMenus = #{acctPrmsMenus}, </if>
+            <if test="acctPrntCd != null"> acctPrntCd = #{acctPrntCd}, </if>
+            modr = #{modr},
+            modDtime = #{modDtime}          
+        WHERE acctGrpCd = #{acctGrpCd}
+    </update>
 
     <select id="selectMenu" resultType="com.cyberone.scourt.model.Menu">
         SELECT * FROM MenuTbl
@@ -123,5 +172,41 @@
     
     </select>
     
+    <insert id="insertAcct">
+        INSERT INTO AcctTbl(
+        <if test="acctId != null">acctId,</if>
+        <if test="acctNm != null">acctNm,</if>
+        <if test="acctGrpCd != null">acctGrpCd,</if>
+        <if test="deptCd != null">deptCd,</if>
+        <if test="oflvCd != null">oflvCd,</if>
+        <if test="acctPw != null">acctPw,</if>
+        <if test="mobile != null">mobile,</if>
+        <if test="email != null">email,</if>
+        regr, regDtime, modr, modDtime)
+        VALUES (
+        <if test="acctId != null">#{acctId},</if>
+        <if test="acctNm != null">#{acctNm},</if>
+        <if test="acctGrpCd != null">#{acctGrpCd},</if>
+        <if test="deptCd != null">#{deptCd},</if>
+        <if test="oflvCd != null">#{oflvCd},</if>
+        <if test="acctPw != null">#{acctPw},</if>
+        <if test="mobile != null">#{mobile},</if>
+        <if test="email != null">#{email},</if>
+        #{regr}, #{regDtime}, #{modr}, #{modDtime})
+    </insert>
+	
+	<update id="updateAcct">
+        UPDATE AcctTbl SET
+            <if test="acctNm != null"> acctNm = #{acctNm}, </if>
+            <if test="acctGrpCd != null"> acctGrpCd = #{acctGrpCd}, </if>
+            <if test="deptCd != null"> deptCd = #{deptCd}, </if>
+            <if test="oflvCd != null"> oflvCd = #{oflvCd}, </if>
+            <if test="acctPw != null"> acctPw = #{acctPw}, </if>
+            <if test="mobile != null"> mobile = #{mobile}, </if>
+            <if test="email != null"> email = #{email}, </if>
+            modr = #{modr},
+            modDtime = #{modDtime}          
+        WHERE acctId = #{acctId}
+    </update>
 	
 </mapper>

@@ -135,6 +135,20 @@
            
     </update>
 
+	<select id="selectMenu" resultType="java.util.HashMap">
+		SELECT * FROM MenuTbl
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="menuCd != null and menuCd != ''">
+                AND menuCd = #{menuCd}
+            </if>        
+            <if test="prtsCd != null and prtsCd != ''">
+                AND prtsCd = #{prtsCd}
+            </if>
+        </trim>        
+    	ORDER BY menuCd ASC
+    </select>
+	
+
     	
 </mapper>
 

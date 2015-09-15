@@ -53,12 +53,12 @@ $(document).ready(function(){
     <div id="navigation">
         <ul style="float:left;">
             <li><a href="/notice">공지사항</a></li>
-            <li><a href="/product?gubun=2001" >보안관제/운영</a></li>
-            <li><a href="/product?gubun=3001">보안진단</a></li>
-            <li><a href="/product?gubun=4001">정보보호 관리체계</a></li>
-            <li><a href="/product?gubun=5001">정보보호 정책/지침</a></li>
-            <li><a href="/product?gubun=6001">정보보호 동향</a></li>
-            <li><a href="/product?gubun=7001">보안뉴스</a></li>
+            <li><a href="/files/security_control" >보안관제/운영</a></li>
+            <li><a href="/files/security_diagnosis">보안진단</a></li>
+            <li><a href="/files/info_protection_manage">정보보호 관리체계</a></li>
+            <li><a href="/files/info_protection_policy">정보보호 정책/지침</a></li>
+            <li><a href="/files/info_protection_trend">정보보호 동향</a></li>
+            <li><a href="/files/security_news">보안뉴스</a></li>
             <li><a href="/schedule">일정관리</a></li>
             <li><a href="/rssFeedMng">인수인계</a></li>
             <li><a href="/account">계정관리</a></li>

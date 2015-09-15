@@ -6,9 +6,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
-
-import com.cyberone.scourt.utils.StringUtil;
 
 
 public class Constants {

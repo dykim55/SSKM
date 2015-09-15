@@ -99,6 +99,10 @@
         <constructor-arg index="0" ref="sqlSessionFactory" />
     </bean>
 
+    <bean id="codeSelect" class="com.cyberone.scourt.Common" >
+        <property name="sqlSession" ref="sqlSession" />
+    </bean>
+
 <!-- 
     <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="triggers">
