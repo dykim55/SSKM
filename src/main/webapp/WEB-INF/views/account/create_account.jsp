@@ -29,9 +29,10 @@ CREATE_ACCOUNT = (function() {
         init: function(Dlg, t) {
         	_Dlg = Dlg;
 
+        	stop();
         	if (t) {
-	        	_tt_id = t[0].getAttribute('data-tt-id');
-	        	_tt_parent_id = t[0].getAttribute('data-tt-parent-id');
+	        	_tt_id = t.attr('data-tt-id');
+	        	_tt_parent_id = t.attr('data-tt-parent-id');
 	        	$("#acct_auth_grp").val(_tt_parent_id);
         	} else {
         		$("#acct_auth_grp").val(<%=acctInfo.getAuthGrp() %>);
@@ -43,21 +44,20 @@ CREATE_ACCOUNT = (function() {
             	_Dlg.find("#acct_grp").load('/account/selectView?name=acct_grp&grpSct='+slctAuth, function() {});
             });
         	
-        	_Dlg.find("#path_name").html($("#account-tree").treetable('pathName', parent));
-        	
-        	_Dlg.find("#g_parent").val(parent);
-        	
         	_Dlg.dialog({
                 autoOpen: false, 
                 resizable: false, 
                 width: 600,
                 modal: true,
-                title: "계정 생성",
+                title: <% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %> "계정 등록" <% } else { %> "계정 수정" <% } %>,
                 buttons: {
-                    "생성" : function() {
-                    	
+<% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %> "등록" <% } else { %> "수정" <% } %> : function() {                	
                         $.ajax({
+                       <% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %>                        	
                             url: "/account/register_account",
+                       <% } else { %>
+                       		url: "/account/modify_account",
+                       <% } %>
                             dataType: 'json',
                             data : { 
                             	id : $("#acct_id").val(),
@@ -72,7 +72,11 @@ CREATE_ACCOUNT = (function() {
                             	mobile: $("#acct_mobile").val()
                             },
                             success: function(data, text, request) {
-								_Dlg.dialog("close");
+                            	if (data.status == "success") {
+                            		ACCT_PG.reload(false, false, function() { _Dlg.dialog("close"); });
+                            	} else {
+                            		alert(data.message);
+                            	}
                             }
                         });
                     	
@@ -100,78 +104,63 @@ CREATE_ACCOUNT = (function() {
 
 </script>
 
-<div class="contents">
-    <div class="dialogContent">
-        <div class="contents">
-            <table class="popTable mt20" cellpadding="0" cellspacing="0">
-                <colgroup>
-                    <col width="160"><col width="*">
-                </colgroup>
-                <tbody>
-                    <tr>
-                        <th>계정 ID</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="acct_id" id="acct_id" style="width:200px;" value="<%=acctInfo.getAcctId() %>">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>성명</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="acct_name" id="acct_name" style="width:200px;" value="<%=acctInfo.getAcctNm() %>">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>비밀번호</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="acct_pw" id="acct_pw" style="width:200px;">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>비밀번호 확인</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="acct_pw_cf" id="acct_pw_cf" style="width:200px;">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>접근권한 그룹</th>
-                        <td class="left">
-                        	<%=Common.acctGrpSelect("acct_auth_grp", "선택하세요.", Integer.valueOf(sAuthGrp), 1) %>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>계정 그룹</th>
-                        <td class="left">
-                        	<%=Common.acctGrpSelect("acct_grp", "선택하세요.", Integer.valueOf(sAcctGrp), Integer.valueOf(sAuthGrp)) %>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>부서</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="acct_dept" id="acct_dept" style="width:200px;">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>직급</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="acct_oflv" id="acct_oflv" style="width:200px;">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>이메일</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="acct_email" id="acct_email" style="width:200px;">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>모바일</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="acct_mobile" id="acct_mobile" style="width:200px;">
-                        </td>
-                    </tr>
-                    
-                </tbody>
-            </table>
-        </div>
-    </div>
+<div id="account">
+	<div class="dia-insert">
+		<table class="board-insert">
+			<colgroup>
+				<col width="100">
+				<col width="*">
+			</colgroup>
+			<tr>
+				<th>계정 ID</th>
+				<td>
+			<% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %>
+					<input type="text" name="acct_id" id="acct_id" value="<%=StringUtil.convertString(acctInfo.getAcctId()) %>">
+			<% } else { %>
+					<%=StringUtil.convertString(acctInfo.getAcctId()) %><input type="hidden" name="acct_id" id="acct_id" value="<%=StringUtil.convertString(acctInfo.getAcctId()) %>">
+			<% }  %>
+				</td>
+				<th>성명</th>
+				<td>
+					<input type="text" name="acct_name" id="acct_name" value="<%=StringUtil.convertString(acctInfo.getAcctNm()) %>">
+				</td>
+			</tr>
+			<tr>
+				<th>비밀번호</th>
+				<td><input type="password" name="acct_pw" id="acct_pw"></td>
+				<th>비밀번호 확인</th>
+				<td><input type="password" name="acct_pw_cf" id="acct_pw_cf"></td>
+			</tr>
+			<tr>
+				<th>접근권한그룹</th>
+				<td>
+					<%=Common.acctGrpSelect("acct_auth_grp", "선택하세요.", Integer.valueOf(sAuthGrp), 1) %>
+				</td>
+				<th>계정그룹</th>
+				<td>
+					<%=Common.acctGrpSelect("acct_grp", "선택하세요.", Integer.valueOf(sAcctGrp), Integer.valueOf(sAuthGrp)) %>
+				</td>
+			</tr>
+			<tr>
+				<th>부서</th>
+				<td>
+					<input type="text" name="acct_dept" id="acct_dept" value="<%=StringUtil.convertString(acctInfo.getDeptNm()) %>">
+				</td>
+				<th>직급</th>
+				<td>
+					<input type="text" name="acct_oflv" id="acct_oflv" value="<%=StringUtil.convertString(acctInfo.getOflvNm()) %>">
+				</td>
+			</tr>
+			<tr>
+				<th>이메일</th>
+				<td>
+					<input type="text" name="acct_email" id="acct_email" value="<%=StringUtil.convertString(acctInfo.getEmail()) %>"> 
+				</td>
+				<th>모바일 번호</th>
+				<td>
+					<input type="text" name="acct_mobile" id="acct_mobile" value="<%=StringUtil.convertString(acctInfo.getMobile()) %>">
+				</td>
+			</tr>
+		</table>
+  	</div>
 </div>
-

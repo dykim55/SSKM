@@ -159,15 +159,15 @@
     };
 
     Node.prototype.reveal = function() {
-      if (this.parentId != null) {
+      if (this.parentNode()) {
         this.parentNode().reveal();
       }
       return this.expand();
     };
 
     Node.prototype.pathName = function() {
-        if (this.parentId != null) {
-          return this.parentNode().pathName() + "," + this.treeCell[0].textContent.trim();
+        if (this.parentNode() != null) {
+          return this.parentNode().pathName() + "&nbsp;&nbsp;>&nbsp;&nbsp;" + this.treeCell[0].textContent.trim();
         }
         return this.treeCell[0].textContent.trim();
       };

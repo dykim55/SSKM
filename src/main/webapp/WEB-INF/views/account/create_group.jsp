@@ -22,42 +22,22 @@ CREATE_GROUP = (function() {
 	
     return {
     	auth: function() {
-    		var menuCodes='';
-    		$("#menu-tree").find("input:checked").each(function() {
-    			 menuCodes += $(this).closest('tr').attr('data-tt-id') + ",";
+    		var menuCodes=',';
+    		$(".board-insert input:checked").each(function() {
+    			 menuCodes += $(this).attr('menu-id') + ",";
     		});
+    		console.log(menuCodes);
 			return menuCodes;    		
     	},
-        init: function(Dlg, tr) {
+        init: function(Dlg, t) {
         	_Dlg = Dlg;
 
-        	_Parent = tr.attr('data-tt-id');
+        	_Parent = t.attr('data-tt-id');
         	
-        	$("#menu-tree").treetable({ expandable: true });
-        	
-            $("#menu-tree tbody").on("mousedown", "tr", function() {
-            	if (!$(this).hasClass("selected")) {
-            	    $(".selected").not(this).removeClass("selected");
-            	    $(this).toggleClass("selected");
-            	}
-            });
-            $("#menu-tree tbody").on("click", "input:checkbox", function() {
-            	var tt = $(this).closest('tr').attr('data-tt-parent-id');
-            	if (tt == "0") {
-            		$("[data-tt-parent-id="+$(this).closest('tr').attr('data-tt-id')+"]").find("input").prop("checked", $(this).is(':checked'));	
-            	} else {
-            		if ($("[data-tt-parent-id="+$(this).closest('tr').attr('data-tt-parent-id')+"]").find(':checked').length > 0) {
-            			$("[data-tt-id="+$(this).closest('tr').attr('data-tt-parent-id')+"]").find("input").prop("checked", true);
-            		} else {
-            			$("[data-tt-id="+$(this).closest('tr').attr('data-tt-parent-id')+"]").find("input").prop("checked", false);
-            		}
-            	}
-            });
-            
         	_Dlg.dialog({
                 autoOpen: false, 
                 resizable: false, 
-                width: 600,
+                width: 1020,
                 modal: true,
                 title: <% if (acctGrpInfo.getAcctPrntCd() == 0) { %> "계정 그룹 등록" <% } else { %> "계정 그룹 수정" <% } %>,
                 buttons: {
@@ -75,14 +55,7 @@ CREATE_GROUP = (function() {
                             },
                             success: function(data, text, request) {
 								$("#account-tree-div").load("/account/tree_ajax", {}, function() {
-								    $("#account-tree tr").each(function() {
-								    	console.log($(this)[0].getAttribute('data-tt-id'));
-								    	if ($(this)[0].getAttribute('data-tt-id')==data.id) {
-								    	    $(".selected").not(this).removeClass("selected");
-								    	    $(this).addClass("selected");
-								    		return false;
-								    	}
-									});
+									$(this).find(".account-tree").treetable("reveal", data.id);
 								});
 								_Dlg.dialog("close");
                             }
@@ -105,82 +78,119 @@ CREATE_GROUP = (function() {
             });
             _Dlg.dialog("open");    
             _Dlg.dialog('option', 'position', 'center');
-            
-            $('#menu-tree').treetable('expandAll');
         }
     };
     
 })();
 
 
+$(document).ready(function() {
+
+	$(".board-insert dd input:checkbox").on("change", function(e) {
+		$(this).parent().siblings('dt').find('input').prop("checked", $(this).closest('dl').find('dd input:checked').length);
+		
+	});
+
+	$(".board-insert dt input:checkbox").on("change", function(e) {
+		$(this).parent().siblings('dd').find('input').prop("checked", $(this).is(":checked"));
+	});
+	
+	$(".board-insert dl").each(function() {
+		$(this).find('dt').find('input').prop("checked", $(this).find('dd input:checked').length);
+	});
+});
+
 
 </script>
 
-<div class="contents">
-    <div class="dialogContent">
-        <div class="contents">
-            <table class="popTable mt20" cellpadding="0" cellspacing="0">
-                <colgroup>
-                    <col width="160"><col width="*">
-                </colgroup>
-                <tbody>
-                    <tr>
-                        <th>계정그룹 명</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="group_name" id="group_name" style="width:200px;" value="<%=StringUtil.convertString(acctGrpInfo.getAcctGrpNm()) %>">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>계정그룹 설명</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="group_desc" id="group_desc" style="width:200px;" value="<%=StringUtil.convertString(acctGrpInfo.getAcctGrpDesc()) %>">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-		<div id="menu-tree-div" style="background: #fff;max-width: 360px;padding: 20px; overflow-y:auto; height: 300px;" onselectstart="return false" ondragstart="return false">
-		
-		    <table id="menu-tree">
-		        <tbody>
-		    <% if (menuList.size() > 0) {
-		           for (HashMap<String, Object> map : menuList) { %>
-		            <tr data-tt-id='<%=map.get("menuCd") %>' data-tt-parent-id='<%=map.get("prtsCd") %>'>
-		                <td>
-		                    <span class='folder'><input type="checkbox" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf(StringUtil.convertString(map.get("menuCd"))) >= 0) { %> checked <% } %>><%=StringUtil.convertString(map.get("menuNm")) %></span>
-		                </td>
-		            </tr>
-		    <%     } 
-		       } %>        
-		        </tbody>
-		    </table>
-		
-		</div>
-        
-    </div>
+<div id="accountGroup">
+	<div class="dia-insert">
+		<table class="board-insert">
+			<colgroup>
+				<col width="100">
+				<col width="*">
+			</colgroup>
+			<tr>
+				<th>계정그룹명</th>
+				<td>
+					<input type="text" name="group_name" id="group_name" value="<%=StringUtil.convertString(acctGrpInfo.getAcctGrpNm()) %>">
+				</td>
+			</tr>
+            <tr>
+                <th>계정그룹 설명</th>
+                <td class="left">
+                    <input type="text" name="group_desc" id="group_desc" value="<%=StringUtil.convertString(acctGrpInfo.getAcctGrpDesc()) %>">
+                </td>
+            </tr>
+			<tr>
+				<th>접근권한 설정</th>
+				<td>
+					<div class="rows1">
+						<dl style="width: 16%;">
+							<dt><input type="checkbox" id="b0" menu-id="1000"><label for="b0">보안 관제/운영</label></dt>
+							<dd><input type="checkbox" id="b1" menu-id="1001" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("1001") >= 0) { %> checked <% } %>><label for="b1">업무 보고서</label></dd>
+							<dd><input type="checkbox" id="b2" menu-id="1002" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("1002") >= 0) { %> checked <% } %>><label for="b2">오류 보고서</label></dd>
+							<dd><input type="checkbox" id="b3" menu-id="1003" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("1003") >= 0) { %> checked <% } %>><label for="b3">보안성 검토 보고서</label></dd>
+							<dd><input type="checkbox" id="b4" menu-id="1004" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("1004") >= 0) { %> checked <% } %>><label for="b4">보안 분석 보고서</label></dd>
+							<dd><input type="checkbox" id="b5" menu-id="1005" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("1005") >= 0) { %> checked <% } %>><label for="b5">구성 관리</label></dd>
+							<dd><input type="checkbox" id="b6" menu-id="1006" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("1006") >= 0) { %> checked <% } %>><label for="b6">모의 훈련</label></dd>
+						</dl>
+						<dl style="width: 18%;">
+							<dt><input type="checkbox" id="c0" menu-id="2000"><label for="c0">보안 진단</label></dt>
+							<dd><input type="checkbox" id="c1" menu-id="2001" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("2001") >= 0) { %> checked <% } %>><label for="c1">보안 진단(센터)</label></dd>
+							<dd><input type="checkbox" id="c2" menu-id="2002" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("2002") >= 0) { %> checked <% } %>><label for="c2">보안 진단(사업자)</label></dd>
+							<dd><input type="checkbox" id="c3" menu-id="2003" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("2003") >= 0) { %> checked <% } %>><label for="c3">사법부 보안컨설팅</label></dd>
+							<dd><input type="checkbox" id="c4" menu-id="2004" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("2004") >= 0) { %> checked <% } %>><label for="c4">사이버 보안의날</label></dd>
+							<dd><input type="checkbox" id="c5" menu-id="2005" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("2005") >= 0) { %> checked <% } %>><label for="c5">보안점검 체크리스트</label></dd>
+						</dl>
+						<dl style="width: 19%;">
+							<dt><input type="checkbox" id="d0" menu-id="3000"><label for="d0">정보보호 관리체계</label></dt>
+							<dd><input type="checkbox" id="d1" menu-id="3001" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("3001") >= 0) { %> checked <% } %>><label for="d1">정보보호 조직</label></dd>
+							<dd><input type="checkbox" id="d2" menu-id="3002" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("3002") >= 0) { %> checked <% } %>><label for="d2">정보보호 관리체계 인증</label></dd>
+							<dd><input type="checkbox" id="d3" menu-id="3003" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("3003") >= 0) { %> checked <% } %>><label for="d3">서비스 수준관리</label></dd>
+							<dd><input type="checkbox" id="d4" menu-id="3004" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("3004") >= 0) { %> checked <% } %>><label for="d4">보안 운영 감리</label></dd>
+							<dd><input type="checkbox" id="d5" menu-id="3005" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("3005") >= 0) { %> checked <% } %>><label for="d5">보안 교육</label></dd>
+						</dl>
+						<dl style="width: 17%;">
+							<dt><input type="checkbox" id="e0" menu-id="4000"><label for="e0">정보보호 정책/지침</label></dt>
+							<dd><input type="checkbox" id="e1" menu-id="4001" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("4001") >= 0) { %> checked <% } %>><label for="e1">정보보호 관련 법규</label></dd>
+							<dd><input type="checkbox" id="e2" menu-id="4002" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("4002") >= 0) { %> checked <% } %>><label for="e2">사이버 안전 메뉴얼</label></dd>
+							<dd><input type="checkbox" id="e3" menu-id="4003" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("4003") >= 0) { %> checked <% } %>><label for="e3">정보보호 정책서</label></dd>
+							<dd><input type="checkbox" id="e4" menu-id="4004" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("4004") >= 0) { %> checked <% } %>><label for="e4">정보보호 지침</label></dd>
+							<dd><input type="checkbox" id="e5" menu-id="4005" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("4005") >= 0) { %> checked <% } %>><label for="e5">정보보호 가이드</label></dd>
+						</dl>
+						<dl style="width: 16%;">
+							<dt><input type="checkbox" id="f0" menu-id="5000"><label for="f0">정보보호 동향</label></dt>
+							<dd><input type="checkbox" id="f1" menu-id="5001" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("5001") >= 0) { %> checked <% } %>><label for="f1">주간 보안 동향</label></dd>
+							<dd><input type="checkbox" id="f2" menu-id="5002" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("5002") >= 0) { %> checked <% } %>><label for="f2">상황 전파문</label></dd>
+						</dl>
+						<dl style="width: 16%;">
+							<dt><input type="checkbox" id="g0" menu-id="6000"><label for="g0">보안 뉴스</label></dt>
+							<dd><input type="checkbox" id="g1" menu-id="6001" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("6001") >= 0) { %> checked <% } %>><label for="g1">일일 보안 뉴스</label></dd>
+						</dl>
+					</div>
+					
+					<div class="rows2">
+						<dl>
+							<dt><input type="checkbox" id="a0" menu-id="A000"><label for="a0">공지사항</label></dt>
+							<dd><input type="checkbox" id="a1" menu-id="A001" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("A001") >= 0) { %> checked <% } %>><label for="a1">공지사항</label></dd>
+						</dl>
+						<dl>
+							<dt><input type="checkbox" id="h0" menu-id="B000"><label for="h0">인수 인계</label></dt>
+							<dd><input type="checkbox" id="h1" menu-id="B001" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("B001") >= 0) { %> checked <% } %>><label for="h1">인수 인계</label></dd>
+						</dl>
+						<dl>
+							<dt><input type="checkbox" id="i0" menu-id="C000"><label for="i0">일정 관리</label></dt>
+							<dd><input type="checkbox" id="i1" menu-id="C001" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("C001") >= 0) { %> checked <% } %>><label for="i1">일정 관리</label></dd>
+						</dl>
+						<dl>
+							<dt><input type="checkbox" id="j0" menu-id="Z000"><label for="j0">계정 관리</label></dt>
+							<dd><input type="checkbox" id="j1" menu-id="Z001" <% if (!StringUtil.isEmpty(acctGrpInfo.getAcctPrmsMenus()) && acctGrpInfo.getAcctPrmsMenus().indexOf("Z001") >= 0) { %> checked <% } %>><label for="j1">계정 관리</label></dd>
+						</dl>
+					</div>
+				</td>
+			</tr>
+		</table>
+  	</div>
 </div>
 
-
-<!-- 
-<div class="contents">
-    <div class="dialogContent">
-        <div class="contents">
-            <table class="popTable mt20" cellpadding="0" cellspacing="0">
-                <colgroup>
-                    <col width="160"><col width="*">
-                </colgroup>
-                <tbody>
-                    <tr>
-                        <th>계정 그룹명</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="group_name" id="group_name" style="width:200px;">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
- -->

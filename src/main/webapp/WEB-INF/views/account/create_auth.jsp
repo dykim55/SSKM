@@ -40,7 +40,7 @@ CREATE_AUTH_GROUP = (function() {
                             },
                             success: function(data, text, request) {
 								$("#account-tree-div").load("/account/tree_ajax", {}, function() {
-								    $("#account-tree tr").each(function() {
+								    $(".account-tree tr").each(function() {
 								    	stop();
 								    	console.log($(this)[0].getAttribute('data-tt-id'));
 								    	if ($(this)[0].getAttribute('data-tt-id')==data.id) {
@@ -78,52 +78,25 @@ CREATE_AUTH_GROUP = (function() {
 
 </script>
 
-<div class="contents">
-    <div class="dialogContent">
-        <div class="contents">
-            <table class="popTable mt20" cellpadding="0" cellspacing="0">
-                <colgroup>
-                    <col width="160"><col width="*">
-                </colgroup>
-                <tbody>
-                    <tr>
-                        <th>접근권한 그룹명</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="auth_name" id="auth_name" style="width:200px;" value="<%=StringUtil.convertString(authInfo.getAcctGrpNm()) %>">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>접근권한 그룹 설명</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="auth_desc" id="auth_desc" style="width:200px;" value="<%=StringUtil.convertString(authInfo.getAcctGrpDesc()) %>">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+<div id="addGroup">
+	<div class="dia-insert">
+		<table class="board-insert">
+			<colgroup>
+				<col width="100">
+				<col width="*">
+			</colgroup>
+			<tr>
+				<th>접근권한 그룹명</th>
+				<td>
+					<input type="text" name="auth_name" id="auth_name" value="<%=StringUtil.convertString(authInfo.getAcctGrpNm()) %>">
+				</td>
+			</tr>
+			<tr>
+				<th>설명</th>
+				<td>
+					<textarea name="auth_desc" id="auth_desc"><%=StringUtil.convertString(authInfo.getAcctGrpDesc()) %></textarea>
+				</td>
+			</tr>
+		</table>
+  	</div>
 </div>
-
-
-<!-- 
-<div class="contents">
-    <div class="dialogContent">
-        <div class="contents">
-            <table class="popTable mt20" cellpadding="0" cellspacing="0">
-                <colgroup>
-                    <col width="160"><col width="*">
-                </colgroup>
-                <tbody>
-                    <tr>
-                        <th>계정 그룹명</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="group_name" id="group_name" style="width:200px;">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
- -->

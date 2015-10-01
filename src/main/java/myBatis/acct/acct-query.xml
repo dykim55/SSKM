@@ -14,8 +14,8 @@
 		    ,A.acctGrpCd
 		    ,(SELECT acctGrpNm FROM AcctGrpTbl WHERE acctGrpCd = A.acctGrpCd) as acctGrpNm
 		    ,A.acctSt
-		    ,A.deptCd
-		    ,A.oflvCd
+		    ,A.deptNm
+		    ,A.oflvNm
 		    ,A.acctPw
 		    ,A.mobile
 		    ,A.telephone
@@ -43,7 +43,7 @@
         <if test="acctNm != null and acctNm != ''">
             AND acctNm LIKE CONCAT('%', #{ acctNm }, '%')
         </if>
-        AND A.acctSt != '9'
+        AND A.acctSt != 9
     </sql>
 
 	<select id="selectAccountList" resultType="java.util.HashMap">
@@ -65,8 +65,8 @@
 		    ,bizSct
 		    ,acctGrpCd
 		    ,acctSt
-		    ,deptCd
-		    ,oflvCd
+		    ,deptNm
+		    ,oflvNm
 		    ,acctPw
 		    ,mobile
 		    ,telephone
@@ -84,14 +84,11 @@
         <if test="acctPw != null and acctPw != ''">
             AND A.acctPw = #{acctPw}
         </if>
-        <if test="acctSt != null and acctSt != ''">
-            AND A.acctSt = #{acctSt}
+        <if test="deptNm != null and deptNm != ''">
+            AND A.deptNm = #{deptNm}
         </if>
-        <if test="deptCd != null and deptCd != ''">
-            AND A.deptCd = #{deptCd}
-        </if>
-        <if test="oflvCd != null and oflvCd != ''">
-            AND A.oflvCd = #{oflvCd}
+        <if test="oflvNm != null and oflvNm != ''">
+            AND A.oflvNm = #{oflvNm}
         </if>
         <if test="acctSt != null and acctSt != ''">
             AND A.acctSt = #{acctSt}
@@ -141,6 +138,18 @@
             modDtime = #{modDtime}          
         WHERE acctGrpCd = #{acctGrpCd}
     </update>
+    
+    <delete id="deleteAcctGrp">
+    	DELETE FROM AcctGrpTbl
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="acctGrpCd != null">
+                AND acctGrpCd = #{acctGrpCd}
+            </if>
+            <if test="acctPrntCd != null">
+                AND acctPrntCd = #{acctPrntCd}
+            </if>
+        </trim>
+    </delete>
 
     <select id="selectMenu" resultType="com.cyberone.scourt.model.Menu">
         SELECT * FROM MenuTbl
@@ -177,8 +186,8 @@
         <if test="acctId != null">acctId,</if>
         <if test="acctNm != null">acctNm,</if>
         <if test="acctGrpCd != null">acctGrpCd,</if>
-        <if test="deptCd != null">deptCd,</if>
-        <if test="oflvCd != null">oflvCd,</if>
+        <if test="deptNm != null">deptNm,</if>
+        <if test="oflvNm != null">oflvNm,</if>
         <if test="acctPw != null">acctPw,</if>
         <if test="mobile != null">mobile,</if>
         <if test="email != null">email,</if>
@@ -187,8 +196,8 @@
         <if test="acctId != null">#{acctId},</if>
         <if test="acctNm != null">#{acctNm},</if>
         <if test="acctGrpCd != null">#{acctGrpCd},</if>
-        <if test="deptCd != null">#{deptCd},</if>
-        <if test="oflvCd != null">#{oflvCd},</if>
+        <if test="deptNm != null">#{deptNm},</if>
+        <if test="oflvNm != null">#{oflvNm},</if>
         <if test="acctPw != null">#{acctPw},</if>
         <if test="mobile != null">#{mobile},</if>
         <if test="email != null">#{email},</if>
@@ -199,9 +208,10 @@
         UPDATE AcctTbl SET
             <if test="acctNm != null"> acctNm = #{acctNm}, </if>
             <if test="acctGrpCd != null"> acctGrpCd = #{acctGrpCd}, </if>
-            <if test="deptCd != null"> deptCd = #{deptCd}, </if>
-            <if test="oflvCd != null"> oflvCd = #{oflvCd}, </if>
+            <if test="deptNm != null"> deptNm = #{deptNm}, </if>
+            <if test="oflvNm != null"> oflvNm = #{oflvNm}, </if>
             <if test="acctPw != null"> acctPw = #{acctPw}, </if>
+            <if test="acctSt != null"> acctSt = #{acctSt}, </if>
             <if test="mobile != null"> mobile = #{mobile}, </if>
             <if test="email != null"> email = #{email}, </if>
             modr = #{modr},

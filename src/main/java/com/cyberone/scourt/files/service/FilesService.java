@@ -12,32 +12,65 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cyberone.scourt.exception.BizException;
-import com.cyberone.scourt.files.dao.DocumentDao;
+import com.cyberone.scourt.files.dao.FilesDao;
+import com.cyberone.scourt.model.Files;
 import com.cyberone.scourt.model.Product;
 import com.cyberone.scourt.model.UserInfo;
 import com.cyberone.scourt.utils.StringUtil;
 
 @Service
-public class DocumentService {
+public class FilesService {
 	
 	@Autowired
-	private DocumentDao docDao;
+	private FilesDao filesDao;
 
-	public List<HashMap<String, Object>> selectCategory(HashMap<String, Object> paramMap) throws Exception {
-		return docDao.selectCategory(paramMap);
+	public HashMap<String, Object> selectCategory(HashMap<String, Object> paramMap) throws Exception {
+		return filesDao.selectCategory(paramMap);
+	}
+
+	public List<HashMap<String, Object>> selectCategoryList(HashMap<String, Object> paramMap) throws Exception {
+		return filesDao.selectCategoryList(paramMap);
+	}
+	
+	public List<HashMap<String, Object>> selectCategoryTree(HashMap<String, Object> paramMap) throws Exception {
+		return filesDao.selectCategoryTree(paramMap);
 	}
 
 	public List<HashMap<String, Object>> selectProductList(Product dto) throws Exception {
-		return docDao.selectProductList(dto);
+		return filesDao.selectProductList(dto);
 	}
 	
+	public HashMap<String, Object> selectProduct(HashMap<String, Object> paramMap) throws Exception {
+		return filesDao.selectProduct(paramMap);
+	}
+	
+	public int deleteProduct(HashMap<String, Object> paramMap) throws Exception {
+		return filesDao.deleteProduct(paramMap);
+	}
+	
+	public List<Files> selectFiles(Files files) throws Exception {
+		return filesDao.selectFiles(files);
+	}
+	
+	public int deleteFilesById(HashMap<String, Object> paramMap) throws Exception {
+		return filesDao.deleteFilesById(paramMap);
+	}
+
+	public int deleteFilesByRef(HashMap<String, Object> paramMap) throws Exception {
+		return filesDao.deleteFilesByRef(paramMap);
+	}
+
 	public void insertCategory(HashMap<String, Object> paramMap) throws Exception {
-		docDao.insertCategory(paramMap);
+		filesDao.insertCategory(paramMap);
 	}
 
 	public void updateCategory(HashMap<String, Object> paramMap) throws Exception {
-		docDao.updateCategory(paramMap);
+		filesDao.updateCategory(paramMap);
 	}	
+	
+	public void deleteCategory(HashMap<String, Object> paramMap) throws Exception {
+		filesDao.deleteCategory(paramMap);
+	}
 	
 	public void insertProduct(HttpServletRequest request, HashMap<String, Object> paramMap, List<MultipartFile> mpfList) throws Exception {
         for (MultipartFile mpf : mpfList) {
@@ -45,20 +78,22 @@ public class DocumentService {
         		paramMap.put("fileYn", "y");
         	}
         }
-        docDao.insertProduct(paramMap);
+        filesDao.insertProduct(paramMap);
         
-        updateDcmtFile(request, (Integer)paramMap.get("parent"), mpfList, (Integer)paramMap.get("pId"));
+        transferFiles(request, (Integer)paramMap.get("parent"), mpfList, (Integer)paramMap.get("pId"));
 	}
 	
 	public void updateProduct(HttpServletRequest request, HashMap<String, Object> paramMap, List<MultipartFile> mpfList) throws Exception {
-        int fileCount = updateDcmtFile(request, (Integer)paramMap.get("parent"), mpfList, (Integer)paramMap.get("pId"));
+        int fileCount = transferFiles(request, (Integer)paramMap.get("parent"), mpfList, (Integer)paramMap.get("pId"));
         if (fileCount > 0) {
         	paramMap.put("fileYn", "y");
         }
-        docDao.updateProduct(paramMap);
+        filesDao.updateProduct(paramMap);
 	}
 	
-	public int updateDcmtFile(HttpServletRequest request, int nParent, List<MultipartFile> mpfList, int pId) throws Exception {
+	public int transferFiles(HttpServletRequest request, int nParent, List<MultipartFile> mpfList, int pId) throws Exception {
+		
+		if (mpfList == null) return 0;
 		
 		int fileCount = 0;
         for (MultipartFile mpf : mpfList) {
@@ -109,12 +144,12 @@ public class DocumentService {
 
             fileCount++;
             
-            docDao.insertDcmtFile(paramMap);
+            filesDao.insertFiles(paramMap);
         }
 		return fileCount;
 	}
 	
 	public List<HashMap<String, Object>> selectMenu(HashMap<String, Object> paramMap) throws Exception {
-		return docDao.selectMenu(paramMap);
+		return filesDao.selectMenu(paramMap);
 	}
 }

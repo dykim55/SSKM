@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="Document">
+<mapper namespace="Files">
 
     <sql id="countQueryTop">
         SELECT COUNT(*) as records FROM (
@@ -16,6 +16,7 @@
             ,A.fileYn
             ,A.delYn
             ,A.regr
+            ,(SELECT acctNm FROM AcctTbl WHERE acctId = A.regr) AS regrNm
             ,A.modr
             ,A.regDtime
             ,A.modDtime
@@ -44,10 +45,40 @@
         <include refid="sqlProduct"/>
         ) B
     </select>
+
+	<select id="selectProduct" resultType="java.util.HashMap">
+        <include refid="sqlProduct"/>
+    </select>
+
+	<select id="selectCategory" resultType="java.util.HashMap">
+		SELECT * 
+		FROM CategoryTbl
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="ctgId != null and ctgId > 0">
+				AND ctgId = #{ctgId}
+			</if>
+			<if test="ctgSct != null and ctgSct > 0">
+				AND ctgSct = #{ctgSct}
+			</if>
+		</trim>
+	</select>
+
+	<select id="selectCategoryList" resultType="java.util.HashMap">
+		SELECT * 
+		FROM CategoryTbl
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="ctgParent != null and ctgParent > 0">
+				AND ctgParent = #{ctgParent}
+			</if>
+			<if test="ctgSct != null and ctgSct != ''">
+				AND ctgSct = #{ctgSct}
+			</if>
+		</trim>
+	</select>
 	
-    <select id="selectCategory" resultType="java.util.HashMap">
+    <select id="selectCategoryTree" resultType="java.util.HashMap">
     
-		SELECT ctg.ctgId, ctg.ctgNm, ctg.ctgParent, level
+		SELECT ctg.ctgId, ctg.ctgNm, ctg.ctgParent, level, ctg.ctgSct
 		FROM (
 		    SELECT connect_by_category() AS id, @level AS level, @inclause AS inclause
 		    FROM (
@@ -83,6 +114,11 @@
             modDtime = #{modDtime}          
         WHERE ctgId = #{ctgId}
     </update>
+
+    <delete id="deleteCategory">
+    	DELETE FROM CategoryTbl
+		WHERE ctgId = #{ctgId}
+    </delete>
     	
 	<insert id="insertProduct">
         INSERT INTO ProductTbl(title, content, parent, fileYn, delYn, regr, regDtime, modr, modDtime)
@@ -97,7 +133,7 @@
             <if test="title != null"> title = #{title}, </if>
             <if test="content != null"> content = #{content}, </if>
             <if test="parent != null"> parent = #{parent}, </if>
-            <if test="query != null"> query = #{query}, </if>
+            <if test="query != null"> query = query + 1, </if>
             <if test="fileYn != null"> fileYn = #{fileYn}, </if>
             <if test="delYn != null"> delYn = #{delYn}, </if>
             modr = #{modr},
@@ -105,13 +141,18 @@
         WHERE pId = #{pId}
     </update>
 
-    <insert id="insertDcmtFile">
-        INSERT INTO DcmtFileTbl(pId, fileSct, fileSize, fileLoc, fileOrgNm, fileSavNm, regr, regDtime, modr, modDtime)
+    <delete id="deleteProduct">
+    	DELETE FROM ProductTbl
+		WHERE pId = #{pId}
+    </delete>
+
+    <insert id="insertFiles">
+        INSERT INTO FilesTbl(pId, fileSct, fileSize, fileLoc, fileOrgNm, fileSavNm, regr, regDtime, modr, modDtime)
         VALUES (#{pId}, #{fileSct}, #{fileSize}, #{fileLoc}, #{fileOrgNm}, #{fileSavNm}, #{regr}, #{regDtime}, #{modr}, #{modDtime})
     </insert>
 
-    <update id="updateDcmtFile">
-        UPDATE DcmtFileTbl
+    <update id="updateFiles">
+        UPDATE FilesTbl
            SET 
                <if test="pId != null"> pId = #{pId},</if>
                <if test="fileSct != null"> fileSct = #{fileSct},</if>
@@ -135,6 +176,16 @@
            
     </update>
 
+	<delete id="deleteFilesById">
+		DELETE FROM FilesTbl
+		WHERE fileId = #{fileId}
+	</delete>
+
+	<delete id="deleteFilesByRef">
+		DELETE FROM FilesTbl
+		WHERE pId = #{pId}
+	</delete>
+
 	<select id="selectMenu" resultType="java.util.HashMap">
 		SELECT * FROM MenuTbl
         <trim prefix="WHERE" prefixOverrides="AND|OR">
@@ -148,7 +199,19 @@
     	ORDER BY menuCd ASC
     </select>
 	
-
+	<select id="selectFiles" resultType="com.cyberone.scourt.model.Files">
+		SELECT * FROM FilesTbl
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="fileId != null and fileId > 0">
+                AND fileId = #{fileId}
+            </if>        
+            <if test="pId != null and pId > 0">
+                AND pId = #{pId}
+            </if>
+        </trim>        
+ 
+		
+	</select>
     	
 </mapper>
 

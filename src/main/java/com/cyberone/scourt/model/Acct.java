@@ -9,8 +9,8 @@ public class Acct extends Paging {
 	private String bizSct;
 	private int acctGrpCd;
 	private String acctSt;
-	private String deptCd;
-	private String oflvCd;
+	private String deptNm;
+	private String oflvNm;
 	private String acctPw;
 	private String mobile;
 	private String telephone;
@@ -51,18 +51,6 @@ public class Acct extends Paging {
 	}
 	public void setAcctSt(String acctSt) {
 		this.acctSt = acctSt;
-	}
-	public String getDeptCd() {
-		return deptCd;
-	}
-	public void setDeptCd(String deptCd) {
-		this.deptCd = deptCd;
-	}
-	public String getOflvCd() {
-		return oflvCd;
-	}
-	public void setOflvCd(String oflvCd) {
-		this.oflvCd = oflvCd;
 	}
 	public String getAcctPw() {
 		return acctPw;
@@ -117,6 +105,18 @@ public class Acct extends Paging {
 	}
 	public void setAuthGrp(int authGrp) {
 		this.authGrp = authGrp;
+	}
+	public String getDeptNm() {
+		return deptNm;
+	}
+	public void setDeptNm(String deptNm) {
+		this.deptNm = deptNm;
+	}
+	public String getOflvNm() {
+		return oflvNm;
+	}
+	public void setOflvNm(String oflvNm) {
+		this.oflvNm = oflvNm;
 	}	
 	
 }

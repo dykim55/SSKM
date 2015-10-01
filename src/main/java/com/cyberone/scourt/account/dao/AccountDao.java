@@ -43,6 +43,10 @@ public class AccountDao {
 	public void updateAcctGrp(HashMap<String, Object> paramMap) throws Exception {
 		sqlSession.update("Account.updateAcctGrp", paramMap);
 	}
+
+	public void deleteAcctGrp(HashMap<String, Object> paramMap) throws Exception {
+		sqlSession.delete("Account.deleteAcctGrp", paramMap);
+	}
 	
 	public List<HashMap<String, Object>> selectAccountList(Acct dto) throws Exception {
 		dto.searchRowCount(sqlSession, "Account.selectAccountList-Count");
@@ -50,7 +54,7 @@ public class AccountDao {
 	}
 
 	public List<HashMap<String, Object>> selectMenu(HashMap<String, Object> paramMap) throws Exception {
-		return sqlSession.selectList("Document.selectMenu", paramMap);
+		return sqlSession.selectList("Files.selectMenu", paramMap);
 	}
 	
 }

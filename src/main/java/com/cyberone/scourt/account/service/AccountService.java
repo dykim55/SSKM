@@ -43,7 +43,11 @@ public class AccountService {
 	public void updateAcctGrp(HashMap<String, Object> paramMap) throws Exception {
 		accountDao.updateAcctGrp(paramMap);
 	}
-	
+
+	public void deleteAcctGrp(HashMap<String, Object> paramMap) throws Exception {
+		accountDao.deleteAcctGrp(paramMap);
+	}
+
 	public List<HashMap<String, Object>> selectAccountList(Acct dto) throws Exception {
 		return accountDao.selectAccountList(dto);
 	}

@@ -6,51 +6,46 @@
 
 <%
     @SuppressWarnings("unchecked")
-    HashMap<String, Object> schedule = (HashMap<String, Object>)request.getAttribute("schedule");
-    if (StringUtil.isEmpty(schedule)) {
-    	schedule = new HashMap<String, Object>(); 
+    HashMap<String, Object> category = (HashMap<String, Object>)request.getAttribute("category");
+    if (StringUtil.isEmpty(category)) {
+    	category = new HashMap<String, Object>(); 
     }
-    
-    String sCtgSct = request.getParameter("gubun");
 %>
 
 <script type="text/javascript">
 
 CREATE_FOLDER = (function() {
-	var _Dlg, _Parent;
+	var _Dlg;
 	var bProcessing = false;
 	
     return {
-        init: function(Dlg, tr) {
+        init: function(Dlg, loc) {
         	_Dlg = Dlg;
-        	_Parent = tr[0].getAttribute('data-tt-id');
-        	stop();
-        	_Dlg.find("#path_name").html(tr.closest("table").treetable('pathName', _Parent));
         	
-        	_Dlg.find("#h_parent").val(_Parent);
+        	_Dlg.find("#path_name").html($(".location").html());
         	
         	_Dlg.dialog({
                 autoOpen: false, 
                 resizable: false, 
                 width: 600,
                 modal: true,
-                title: "폴더 생성",
+                title: <% if (!category.containsKey("ctgId")) { %> "폴더 생성" <% } else { %> "폴더 수정" <% } %>,
                 buttons: {
-                    "생성" : function() {
-                    	
+<% if (!category.containsKey("ctgId")) { %> "생성" <% } else { %> "수정" <% } %> : function() {                	
+                    	stop();
                         $.ajax({
                             url: "/files/folder_register",
                             dataType: 'json',
-                            data : {gubun: "<%=sCtgSct%>", parent: $("#h_parent").val(), name: $("#folder_name").val() },
+                            data : {
+                            	id: '<%=StringUtil.convertString(category.get("ctgId")) %>',
+                            	gubun: $('.accordion').find('.accordionHeaders.ac_selected').attr("ref-sct"), 
+                            	parent: $(".left-tree .selected").attr('data-tt-id') ? $(".left-tree .selected").attr('data-tt-id') : $('.accordion').find('.accordionHeaders.ac_selected').attr("ref-id"), 
+                            	name: $("#folder_name").val(),
+                            	desc: $("#folder_desc").val()
+                            },
                             success: function(data, text, request) {
-								$("#left-tree-div").load("/files/tree_ajax", {"gubun": data.gubun}, function() {
-								    $("#left-tree tr").each(function() {
-								    	if ($(this)[0].getAttribute('data-tt-id')==data.id) {
-								    	    $(".selected").not(this).removeClass("selected");
-								    	    $(this).addClass("selected");
-								    		return false;
-								    	}
-									});
+                            	$('.accordion').find('.accordionHeaders.ac_selected').next().load("/files/tree_ajax", {"gubun": data.gubun}, function() {
+                            		$(this).find(".left-tree").treetable("reveal", data.parent);
 								});
 								_Dlg.dialog("close");
                             }
@@ -80,30 +75,25 @@ CREATE_FOLDER = (function() {
 
 </script>
 
-
-<div class="contents">
-    <div class="dialogContent">
-        <div class="contents">
-            <input type="hidden" id="h_parent" name="h_parent">
-            <table class="popTable mt20" cellpadding="0" cellspacing="0">
-                <colgroup>
-                    <col width="80"><col width="*">
-                </colgroup>
-                <tbody>
-                    <tr>
-                        <th>폴더위치</th>
-                        <td class="left">
-                            <span id="path_name"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>폴더명</th>
-                        <td class="left">
-                            <input type="text" class="normal focus_e" name="folder_name" id="folder_name" style="width:100px;">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+<div id="dir">
+	<div class="dia-insert">
+		<table class="board-insert">
+			<colgroup>
+				<col width="100">
+				<col width="*">
+			</colgroup>
+			<tr>
+				<th>폴더명</th>
+				<td colspan="3">
+					<input type="text" name="folder_name" id="folder_name" value="<%=StringUtil.convertString(category.get("ctgNm")) %>">
+				</td>
+			</tr>
+			<tr>
+				<th>폴더설명</th>
+				<td colspan="3">
+					<textarea name="folder_desc" id="folder_desc"><%=StringUtil.convertString(category.get("ctgDesc")) %></textarea>
+				</td>
+			</tr>
+		</table>
+	</div>
 </div>

@@ -14,10 +14,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.cyberone.scourt.Common;
+import com.cyberone.scourt.Constants;
 import com.cyberone.scourt.exception.BizException;
 import com.cyberone.scourt.interceptor.SessionMonitorListener;
 import com.cyberone.scourt.login.service.LoginService;
 import com.cyberone.scourt.model.Acct;
+import com.cyberone.scourt.model.AcctGrp;
 import com.cyberone.scourt.model.UserInfo;
 import com.cyberone.scourt.utils.Encryption;
 
@@ -35,7 +38,7 @@ public class LoginController {
         return "/login/auth";
     }
 	
-    @RequestMapping(value="/verify_account", method=RequestMethod.POST)
+    @RequestMapping(value="/verify", method=RequestMethod.POST)
     public String verifyAccount(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
     	logger.debug(request.getServletPath());
 
@@ -55,21 +58,28 @@ public class LoginController {
     	Acct acct = loginService.selectAcct(paramMap);
     	
 		if (acct == null) {
-			throw new BizException("9999", "로그인아이디 또는 비밀번호가 잘못됐습니다.");
+			Common.insertAuditHist(Constants.AUDIT_LOGIN, "로그인 아이디 또는 비밀번호가 잘못됐습니다.", "F", "", sAcctId);
+			throw new BizException("9999", "로그인 아이디 또는 비밀번호가 잘못됐습니다.");
 		}
 
 		UserInfo userInfo  = new UserInfo();
 		userInfo.setAcct(acct);
+		
+		paramMap.put("acctGrpCd", acct.getAcctGrpCd());
+		AcctGrp acctGrp = loginService.selectAcctGrp(paramMap);
+		userInfo.setAcctGrp(acctGrp);
 		
     	HttpSession session = request.getSession();
     	session.setAttribute("userInfo", userInfo);
     	
     	SessionMonitorListener.addUserInfo(userInfo, session);
     	
+    	Common.insertAuditHist(Constants.AUDIT_LOGIN, userInfo.getAcct().getAcctNm() + "님이 로그인하셨습니다.", "S", "", userInfo.getAcct().getAcctId());
+    	
     	logger.info("접속 아이디: " + userInfo.getAcct().getAcctId() + "(" + userInfo.getAcct().getAcctNm() + ")");
     	logger.info("Login Session ID {} ( timeout: {} )", session.getId(), session.getMaxInactiveInterval());
     	
-		return "redirect:/main";
+		return "redirect:/files/security_control";
     }
 
     @RequestMapping("logout")
