@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Audit">
+
+    <sql id="whereOrderLimit">
+        ORDER BY ${sidx} ${sord}
+        LIMIT #{limit}, #{rows}
+    </sql>
+
+    <sql id="countQueryTop">
+        SELECT COUNT(*) as records FROM (
+    </sql>
+
+    <insert id="insertAuditHist">
+        INSERT INTO AuditHistTbl(regr, regDtime, workMsg, workResult, workMemo, workSct)
+        VALUES (#{regr}, #{regDtime}, #{workMsg}, #{workResult}, #{workMemo}, #{workSct})
+        <selectKey keyProperty="auditCd" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID() AS "auditCd"
+        </selectKey>            
+    </insert>
+    
+    <sql id="sqlAuditHist">
+        SELECT
+            auditCd
+            ,regr
+            ,(SELECT acctNm FROM AcctTbl WHERE acctId = A.regr) AS regrNm
+            ,regDtime
+            ,workMsg
+            ,workResult
+            ,workMemo
+            ,workSct
+        FROM AuditHistTbl A
+        WHERE 1 = 1
+        <if test="workSct != null and workSct != ''">
+            AND A.workSct = #{workSct}
+        </if>
+        <if test="workResult != null and workResult != ''">
+            AND A.workResult = #{workResult}
+        </if>
+        <if test="workMemo != null and workMemo != ''">
+            AND A.workMemo LIKE CONCAT('%', #{workMemo}, '%')
+        </if>
+        <if test="workMsg != null and workMsg != ''">
+            AND A.workMsg LIKE CONCAT('%', #{workMsg}, '%')
+        </if>
+        <if test="regr != null and regr != ''">
+            AND A.regr IN (SELECT acctId FROM AcctTbl WHERE acctNm = #{regr})
+        </if>
+        <if test="startDtime != null and endDtime != null and startDtime != '' and endDtime != ''">
+            AND A.regDtime BETWEEN STR_TO_DATE(#{startDtime},'%Y-%m-%d %H:%i:%s') AND STR_TO_DATE(#{endDtime},'%Y-%m-%d %H:%i:%s') 
+        </if>
+        
+    </sql>
+
+    <select id="selectAuditHist" resultType="java.util.HashMap">
+        <include refid="sqlAuditHist"/>
+        <include refid="whereOrderLimit"/>
+    </select>
+
+    <select id="selectAuditHist-Count" resultType="com.cyberone.scourt.model.AuditHist">
+        <include refid="countQueryTop" />
+        <include refid="sqlAuditHist"/>
+        ) B
+    </select>
+    
+
+</mapper>
+
+
+    
+
+    

@@ -1,0 +1,25 @@
+﻿/* @Author lee jun */
+
+@charset "utf-8";
+
+@font-face {
+  font-family: 'nanum';
+  font-style: normal;
+  font-weight: 400;
+  src: url(font/nanumGothic-Regular.eot);
+  src: url(font/nanumGothic-Regular.eot?#iefix) format('embedded-opentype'),
+       url(font/nanumGothic-Regular.woff2) format('x-woff2'),
+       url(font/nanumGothic-Regular.woff) format('woff'),
+       url(font/nanumGothic-Regular.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'nanumbold';
+  font-style: normal;
+  font-weight: 700;
+  src: url(font/nanumGothic-Bold.eot);
+  src: url(font/nanumGothic-Bold.eot?#iefix) format('embedded-opentype'),
+       url(font/nanumGothic-Bold.woff2) format('x-woff2'),
+       url(font/nanumGothic-Bold.woff) format('woff'),
+       url(font/nanumGothic-Bold.ttf) format('truetype');
+}

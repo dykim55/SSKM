@@ -1,0 +1,144 @@
+/* @Author lee jun */
+
+@charset "utf-8";
+
+a.clip {
+	display:inline-block;
+	width:12px; height:12px;
+	background:url(/images/detail/icon_clip.png) no-repeat;
+	vertical-align:middle;
+}
+
+a.doc {
+	display:inline-block;
+	width:16px; height:16px;
+	background:url(/images/detail/fileicon/icon_doc.png) no-repeat;
+	vertical-align:middle;
+}
+a.hwp {
+	display:inline-block;
+	width:16px; height:16px;
+	background:url(/images/detail/fileicon/icon_hwp.png) no-repeat;
+	vertical-align:middle;
+}
+a.img {
+	display:inline-block;
+	width:16px; height:16px;
+	background:url(/images/detail/fileicon/icon_img.png) no-repeat;
+	vertical-align:middle;
+}
+a.no {
+	display:inline-block;
+	width:16px; height:16px;
+	background:url(/images/detail/fileicon/icon_no.png) no-repeat;
+	vertical-align:middle;
+}
+a.pdf {
+	display:inline-block;
+	width:16px; height:16px;
+	background:url(/images/detail/fileicon/icon_pdf.png) no-repeat;
+	vertical-align:middle;
+}
+a.ppt {
+	display:inline-block;
+	width:16px; height:16px;
+	background:url(/images/detail/fileicon/icon_ppt.png) no-repeat;
+	vertical-align:middle;
+}
+a.xls {
+	display:inline-block;
+	width:16px; height:16px;
+	background:url(/images/detail/fileicon/icon_xls.png) no-repeat;
+	vertical-align:middle;
+}
+a.zip {
+	display:inline-block;
+	width:16px; height:16px;
+	background:url(/images/detail/fileicon/icon_zip.png) no-repeat;
+	vertical-align:middle;
+}
+a.close {
+	display:block;
+	width:14px; height:13px;
+	background:url(/images/detail/icon_download_close.png) no-repeat;
+	position:absolute; right:13px; top:13px; z-index:11;
+}
+a.write {
+	display:inline-block;
+	width:16px; height:16px;
+	background:url(/images/detail/icon_write.png) no-repeat;
+	vertical-align:middle;
+}
+a.edit {
+	display:inline-block;
+	width:16px; height:16px;
+	background:url(/images/detail/icon_edit.png) no-repeat;
+	vertical-align:middle;
+}
+a.delete {
+	display:inline-block;
+	width:16px; height:16px;
+	background:url(/images/detail/icon_delete.png) no-repeat;
+	vertical-align:middle;
+}
+a.first {
+	background:url(/images/detail/icon_first.png) no-repeat;
+	vertical-align:middle;
+}
+a.prev {
+	background:url(/images/detail/icon_prev.png) no-repeat;
+	vertical-align:middle;
+}
+a.next {
+	background:url(/images/detail/icon_next.png) no-repeat;
+	vertical-align:middle;
+}
+a.last {
+	background:url(/images/detail/icon_last.png) no-repeat;
+	vertical-align:middle;
+}
+u.selected {
+	background:url(/images/detail/bg_paging_on.png) no-repeat;
+	color:#999;
+	vertical-align:middle;
+}
+a.page {
+	background:url(/images/detail/bg_paging.png) no-repeat;
+	vertical-align:middle;
+}
+a.add {
+	display:inline-block;
+	width:23px; height:23px;
+	background:url(/images/detail/icon_add.png) no-repeat;
+	vertical-align:middle;
+}
+a.remove {
+	display:inline-block;
+	width:23px; height:23px;
+	background:url(/images/detail/icon_remove.png) no-repeat;
+	vertical-align:middle;
+}
+a.del {
+	display:inline-block;
+	width:12px; height:12px;
+	background:url(/images/detail/icon_m_delete.png) no-repeat;
+	vertical-align:middle;
+}
+u.area {
+	display:inline-block;
+	width:12px; height:12px;
+	background:url(/images/common/icon_area.png) no-repeat;
+	vertical-align:middle;
+}
+a.addfolder {
+	display:inline-block;
+	width:11px; height:11px;
+	background:url(/images/detail/icon_add_folder.png) no-repeat;
+	vertical-align:middle;
+}
+a.delfolder {
+	display:inline-block;
+	width:11px; height:11px;
+	background:url(/images/detail/icon_del_folder.png) no-repeat;
+	vertical-align:middle;
+}
