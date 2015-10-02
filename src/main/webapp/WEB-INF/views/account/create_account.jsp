@@ -29,7 +29,6 @@ CREATE_ACCOUNT = (function() {
         init: function(Dlg, t) {
         	_Dlg = Dlg;
 
-        	stop();
         	if (t) {
 	        	_tt_id = t.attr('data-tt-id');
 	        	_tt_parent_id = t.attr('data-tt-parent-id');

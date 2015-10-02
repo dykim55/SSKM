@@ -82,8 +82,7 @@ $(document).ready(function(){
 			</div>
 
 			<!-- depth 3. location-->
-			<div class="location">
-			</div>
+			<div class="location"></div>
 		</div>
 	</div>
 

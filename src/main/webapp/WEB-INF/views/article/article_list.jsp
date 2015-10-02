@@ -6,9 +6,9 @@
     
 %>
 
-<%@ include file="../include/header.jsp"%>
-
 <%
+	String sBbsSct = StringUtil.convertString(request.getParameter("bbsSct"));
+
     @SuppressWarnings("unchecked")
     List<HashMap<String, Object>> bbsList = (List<HashMap<String, Object>>)request.getAttribute("list");
     
@@ -27,48 +27,45 @@
 
 <script type="text/javascript">
 
-ARTICLE = (function() {
-	return {
-		   init: function() { }
-	};
-})();
-
 $(document).ready(function() {
-	ARTICLE.init();
-});
 
-function searchSub() {
-    document.searchForm.submit();
-}
+	$(".board").find("tbody").on("click", "tr", function() {
+		console.log("click!");
+		articleWrite(<%=sBbsSct%>, $(this).attr("data-tt-id"));
+	});
+
+	$(".board").find("tbody").on("mouseenter", "td", function() {
+		$(this).parent().find("td").css({background:"#f2f2f2"});
+	});
+
+	$(".board").find("tbody").on("mouseleave", "td", function() {
+		$(this).parent().find("td").css({background:"#ffffff"});
+	});
+	
+	$("#pg_selbox").change(function() {
+		ARTICLE_PG.rows($(".paging select").val());
+	});
+
+});
 
 </script>
 
-<div class="board_pane" style="background-color:lightgray;font: 12px 맑은 고딕;padding: 10px 0px;">
-
-    <h1 style="margin: 0px auto 10px auto;width: 200px;text-align: center;">공지사항</h1>
-
-    <div style="text-align: right;">
-    <form name="searchForm" action="/notice" method="post">
-	    <input name="page" type="hidden" value="1">
-        <input name="searchWord" id="searchWord" type="text" style="width: 150px;" value="<%=sSearchWord%>"/>
-        <a href="javascript:searchSub();">검색</a>
-    </form>
-    </div>
-    
-    <table cellpadding="0" cellspacing="0" border="1" style="width: 70%;margin: 0 auto;">
+	<table class="board">
         <colgroup>
             <col width="5%">
-            <col width="45%">
-            <col width="25%">
-            <col width="15%">
             <col width="*">
+            <col width="8%">
+            <col width="20%">
+            <col width="10%">
+            <col width="8%">
         </colgroup>
         <thead>
             <tr>
               <th>번호</th>
               <th>제목</th>
-              <th>작성일</th>
               <th>첨부</th>
+              <th>작성일</th>
+              <th>작성자</th>
               <th>조회</th>
             </tr>
          </thead>
@@ -76,11 +73,19 @@ function searchSub() {
     <%  if (bbsList.size() > 0) {
     	    int m = (nPage - 1) * nRows; 
             for (HashMap<String, Object> map : bbsList) { %>
-            <tr>
+            <tr data-tt-id='<%=map.get("bbsId") %>'>
                 <td><%=nTotalRecord - m++ %></td>
-                <td style="font-weight: bold;"><a style="color: #3577c8;" href="/noticeDtl?page=<%=nPage%>&searchWord=<%=sSearchWord%>&bbs=<%=map.get("bbsId")%>"><%=StringUtil.replaceHtml(StringUtil.convertString(map.get("bbsTit"))) %></a></td>
+                <td style="text-align: left;padding-left: 10px;"><%=StringUtil.replaceHtml(StringUtil.convertString(map.get("bbsTit"))) %></td>
+                <td>
+					<% if (StringUtil.convertString(map.get("fileYn")).equals("y")) { %>
+							<!-- file list -->
+							<div class="filebox">
+								<a href="#" onclick="javascript:fileBox(24)" class="clip"></a>
+							</div>
+					<% } %>
+                </td>
                 <td><%=StringUtil.convertDate(map.get("regDtime"),"yyyy-MM-dd HH:mm:ss") %></td>
-                <td><%=StringUtil.convertString(map.get("fileYn")) %></td>
+                <td><%=StringUtil.convertString(map.get("regrNm")) %></td>
                 <td><%=StringUtil.convertString(map.get("qryCnt")) %></td>
             </tr>
     <%      }
@@ -93,30 +98,32 @@ function searchSub() {
     <% } %>
             
         </tbody>
-    </table>
-
+	</table>
+	
 <% if (bbsList.size() > 0) { %>
-    <div style="margin: 5px auto 0px auto;text-align: center;">
-        <a class="pre" href="/notice?page=<%=nPrevPageNo%>&searchWord=<%=sSearchWord%>"><img src="/images/btn_page_prev.gif" width="16" height="16" alt="이전"></a>
+    <div class="paging">
+    	<div>
+        	<a class="prev" href="javascript:ARTICLE_PG.move(<%=nPrevPageNo %>);"></a>
+        </div>
+        <div class="pl15 pr15">
 <% for (int i=nGroupStartPos; i<=nGroupEndPos; i++) { %>
     <% if (nPage == i) { %>
-        <strong><span><%=i %></span></strong>
+        	<u class="selected"><%=i %></u>
     <% } else { %>
-        <a href="/notice?page=<%=i %>&searchWord=<%=sSearchWord%>"><span><%=i %></span></a>
+        	<a class="page" href="javascript:ARTICLE_PG.move(<%=i %>);"><%=i %></a>
     <% }  %>
 <% } %>
-        <a class="next" href="/notice?page=<%=nNextPageNo%>&searchWord=<%=sSearchWord%>"><img src="/images/btn_page_next.gif" width="16" height="16" alt="다음"></a>
+		</div>
+		<div>
+        	<a class="next" href="javascript:ARTICLE_PG.move(<%=nNextPageNo %>);"></a>
+        </div>
+        <div>
+			<select id="pg_selbox" style="margin-left: 10px;">
+				<option <%= nRows==15 ? "selected" : "" %>>15</option>
+				<option <%= nRows==30 ? "selected" : "" %>>30</option>
+				<option <%= nRows==50 ? "selected" : "" %>>50</option>
+				<option <%= nRows==100 ? "selected" : "" %>>100</option>
+			</select>        
+		</div>
     </div>
 <% } %>
-
-    <div class="tableBtnBox">
-        <a href="/noticeWrite?page=<%=nPage %>&searchWord=<%=sSearchWord%>">
-            글쓰기
-        </a>
-    </div>
-
-</div>
-  
-
-
-<%@ include file="../include/footer.jsp"%>

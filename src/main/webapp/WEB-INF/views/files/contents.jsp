@@ -37,6 +37,8 @@ $(document).ready(function() {
 	$('.accordionHeaders').click(function() {
 		$(".location").html($(this)[0].textContent.trim());
 		$(".left-tree .selected").not(this).removeClass("selected");
+
+		if ($(".content-head").find("button").length > 1) $(".content-head").find("button")[0].remove();
 		
 		if ($(this).hasClass('ac_selected')) {
 			return;
@@ -44,8 +46,6 @@ $(document).ready(function() {
 		$('.accordionHeaders').removeClass('ac_selected');
 		$('.contentHolder').slideUp();
 		$(this).addClass('ac_selected').next('.contentHolder').slideToggle();
-		
-		if ($(".content-head").find("button").length > 1) $(".content-head").find("button")[0].remove(); 
 		
 	});
 	
@@ -61,9 +61,10 @@ $(document).ready(function() {
     	    $(".left-tree .selected").not(this).removeClass("selected");
     	    $(this).toggleClass("selected");
     	}
-    	$(".location").html($('.accordion').find('.accordionHeaders.ac_selected')[0].textContent.trim() + "&nbsp;&nbsp;>&nbsp;&nbsp;" + $(this).closest('table').treetable('pathName', $(this).attr('data-tt-id')));
-
-    	PG.reload($(this).attr('data-tt-id'), function() {});
+    	
+    	PG.reload($(this).attr('data-tt-id'), function() {
+    		$(".location").html($('.accordion').find('.accordionHeaders.ac_selected')[0].textContent.trim() + "&nbsp;&nbsp;>&nbsp;&nbsp;" + $(".left-tree:visible").treetable('pathName', $(".left-tree:visible").find(".selected").attr('data-tt-id')));	
+    	});
     });
     
     $(".left-tree tbody").on("mouseenter", "tr", function() {
@@ -135,6 +136,7 @@ function deleteFile(id) {
             }
         });
     }
+    event.stopPropagation();
 }
 
 function fileBox(id) {
@@ -143,6 +145,7 @@ function fileBox(id) {
 			$('[data-tt-id=' + id + ']').find(".filebox").append(data);
 		});
 	}
+	event.stopPropagation();
 }
 
 </script>

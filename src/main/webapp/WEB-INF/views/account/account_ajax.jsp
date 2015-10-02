@@ -99,10 +99,10 @@ $(document).ready(function() {
                     <span><%=StringUtil.convertString(map.get("oflvNm")) %></span>
                 </td>
                 <td>
-                    <span></span>
+                    <span><%=StringUtil.convertDate(map.get("regDtime"),"yyyy-MM-dd HH:mm:ss") %></span>
                 </td>
                 <td>
-                    <span></span>
+                    <span><%=StringUtil.convertDate(map.get("latestDtime"),"yyyy-MM-dd HH:mm:ss") %></span>
                 </td>
                 
             </tr>

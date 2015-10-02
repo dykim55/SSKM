@@ -1,5 +1,6 @@
 package com.cyberone.scourt.login.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.cyberone.scourt.Common;
 import com.cyberone.scourt.Constants;
+import com.cyberone.scourt.account.service.AccountService;
 import com.cyberone.scourt.exception.BizException;
 import com.cyberone.scourt.interceptor.SessionMonitorListener;
 import com.cyberone.scourt.login.service.LoginService;
@@ -31,7 +33,10 @@ public class LoginController {
     
     @Autowired
     private LoginService loginService;
-    
+
+    @Autowired
+    private AccountService accountService;
+
     @RequestMapping("/login")
     public String login(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
     	logger.debug(request.getServletPath());
@@ -62,6 +67,12 @@ public class LoginController {
 			throw new BizException("9999", "로그인 아이디 또는 비밀번호가 잘못됐습니다.");
 		}
 
+		
+		paramMap.clear();
+		paramMap.put("acctId", sAcctId);
+		paramMap.put("latestDtime", new Date());
+		accountService.updateAcct(paramMap);
+		
 		UserInfo userInfo  = new UserInfo();
 		userInfo.setAcct(acct);
 		

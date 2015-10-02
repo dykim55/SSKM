@@ -44,7 +44,7 @@ public class BoardController {
         UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
         model.addAttribute("userInfo", userInfo);
 
-       	String sBbsSct = Constants.getBbsSct(request.getServletPath());
+       	String sBbsSct = "";//Constants.getBbsSct(request.getServletPath());
        	
         /*
         if (!userInfo.isAuth("2006", "R")) {
@@ -164,11 +164,11 @@ public class BoardController {
     	String sMapping = "";
     	if (sBbsSct.equals(Constants.BBS_NOTICE)) {
         	sMapping = "redirect:/notice";
-    	} else if (sBbsSct.equals(Constants.BBS_RAWS)) {
+    	} else if (sBbsSct.equals("2")) {
     		sMapping = "redirect:/raws";
-    	} else if (sBbsSct.equals(Constants.BBS_TREND)) {
+    	} else if (sBbsSct.equals("3")) {
     		sMapping = "redirect:/securityTrend";
-    	} else if (sBbsSct.equals(Constants.BBS_PRIVACY)) {
+    	} else if (sBbsSct.equals("4")) {
     		sMapping = "redirect:/privacy";
     	}
     	
@@ -207,11 +207,11 @@ public class BoardController {
     	String sMapping = "";
     	if (sBbsSct.equals(Constants.BBS_NOTICE)) {
         	sMapping = "redirect:/notice";
-    	} else if (sBbsSct.equals(Constants.BBS_RAWS)) {
+    	} else if (sBbsSct.equals("2")) {
     		sMapping = "redirect:/raws";
-    	} else if (sBbsSct.equals(Constants.BBS_TREND)) {
+    	} else if (sBbsSct.equals("3")) {
     		sMapping = "redirect:/securityTrend";
-    	} else if (sBbsSct.equals(Constants.BBS_PRIVACY)) {
+    	} else if (sBbsSct.equals("4")) {
     		sMapping = "redirect:/privacy";
     	}
     	

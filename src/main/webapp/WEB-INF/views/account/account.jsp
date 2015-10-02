@@ -10,7 +10,7 @@
 
 <%
 @SuppressWarnings("unchecked")
-List<HashMap<String, Object>> acctList = (List<HashMap<String, Object>>)request.getAttribute("acctList");
+List<HashMap<String, Object>> acctGrpList = (List<HashMap<String, Object>>)request.getAttribute("acctGrpList");
 %>
 
 <script type="text/javascript">
@@ -160,8 +160,8 @@ function fileUpload(parent) {
 							<div id="account-tree-div" class="contentHolder" style="display: block;">
 							    <table class="account-tree">
 							        <tbody>
-							    <% if (acctList.size() > 0) {
-							           for (HashMap<String, Object> map : acctList) { 
+							    <% if (acctGrpList.size() > 0) {
+							           for (HashMap<String, Object> map : acctGrpList) { 
 							           		if ((Long)map.get("level") > 1) { %>
 									            <tr class="accordionContent" level='<%=map.get("level") %>' data-tt-id='<%=map.get("acctGrpCd") %>' <% if ((Integer)map.get("acctPrntCd") > 0) { %> data-tt-parent-id='<%=map.get("acctPrntCd") %>' <% } %>>
 									                <td>
@@ -215,98 +215,12 @@ function fileUpload(parent) {
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td>756</td>
-								<td>mr.hong</td>
-								<td>홍길동</td>
-								<td>데이터센터</td>
-								<td>대외정보관리부</td>
-								<td>과장</td>
-								<td>2015-06-30 12:30:30</td>
-								<td>2015-06-30 12:30:30</td>
-							</tr>
-							<tr>
-								<td>753</td>
-								<td>naveron115</td>
-								<td>장나라</td>
-								<td>데이터센터</td>
-								<td>대외정보관리부</td>
-								<td>과장</td>
-								<td>2015-06-30 12:30:30</td>
-								<td>2015-06-30 12:30:30</td>
-							</tr>
-							<tr>
-								<td>754</td>
-								<td>admin</td>
-								<td>관리자</td>
-								<td>데이터센터</td>
-								<td>대외정보관리부</td>
-								<td>과장</td>
-								<td>2015-06-30 12:30:30</td>
-								<td>2015-06-30 12:30:30</td>
-							</tr>
 						</tbody>
 					</table>
-					
-					<!-- paging -->
-					<div class="paging">
-						<div>
-							<a href="#none" class="first"></a>
-							<a href="#none" class="prev"></a>
-						</div>
-						
-						<div class="pl15 pr15">
-							<u class="selected">1</u>
-							<a href="#" class="page">2</a>
-							<a href="#" class="page">3</a>
-							<a href="#" class="page">4</a>
-							<a href="#" class="page">5</a>
-						</div>
-						
-						<div>
-							<a href="#none" class="next"></a>
-							<a href="#none" class="last"></a>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-
-  
-<div class="contextMenu" id="contextFolder">
-    <ul style="width: 160px;">
-        <li id="createAuthGrp">
-            <i class="fa fa-folder-o"></i>
-            <span style="font-size:12px; font-family:맑은 고딕">접근권한 그룹 생성</span>
-        </li>
-        <li id="modifyAuthGrp">
-            <i class="fa fa-pencil-square-o"></i>
-            <span style="font-size:12px; font-family:맑은 고딕">접근권한 그룹 수정</span>
-        </li>
-        <li id="deleteAuthGrp">
-            <i class="fa fa-trash-o"></i>
-            <span style="font-size:12px; font-family:맑은 고딕">접근권한 그룹 삭제</span>
-        </li>
-        <li id="createAcctGrp">
-            <i class="fa fa-pencil-square-o"></i>
-            <span style="font-size:12px; font-family:맑은 고딕">계정그룹 생성</span>
-        </li>
-        <li id="modifyAcctGrp">
-            <i class="fa fa-pencil-square-o"></i>
-            <span style="font-size:12px; font-family:맑은 고딕">계정그룹 수정</span>
-        </li>
-        <li id="deleteAcctGrp">
-            <i class="fa fa-trash-o"></i>
-            <span style="font-size:12px; font-family:맑은 고딕">계정그룹 삭제</span>
-        </li>
-        <li id="createAcct">
-            <i class="fa fa-trash-o"></i>
-            <span style="font-size:12px; font-family:맑은 고딕">계정 생성</span>
-        </li>
-    </ul>
-</div>
-
 
 <%@ include file="../include/footer.jsp"%>

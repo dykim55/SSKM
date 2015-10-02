@@ -26,7 +26,12 @@ int nPage = (Integer)request.getAttribute("page");
 <script type="text/javascript">
 
 $(document).ready(function() {
-	
+
+	$(".board").find("tbody").on("click", "tr", function() {
+		console.log("click!");
+		fileUpload($(this).attr("data-tt-id"));
+	});
+
 	$(".board").find("tbody").on("mouseenter", "td", function() {
 		$(this).parent().find(".option").show();
 		$(this).parent().find("td").css({background:"#f2f2f2"});
@@ -58,6 +63,7 @@ $(document).ready(function() {
 			<div class="set-table">				
 		
 				<div class="left-set">
+					<div class="location"></div>
 				</div>
 				<div class="right-set">
 				<% if (!StringUtil.isEmpty(sParent)) { %>
@@ -100,7 +106,7 @@ $(document).ready(function() {
 					<div class="subject">
 						<a href="javascript:fileUpload(<%=StringUtil.convertString(map.get("pId")) %>)"><%=StringUtil.convertString(map.get("title")) %></a>
 						<div class="option">
-							<a href="#" onclick="deleteFile(<%=StringUtil.convertString(map.get("pId")) %>)" class="delete"></a>
+							<a href="#" onclick="deleteFile(<%=StringUtil.convertString(map.get("pId")) %>);" class="delete"></a>
 						</div>
 					</div>
 				</td>
@@ -108,7 +114,7 @@ $(document).ready(function() {
 			<% if (StringUtil.convertString(map.get("fileYn")).equals("y")) { %>
 					<!-- file list -->
 					<div class="filebox">
-						<a href="javascript:fileBox(<%=StringUtil.convertString(map.get("pId")) %>)" class="clip"></a>
+						<a href="#" onclick="javascript:fileBox(<%=StringUtil.convertString(map.get("pId")) %>)" class="clip"></a>
 					</div>
 			<% } %>
 				</td>

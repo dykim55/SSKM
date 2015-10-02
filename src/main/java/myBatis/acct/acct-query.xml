@@ -24,6 +24,7 @@
 		    ,A.regDtime
 		    ,A.modr
 		    ,A.modDtime
+		    ,A.latestDtime
 		    ,(SELECT acctPrntCd FROM AcctGrpTbl WHERE acctGrpCd = A.acctGrpCd) as authGrp
         FROM AcctTbl A
         WHERE 1 = 1
@@ -75,6 +76,7 @@
 		    ,regDtime
 		    ,modr
 		    ,modDtime
+		    ,latestDtime
 		    ,(SELECT acctPrntCd FROM AcctGrpTbl WHERE acctGrpCd = A.acctGrpCd) as authGrp
         FROM AcctTbl A
         WHERE 1 = 1
@@ -214,8 +216,10 @@
             <if test="acctSt != null"> acctSt = #{acctSt}, </if>
             <if test="mobile != null"> mobile = #{mobile}, </if>
             <if test="email != null"> email = #{email}, </if>
-            modr = #{modr},
-            modDtime = #{modDtime}          
+            <if test="latestDtime != null"> latestDtime = #{latestDtime}, </if>
+			<if test="modr != null"> modr = #{modr}, </if>
+			<if test="modDtime != null"> modDtime = #{modDtime}, </if>
+			acctId = #{acctId}
         WHERE acctId = #{acctId}
     </update>
 	

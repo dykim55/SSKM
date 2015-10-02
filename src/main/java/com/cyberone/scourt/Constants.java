@@ -34,9 +34,7 @@ public class Constants {
 	
 	/** 게시판타입 */
 	public static final String	BBS_NOTICE = "1";	//공지사항
-	public static final String	BBS_RAWS = "2";		//법제도
-	public static final String	BBS_TREND = "3";	//보안동향
-	public static final String	BBS_PRIVACY = "4";	//개인정보
+	public static final String	BBS_TRANSFER = "2";	//인수인계
 	
 	public static String getFileExtension(String sFileName) {
 		
@@ -102,11 +100,11 @@ public class Constants {
 		if (sUrl.indexOf("/notice") >= 0) {
 			return BBS_NOTICE;
 		} else if (sUrl.indexOf("/raws") >= 0) {
-			return BBS_RAWS;
+			return "2";
 		} else if (sUrl.indexOf("/securityTrend") >= 0) {
-			return BBS_TREND;
+			return "3";
 		} else if (sUrl.indexOf("/privacy") >= 0) {
-			return BBS_PRIVACY;	
+			return "4";	
 		}
 		return "";
 	}

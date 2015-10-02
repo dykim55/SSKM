@@ -21,6 +21,7 @@
             ,A.bbsSct
             ,A.fileYn
             ,A.regr
+            ,(SELECT acctNm FROM AcctTbl WHERE acctId = A.regr) AS regrNm
             ,A.modr
             ,A.regDtime
             ,A.modDtime
@@ -74,8 +75,10 @@
             <if test="bbsCont != null"> bbsCont = #{bbsCont}, </if>
             <if test="fileYn != null"> fileYn = #{fileYn}, </if>
             <if test="delYn != null"> delYn = #{delYn}, </if>
-            modr = #{modr},
-            modDtime = #{modDtime}          
+            <if test="modr != null"> modr = #{modr}, </if>
+            <if test="modDtime != null"> modDtime = #{modDtime}, </if>
+            <if test="qryCnt != null"> qryCnt = qryCnt + 1, </if>
+            bbsId = #{bbsId}
         WHERE bbsId = #{bbsId}
     </update>
 	
@@ -178,5 +181,15 @@
             qryCnt = qryCnt + 1
         WHERE bbsId = #{bbsId}
     </update>
+    	
+	<delete id="deleteAppxById">
+		DELETE FROM AppxFileTbl
+		WHERE fileId = #{fileId}
+	</delete>
+
+	<delete id="deleteAppxByRef">
+		DELETE FROM AppxFileTbl
+		WHERE refCd = #{refCd}
+	</delete>
     	
 </mapper>

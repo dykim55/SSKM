@@ -53,6 +53,29 @@ ACCT_PG = (function() {
 	};
 })();
 
+ARTICLE_PG = (function() {
+	var rows=15, page=1, bbsSct;
+	
+	return {
+		reload : function(b, func) {
+			if(b) bbsSct = b;
+        	$(".dual-right").load("/article/article_list", {
+        		rows: rows,
+        		bbsSct: bbsSct,
+        		page : page
+        	}, func);
+		},
+		move : function(p) {
+			if(p) page = p;
+			this.reload();
+		},
+		rows : function(r) {
+			if(r) { rows = r; page = 1; }
+			this.reload();
+		}
+	};
+})();
+
 DIALOG = (function() { 
     return {
         Open : function() { 
