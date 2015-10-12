@@ -1,6 +1,9 @@
 package com.cyberone.scourt.article.controller;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -24,6 +28,7 @@ import com.cyberone.scourt.article.service.ArticleService;
 import com.cyberone.scourt.exception.BizException;
 import com.cyberone.scourt.model.AppxFile;
 import com.cyberone.scourt.model.Board;
+import com.cyberone.scourt.model.Files;
 import com.cyberone.scourt.model.UserInfo;
 import com.cyberone.scourt.utils.DataUtil;
 import com.cyberone.scourt.utils.StringUtil;
@@ -37,7 +42,7 @@ public class ArticleController {
     @Autowired
     private ArticleService articleService;
 
-    @RequestMapping(value = {"/article/notice", "raws"})
+    @RequestMapping(value = {"/article/notice", "/article/transfer"})
     public String article(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
     	logger.debug(request.getServletPath());
     	
@@ -143,6 +148,7 @@ public class ArticleController {
     		}
     		
     	} else {
+    		paramMap.put("bbsSct", sBbsSct);
         	paramMap.put("fileYn", "n");
         	paramMap.put("delYn", "n");
         	paramMap.put("regr", userInfo.getAcct().getAcctId());
@@ -157,6 +163,87 @@ public class ArticleController {
         return modelAndView.addObject("status", "success");
     }    
  
+    @RequestMapping("/article/article_delete")
+    public ModelAndView fileDelete(HttpServletRequest request) throws Exception {
+    	logger.debug(request.getServletPath());
+
+    	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
+    	
+    	String sId = request.getParameter("id");
+    	
+		HashMap<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("bbsId", Integer.valueOf(sId));
+		HashMap<String, Object> articleMap =  articleService.selectBoard(paramMap);
+
+		if (articleMap == null) {
+			throw new BizException("이미 삭제되었습니다.");
+		}
+		
+		articleService.deleteBoard(paramMap);
+		
+		articleService.deleteAppxByRef(paramMap);
+		
+		Common.insertAuditHist(Constants.AUDIT_ARTICLE, "공지사항이 삭제되었습니다.", "S", StringUtil.convertString(articleMap.get("title")), userInfo.getAcct().getAcctId());
+		
+        ModelAndView modelAndView = new ModelAndView("jsonView");
+        return modelAndView.addObject("status", "success"); 
+    }
+    
+    @RequestMapping("/article/appx_list")
+    public String appxList(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+    	logger.debug(request.getServletPath());
+ 
+    	String sId = request.getParameter("id");
+    	
+    	if (!StringUtil.isEmpty(sId)) {
+    		
+        	AppxFile appxFile = new AppxFile();
+        	appxFile.setRefCd(Integer.valueOf(sId));
+    		List<AppxFile> appxFiles = articleService.selectAppxFiles(appxFile);
+        	model.addAttribute("appxList", appxFiles);
+    	}
+
+    	return "/article/file_box";
+    }
+    
+    @RequestMapping("/article/downloadFile")
+	public void downloadFile(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+    	
+    	String sFileId = request.getParameter("id");
+    	
+    	AppxFile appxFile = new AppxFile();
+    	appxFile.setFileId(Integer.valueOf(sFileId));
+    	List<AppxFile> appxFiles = articleService.selectAppxFiles(appxFile);
+    	
+    	if (appxFiles.size() == 0) {
+    		throw new Exception();
+    	}
+    	
+		String sOrgFileName = appxFiles.get(0).getFileOrgNm();
+		
+		File uFile = new File(appxFiles.get(0).getFileLoc());
+		int fSize = (int) uFile.length();
+ 
+		if (fSize > 0) {
+			BufferedInputStream in = new BufferedInputStream(new FileInputStream(uFile));
+
+			String mimetype = "text/html";
+ 
+			response.setBufferSize(fSize);
+			response.setContentType(mimetype);
+			response.setHeader("Content-Disposition", "attachment; filename=\""
+					+ URLEncoder.encode(sOrgFileName, "UTF-8") + "\"");
+			response.setContentLength(fSize);
+ 
+			FileCopyUtils.copy(in, response.getOutputStream());
+			in.close();
+			response.getOutputStream().flush();
+			response.getOutputStream().close();
+		} else {
+			throw new Exception();
+		}
+	}
+    
 	public void removeFile(String sFileSeq, String sRef, UserInfo userInfo) throws Exception {
 
     	HashMap<String, Object> hRefMap = null;
@@ -192,5 +279,6 @@ public class ArticleController {
 			articleService.updateBoard(paramMap);
 		}
 	}
-    
+ 
+	
 }

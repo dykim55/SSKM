@@ -36,7 +36,11 @@ public class ArticleDao {
 	public void updateBoard(HashMap<String, Object> paramMap) throws Exception {
 		sqlSession.update("Board.updateBoard", paramMap);
 	}	
-	
+
+	public void deleteBoard(HashMap<String, Object> paramMap) throws Exception {
+		sqlSession.delete("Board.deleteBoard", paramMap);
+	}	
+
 	public int writeAppxFile(AppxFile appxFile) throws Exception {
 		return sqlSession.insert("Board.insertAppxFile", appxFile);
 	}

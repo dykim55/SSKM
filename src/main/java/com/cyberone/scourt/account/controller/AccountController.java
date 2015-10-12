@@ -171,6 +171,21 @@ public class AccountController {
         return modelAndView.addObject("status", "success"); 
     }
     
+    @RequestMapping("/account/member")
+    public String member(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+    	logger.debug(request.getServletPath());
+    	
+    	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
+    	
+    	HashMap<String, Object> paramMap = new HashMap<String, Object>();
+    	paramMap.put("acctId", userInfo.getAcct().getAcctId());
+    	Acct acctInfo = accountService.selectAcct(paramMap);
+    	
+    	model.addAttribute("acctInfo", acctInfo);
+    	
+    	return "/account/member";
+    }
+    
     @RequestMapping("/account/create_account")
     public String createAccount(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
     	logger.debug(request.getServletPath());
@@ -196,9 +211,9 @@ public class AccountController {
     	    	
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
-    	String sAuthGrpId = request.getParameter("id");
-    	String sAuthGrpName = StringUtil.replaceHtml(request.getParameter("name"));
-    	String sAuthGrpDesc = StringUtil.replaceHtml(request.getParameter("desc"));
+    	String sAuthGrpId = request.getParameter("auth_grp");
+    	String sAuthGrpName = StringUtil.replaceHtml(request.getParameter("auth_name"));
+    	String sAuthGrpDesc = StringUtil.replaceHtml(request.getParameter("auth_desc"));
     	
     	HashMap<String, Object> paramMap = new HashMap<String, Object>();
     	paramMap.put("acctGrpNm", sAuthGrpName);
@@ -235,6 +250,11 @@ public class AccountController {
     	String sAuthGrpName = StringUtil.replaceHtml(request.getParameter("name"));
     	String sAuthGrpDesc = StringUtil.replaceHtml(request.getParameter("desc"));
     	String sPrmsMenus = request.getParameter("auth");
+    	
+    	String[] saMenu = sPrmsMenus.split(",");
+    	if (saMenu.length == 0) {
+    		throw new BizException("접근권한 설정이 필요합니다.");
+    	}
     	
     	HashMap<String, Object> paramMap = new HashMap<String, Object>();
     	paramMap.put("acctGrpNm", sAuthGrpName);
@@ -279,14 +299,14 @@ public class AccountController {
 
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
-    	String sAcctId = request.getParameter("id");
-    	String sAcctNm = StringUtil.replaceHtml(request.getParameter("name"));
-    	String sPw = request.getParameter("pw");
-    	String sPwCf = request.getParameter("pw_cf");
-    	String sDept = StringUtil.replaceHtml(request.getParameter("dept"));
-    	String sOflv = StringUtil.replaceHtml(request.getParameter("oflv"));
-    	String sEmail = StringUtil.replaceHtml(request.getParameter("email"));
-    	String sMobile = StringUtil.replaceHtml(request.getParameter("mobile"));
+    	String sAcctId = request.getParameter("acct_id");
+    	String sAcctNm = StringUtil.replaceHtml(request.getParameter("acct_name"));
+    	String sPw = request.getParameter("acct_pw");
+    	String sPwCf = request.getParameter("acct_pw_cf");
+    	String sDept = StringUtil.replaceHtml(request.getParameter("acct_dept"));
+    	String sOflv = StringUtil.replaceHtml(request.getParameter("acct_oflv"));
+    	String sEmail = StringUtil.replaceHtml(request.getParameter("acct_email"));
+    	String sMobile = StringUtil.replaceHtml(request.getParameter("acct_mobile"));
 
 		if (StringUtil.isEmpty(sAcctId)) {
 			throw new BizException("아이디를 입력하세요.");
@@ -298,39 +318,19 @@ public class AccountController {
         	throw new BizException("아이디는 영문자 또는 숫자조합으로 5자부터 16자까지 가능합니다.");
         }
 
-    	String sAuthGrp = request.getParameter("auth_grp");
-    	if (sAuthGrp.equals("0")) {
-    		throw new BizException("접근권한그룹을 선택하세요.");
-    	}
-
-    	String sAcctGrp = request.getParameter("acct_grp");
-    	if (sAcctGrp.equals("0")) {
-    		throw new BizException("계정그룹을 선택하세요.");
-    	}
-        
-        if (!StringUtil.isEmpty(sMobile)) {
-			pattern = Pattern.compile(Constants.MOBILE_PATTERN);
-	        matcher = pattern.matcher(sMobile);
-	        if (!matcher.matches()) {
-	        	throw new BizException("잘못된 휴대폰 번호입니다. 휴대폰 번호를 확인하세요.");
-	        }
-        }
-        
-        if (!StringUtil.isEmpty(sEmail)) {
-			pattern = Pattern.compile(Constants.EMAIL_PATTERN);
-	        matcher = pattern.matcher(sEmail);
-	        if (!matcher.matches()) {
-	        	throw new BizException("잘못된 이메일 주소입니다. 이메일 주소를 확인하세요.");
-	        }
-        }
-        
     	HashMap<String, Object> paramMap = new HashMap<String, Object>();
     	paramMap.put("acctId", sAcctId);
 
     	Acct acct = accountService.selectAcct(paramMap);
-    	
+
     	if (request.getServletPath().equals("/account/register_account") && acct != null) {
     		throw new BizException("사용중인 아이디입니다.");
+    	}
+    	
+    	if (request.getServletPath().equals("/account/register_account")) {
+    		if (sPw.isEmpty() || sPwCf.isEmpty()) {
+    			throw new BizException("비밀번호를 확인하세요.");
+    		}
     	}
     	
     	if (!sPw.isEmpty() && !sPwCf.isEmpty()) {
@@ -344,6 +344,32 @@ public class AccountController {
 	        }
 	        paramMap.put("acctPw", Encryption.encrypt(sPw));
     	}
+    	
+    	String sAuthGrp = request.getParameter("acct_auth_grp");
+    	if (sAuthGrp.equals("0")) {
+    		throw new BizException("접근권한그룹을 선택하세요.");
+    	}
+
+    	String sAcctGrp = request.getParameter("acct_grp");
+    	if (sAcctGrp.equals("0")) {
+    		throw new BizException("계정그룹을 선택하세요.");
+    	}
+
+        if (!StringUtil.isEmpty(sEmail)) {
+			pattern = Pattern.compile(Constants.EMAIL_PATTERN);
+	        matcher = pattern.matcher(sEmail);
+	        if (!matcher.matches()) {
+	        	throw new BizException("잘못된 이메일 주소입니다. 이메일 주소를 확인하세요.");
+	        }
+        }
+    	
+        if (!StringUtil.isEmpty(sMobile)) {
+			pattern = Pattern.compile(Constants.MOBILE_PATTERN);
+	        matcher = pattern.matcher(sMobile);
+	        if (!matcher.matches()) {
+	        	throw new BizException("잘못된 휴대폰 번호입니다. 휴대폰 번호를 확인하세요.");
+	        }
+        }
     	
     	paramMap.put("acctNm", sAcctNm);
     	paramMap.put("acctGrpCd", Integer.valueOf(sAcctGrp));
@@ -379,6 +405,133 @@ public class AccountController {
     	
     	ModelAndView modelAndView = new ModelAndView("jsonView");
     	modelAndView.addObject("id", paramMap.get("acctGrpCd"));
+    	return modelAndView.addObject("status", "success"); 
+    }
+
+    @RequestMapping("/account/delete_account")
+    public ModelAndView deleteAccount(HttpServletRequest request) throws Exception {
+    	logger.debug(request.getServletPath());
+
+    	String sAcctId = request.getParameter("acct_id");
+
+    	HashMap<String, Object> paramMap = new HashMap<String, Object>();
+    	paramMap.put("acctId", sAcctId);
+    	Acct acctInfo = accountService.selectAcct(paramMap);
+
+    	if (StringUtil.isEmpty(acctInfo)) {
+    		throw new BizException("계정이 존재하지 않습니다.");
+    	}
+    	
+    	paramMap.put("acctSt", 9);
+    	accountService.updateAcct(paramMap);
+    	
+    	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
+        Common.insertAuditHist(Constants.AUDIT_ACCOUNT, "계정 '" + acctInfo.getAcctId() + "(" + acctInfo.getAcctNm() + ")" + "'이 삭제되었습니다.", "S", "", userInfo.getAcct().getAcctId());
+        
+        ModelAndView modelAndView = new ModelAndView("jsonView");
+        return modelAndView.addObject("status", "success"); 
+    }
+
+    @RequestMapping("/account/modify_member")
+    public ModelAndView modifyMember(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+    	logger.debug(request.getServletPath());
+
+    	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
+    	
+    	String sAcctNm = StringUtil.replaceHtml(request.getParameter("acct_name"));
+    	String sPw = request.getParameter("acct_pw");
+    	String sPwCf = request.getParameter("acct_pw_cf");
+    	String sDept = StringUtil.replaceHtml(request.getParameter("acct_dept"));
+    	String sOflv = StringUtil.replaceHtml(request.getParameter("acct_oflv"));
+    	String sEmail = StringUtil.replaceHtml(request.getParameter("acct_email"));
+    	String sMobile = StringUtil.replaceHtml(request.getParameter("acct_mobile"));
+
+    	HashMap<String, Object> paramMap = new HashMap<String, Object>();
+    	paramMap.put("acctId", userInfo.getAcct().getAcctId());
+
+    	Acct acct = accountService.selectAcct(paramMap);
+
+    	Pattern pattern;
+    	Matcher matcher;
+    	if (!sPw.isEmpty() && !sPwCf.isEmpty()) {
+			if (!sPw.equals(sPwCf)) {
+				throw new BizException("비밀번호확인이 틀림니다.");
+			}
+			pattern = Pattern.compile(Constants.PASSWORD_PATTERN);
+			matcher = pattern.matcher(sPw);
+	        if (!matcher.matches()) {
+	        	throw new BizException("비밀번호는 8~16자리의 영문 대/소문자,숫자,특수문자를 조합하여 사용해야 합니다.");
+	        }
+	        paramMap.put("acctPw", Encryption.encrypt(sPw));
+    	}
+    	
+        if (!StringUtil.isEmpty(sEmail)) {
+			pattern = Pattern.compile(Constants.EMAIL_PATTERN);
+	        matcher = pattern.matcher(sEmail);
+	        if (!matcher.matches()) {
+	        	throw new BizException("잘못된 이메일 주소입니다. 이메일 주소를 확인하세요.");
+	        }
+        }
+    	
+        if (!StringUtil.isEmpty(sMobile)) {
+			pattern = Pattern.compile(Constants.MOBILE_PATTERN);
+	        matcher = pattern.matcher(sMobile);
+	        if (!matcher.matches()) {
+	        	throw new BizException("잘못된 휴대폰 번호입니다. 휴대폰 번호를 확인하세요.");
+	        }
+        }
+    	
+    	paramMap.put("acctNm", sAcctNm);
+    	paramMap.put("deptNm", sDept);
+    	paramMap.put("oflvNm", sOflv);
+    	paramMap.put("mobile", sMobile);
+    	paramMap.put("email", sEmail);
+    	paramMap.put("modr", userInfo.getAcct().getAcctId());
+    	paramMap.put("modDtime", new Date());
+
+		String sBefore = "이전\n";
+		String sAfter = "이후\n";
+
+		if (!sAcctNm.equals(acct.getAcctNm())) {
+			sBefore += "성명: " + acct.getAcctNm() + "\n";
+			sAfter += "성명: " + sAcctNm + "\n";
+			userInfo.getAcct().setAcctNm(sAcctNm);
+		}
+
+		if (!Encryption.encrypt(sPw).equals(acct.getAcctPw())) {
+			sBefore += "비밀번호:\n";
+			sAfter += "비밀번호: 변경되었습니다.\n";
+		}
+
+		if (!sDept.equals(acct.getDeptNm())) {
+			sBefore += "부서: " + acct.getDeptNm() + "\n";
+			sAfter += "부서: " + sDept + "\n";
+			userInfo.getAcct().setDeptNm(sDept);
+		}
+
+		if (!sOflv.equals(acct.getOflvNm())) {
+			sBefore += "직급: " + acct.getOflvNm() + "\n";
+			sAfter += "직급: " + sOflv + "\n";
+			userInfo.getAcct().setOflvNm(sOflv);
+		}
+
+		if (!sMobile.equals(acct.getMobile())) {
+			sBefore += "휴대폰: " + acct.getMobile() + "\n";
+			sAfter += "휴대폰: " + sMobile + "\n";
+			userInfo.getAcct().setMobile(sMobile);
+		}
+
+		if (!sEmail.equals(acct.getEmail())) {
+			sBefore += "이메일: " + acct.getEmail() + "\n";
+			sAfter += "이메일: " + sEmail + "\n";
+			userInfo.getAcct().setEmail(sEmail);
+		}
+		
+		accountService.updateAcct(paramMap);
+		Common.insertAuditHist(Constants.AUDIT_ACCOUNT, "계정을 수정하였습니다.", "S", sBefore + "\n\n" +sAfter, userInfo.getAcct().getAcctId());
+    	
+    	ModelAndView modelAndView = new ModelAndView("jsonView");
+    	modelAndView.addObject("name", sAcctNm);
     	return modelAndView.addObject("status", "success"); 
     }
 
@@ -432,5 +585,10 @@ public class AccountController {
     	out.close();
     }
     
-    
+    @RequestMapping(value = {"/common/_alert", "/common/_confirm"})
+    public String _alert(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+    	logger.debug(request.getServletPath());
+        return request.getServletPath();
+    }
+   
 }

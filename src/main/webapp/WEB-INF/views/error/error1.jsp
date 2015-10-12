@@ -1,6 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
     import= "com.cyberone.scourt.utils.StringUtil"
 %>
+<% 
+    String sMessage = (String)request.getAttribute("message");
+    String sCode = StringUtil.nullToStr((String)request.getAttribute("code"));
+%>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -54,7 +59,6 @@
 	p.msg {
 		font-family:"malgun gothic","dotum",sans-serif; font-size:16px; color:#333; line-height:28px; letter-spacing:-1px;
 	}
-
 </style>
 </head>
 <body>
@@ -63,14 +67,19 @@
 			<img src="/images/common/page_error.png">
 			<div class="msg-box">
 				<div class="cell">
+			<% if (StringUtil.isEmpty(sMessage)) { %>
 					<p class="title">이 페이지를 표시할 수 없습니다.</p>
-					<p class="msg">존재하지 않는 페이지거나 오류로 인하여 페이지를 볼 수 없습니다.</p>
+					<p class="msg">오류로 인하여 페이지를 볼 수 없습니다.</p>
 					<p class="msg">잠시 후 다시 시도해 주십시요.</p>
 					<p class="msg">같은 문제가 지속되면 관리자에게 문의하세요.</p>
+			<% } else { %>
+					<p class="title">이 페이지를 표시할 수 없습니다.</p>
+					<p class="msg"><%=sMessage %></p>
+			<% } %>
 					<a href="javascript:window.history.back('-1')" class="btn btn-default btn-sm" style="text-decoration:none;"><i class="fa fa-undo" style="font-size:14px;color:#666;margin:2px;"></i> 이전 페이지</a>
 				</div>
 			</div>
 		</div>
 	</div>
 </body>
-</html>  
+</html>

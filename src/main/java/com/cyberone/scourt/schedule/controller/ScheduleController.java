@@ -41,8 +41,8 @@ public class ScheduleController {
     	return modelAndView.addObject("status", "success");
     }
 
-    @RequestMapping("scheduleWrite")
-    public ModelAndView regSchedule(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+    @RequestMapping("/schedule/schedule_write")
+    public ModelAndView scheduleWrite(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
     	logger.debug(request.getServletPath());
     	
     	String schdSeq = request.getParameter("schd_seq");
@@ -54,14 +54,14 @@ public class ScheduleController {
     	
     	HashMap<String, Object> schedule = scheduleService.selectSchedule(paramMap);
     	
-    	ModelAndView modelAndView = new ModelAndView("/schedule/scheduleWrite");
+    	ModelAndView modelAndView = new ModelAndView("/schedule/schedule_write");
     	modelAndView.addObject("schedule", schedule);
     	
     	return modelAndView.addObject("status", "success");
     }
     
-    @RequestMapping("scheduleList")
-    public ModelAndView list(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+    @RequestMapping("/schedule/schedule_list")
+    public ModelAndView scheduleList(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
     	logger.debug(request.getServletPath());
     	
     	ModelAndView modelAndView = new ModelAndView("jsonView");
@@ -78,8 +78,8 @@ public class ScheduleController {
     	return modelAndView.addObject("status", "success");
     }
 
-    @RequestMapping("scheduleReg")
-    public ModelAndView scheduleReg(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+    @RequestMapping("/schedule/schedule_register")
+    public ModelAndView scheduleRegister(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
     	logger.debug(request.getServletPath());
     	
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
@@ -135,8 +135,8 @@ public class ScheduleController {
     	return modelAndView.addObject("status", "success");
     }
 
-    @RequestMapping("scheduleDel")
-    public ModelAndView scheduleDel(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+    @RequestMapping("/schedule/schedule_delete")
+    public ModelAndView scheduleDelete(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
     	logger.debug(request.getServletPath());
 
     	String schdSeq = request.getParameter("schd_seq");

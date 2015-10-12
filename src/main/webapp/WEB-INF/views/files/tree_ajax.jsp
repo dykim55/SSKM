@@ -25,12 +25,14 @@ $(document).ready(function() {
     
     $(".left-tree tbody").on("mousedown", "tr", function() {
     	if (!$(this).hasClass("selected")) {
+    		$(this).removeClass("hover");
     	    $(".left-tree .selected").not(this).removeClass("selected");
     	    $(this).toggleClass("selected");
     	}
-    	$(".location").html($('.accordion').find('.accordionHeaders.ac_selected')[0].textContent.trim() + "&nbsp;&nbsp;>&nbsp;&nbsp;" + $(this).closest('table').treetable('pathName', $(this).attr('data-tt-id')));
 
-    	PG.reload($(this).attr('data-tt-id'), function() {});
+    	PG.reload($(this).attr('data-tt-id'), function() {
+    		$(".location .left").html($('.accordion').find('.accordionHeaders.ac_selected')[0].textContent.trim() + "&nbsp;&nbsp;>&nbsp;&nbsp;" + $(".left-tree:visible").treetable('pathName', $(".left-tree:visible").find(".selected").attr('data-tt-id')));	
+    	});
     });
 
     $(".left-tree tbody").on("mouseenter", "tr", function() {
@@ -56,11 +58,11 @@ $(document).ready(function() {
        		
 	            <tr class="accordionContent" level='<%=ctgMap.get("level") %>' ref-sct='<%=ctgMap.get("ctgSct") %>' data-tt-id='<%=ctgMap.get("ctgId") %>' <% if ((Integer)ctgMap.get("ctgParent") > 0) { %> data-tt-parent-id='<%=ctgMap.get("ctgParent") %>' <% } %> style="display: none;">
 	                <td>
-	                    <span class='folder'><%=StringUtil.convertString(ctgMap.get("ctgNm")) %></span>
+	                    <span><%=StringUtil.convertString(ctgMap.get("ctgNm")) %></span>
 	                    <div class="option">
-	                    	<a href="javascript:createFolder();"><i class="fa fa-plus-square-o"></i></a>
-	                    	<a href="javascript:modifyFolder();"><i class="fa fa-pencil-square-o"></i></a>
-							<a href="javascript:deleteFolder();"><i class="fa fa-trash-o"></i></a>
+	                    	<a href="javascript:createFolder();" class="addfolder" title="추가"></a>
+	                    	<a href="javascript:modifyFolder();" class="editfolder" title="수정"></a>
+							<a href="javascript:deleteFolder();" class="delfolder" title="삭제"></a>
 	                    </div>
 	                </td>
 	            </tr>

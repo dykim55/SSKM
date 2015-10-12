@@ -1,15 +1,19 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
         import= "java.util.List
         , java.util.HashMap
+        , java.util.Date
         , java.lang.Integer
+        , com.cyberone.scourt.model.UserInfo
         , com.cyberone.scourt.model.AcctGrp
         , com.cyberone.scourt.utils.StringUtil"
 %>
 
 <%
-@SuppressWarnings("unchecked")
+UserInfo userInfo = (UserInfo)request.getAttribute("userInfo");
+
 AcctGrp acctGrpInfo = (AcctGrp)request.getAttribute("acctGrpInfo");
 
+@SuppressWarnings("unchecked")
 List<HashMap<String, Object>> menuList = (List<HashMap<String, Object>>)request.getAttribute("menuList");
 
 %>
@@ -26,7 +30,6 @@ CREATE_GROUP = (function() {
     		$(".board-insert input:checked").each(function() {
     			 menuCodes += $(this).attr('menu-id') + ",";
     		});
-    		console.log(menuCodes);
 			return menuCodes;    		
     	},
         init: function(Dlg, t) {
@@ -42,7 +45,18 @@ CREATE_GROUP = (function() {
                 title: <% if (acctGrpInfo.getAcctPrntCd() == 0) { %> "계정 그룹 등록" <% } else { %> "계정 그룹 수정" <% } %>,
                 buttons: {
 <% if (acctGrpInfo.getAcctPrntCd() == 0) { %> "등록" <% } else { %> "수정" <% } %> : function() {
-                    	
+    
+					  	var flag=false;
+						_Dlg.find(".important:visible").each(function() {
+					        if ($(this).val().length == 0) {
+					            $(this).select();
+					            flag = true;
+					            _alert($(this).attr("alt")+" 필수 입력값입니다.");
+					            return false;
+					        }
+					    });
+					    if (flag) return false;
+
                         $.ajax({
                             url: "/account/register_acct_group",
                             dataType: 'json',
@@ -54,13 +68,16 @@ CREATE_GROUP = (function() {
                             	auth : CREATE_GROUP.auth()
                             },
                             success: function(data, text, request) {
-								$("#account-tree-div").load("/account/tree_ajax", {}, function() {
-									$(this).find(".account-tree").treetable("reveal", data.id);
-								});
-								_Dlg.dialog("close");
+                            	if (data.status=="success") {
+									$("#account-tree-div").load("/account/tree_ajax", {}, function() {
+										$(this).find(".account-tree").treetable("reveal", data.id);
+									});
+									_Dlg.dialog("close");
+                            	} else {
+                            		_alert(data.message);	
+                            	}
                             }
                         });
-
                     },
                     "취소": function() {
                         $(this).dialog("close");
@@ -107,13 +124,19 @@ $(document).ready(function() {
 	<div class="dia-insert">
 		<table class="board-insert">
 			<colgroup>
-				<col width="100">
+				<col width="10%">
 				<col width="*">
+				<col width="10%">
+				<col width="15%">
 			</colgroup>
 			<tr>
 				<th>계정그룹명</th>
 				<td>
-					<input type="text" name="group_name" id="group_name" value="<%=StringUtil.convertString(acctGrpInfo.getAcctGrpNm()) %>">
+					<input type="text" class="important" name="group_name" id="group_name" value="<%=StringUtil.convertString(acctGrpInfo.getAcctGrpNm()) %>" alt="계정그룹명은">
+				</td>
+				<th>만든 사람</th>
+				<td>
+					<%=acctGrpInfo.getAcctPrntCd() == 0 ? userInfo.getAcct().getAcctNm() : StringUtil.convertString(acctGrpInfo.getRegrNm()) %>
 				</td>
 			</tr>
             <tr>
@@ -121,10 +144,14 @@ $(document).ready(function() {
                 <td class="left">
                     <input type="text" name="group_desc" id="group_desc" value="<%=StringUtil.convertString(acctGrpInfo.getAcctGrpDesc()) %>">
                 </td>
+				<th>만든 날짜</th>
+				<td>
+					<%=acctGrpInfo.getAcctPrntCd() == 0 ? StringUtil.convertDate(new Date(),"yyyy-MM-dd HH:mm:ss") : StringUtil.convertDate(acctGrpInfo.getRegDtime(),"yyyy-MM-dd HH:mm:ss") %>
+				</td>
             </tr>
 			<tr>
 				<th>접근권한 설정</th>
-				<td>
+				<td colspan="3">
 					<div class="rows1">
 						<dl style="width: 16%;">
 							<dt><input type="checkbox" id="b0" menu-id="1000"><label for="b0">보안 관제/운영</label></dt>

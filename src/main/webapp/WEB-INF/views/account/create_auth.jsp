@@ -1,12 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
         import= "java.util.List
         , java.util.HashMap
+        , java.util.Date
+        , com.cyberone.scourt.model.UserInfo
         , com.cyberone.scourt.model.AcctGrp
         , com.cyberone.scourt.utils.StringUtil"
 %>
 
 <%
-@SuppressWarnings("unchecked")
+UserInfo userInfo = (UserInfo)request.getAttribute("userInfo");
 AcctGrp authInfo = (AcctGrp)request.getAttribute("authInfo");
 authInfo = StringUtil.isEmpty(authInfo) || authInfo.getAcctPrntCd() == 0 ? new AcctGrp() : authInfo; 
 %>
@@ -16,6 +18,28 @@ authInfo = StringUtil.isEmpty(authInfo) || authInfo.getAcctPrntCd() == 0 ? new A
 CREATE_AUTH_GROUP = (function() {
 	var _Dlg;
 	var bProcessing = false;
+	
+	$("#auth_frm").ajaxForm({
+        beforeSubmit: function(data, form, option) {
+            return true;
+        },
+        success: function(data, status) {
+        	if (data.status=="success") {
+				$("#account-tree-div").load("/account/tree_ajax", {}, function() {
+				    $(".account-tree tr").each(function() {
+				    	if ($(this)[0].getAttribute('data-tt-id')==data.id) {
+				    	    $(".selected").not(this).removeClass("selected");
+				    	    $(this).addClass("selected");
+				    		return false;
+				    	}
+					});
+				});
+				_Dlg.dialog("close");
+        	} else {
+        		_alert(data.message);	
+        	}
+        }
+    });
 	
     return {
         init: function(Dlg, t) {
@@ -30,30 +54,18 @@ CREATE_AUTH_GROUP = (function() {
                 buttons: {
 <% if (authInfo.getAcctPrntCd() == 0) { %> "등록" <% } else { %> "수정" <% } %> : function() {
                     	
-                        $.ajax({
-                            url: "/account/register_auth_group",
-                            dataType: 'json',
-                            data : { 
-                            	id : <%=authInfo.getAcctGrpCd()%>, 
-                            	name : $("#auth_name").val(), 
-                            	desc : $("#auth_desc").val() 
-                            },
-                            success: function(data, text, request) {
-								$("#account-tree-div").load("/account/tree_ajax", {}, function() {
-								    $(".account-tree tr").each(function() {
-								    	stop();
-								    	console.log($(this)[0].getAttribute('data-tt-id'));
-								    	if ($(this)[0].getAttribute('data-tt-id')==data.id) {
-								    	    $(".selected").not(this).removeClass("selected");
-								    	    $(this).addClass("selected");
-								    		return false;
-								    	}
-									});
-								});
-								_Dlg.dialog("close");
-                            }
-                        });
-                    	
+					  	var flag=false;
+						_Dlg.find(".important:visible").each(function() {
+					        if ($(this).val().length == 0) {
+					            $(this).select();
+					            flag = true;
+					            _alert($(this).attr("alt")+" 필수 입력값입니다.");
+					            return false;
+					        }
+					    });
+					    if (flag) return false;
+					  
+						$("#auth_frm").submit();
                     },
                     "취소": function() {
                         $(this).dialog("close");
@@ -80,23 +92,38 @@ CREATE_AUTH_GROUP = (function() {
 
 <div id="addGroup">
 	<div class="dia-insert">
+		<form name="auth_frm" id="auth_frm" action="/account/register_auth_group" method="POST">
+		<input type="hidden" name="auth_grp" id="auth_grp" value="<%=authInfo.getAcctGrpCd()%>"/>
 		<table class="board-insert">
 			<colgroup>
-				<col width="100">
+				<col width="20%">
+				<col width="30%">
+				<col width="20%">
 				<col width="*">
 			</colgroup>
 			<tr>
-				<th>접근권한 그룹명</th>
+				<th>만든 사람</th>
 				<td>
-					<input type="text" name="auth_name" id="auth_name" value="<%=StringUtil.convertString(authInfo.getAcctGrpNm()) %>">
+					<%=authInfo.getAcctPrntCd() == 0 ? userInfo.getAcct().getAcctNm() : StringUtil.convertString(authInfo.getRegrNm()) %>					
+				</td>
+				<th>만든 날짜</th>
+				<td>
+					<%=authInfo.getAcctPrntCd() == 0 ? StringUtil.convertDate(new Date(),"yyyy-MM-dd HH:mm:ss") : StringUtil.convertDate(authInfo.getRegDtime(),"yyyy-MM-dd HH:mm:ss") %>
 				</td>
 			</tr>
 			<tr>
-				<th>설명</th>
-				<td>
+				<th>권한그룹명</th>
+				<td colspan="3">
+					<input type="text" class="important" name="auth_name" id="auth_name" value="<%=StringUtil.convertString(authInfo.getAcctGrpNm()) %>" alt="그룹명은">
+				</td>
+			</tr>
+			<tr>
+				<th>권한그룹 설명</th>
+				<td colspan="3">
 					<textarea name="auth_desc" id="auth_desc"><%=StringUtil.convertString(authInfo.getAcctGrpDesc()) %></textarea>
 				</td>
 			</tr>
 		</table>
+		</form>
   	</div>
 </div>

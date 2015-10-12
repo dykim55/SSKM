@@ -30,8 +30,7 @@ ARTICLE_DLG = (function() {
 	$("#article_form").ajaxForm({
         success: function(res, status) {
         	ARTICLE_PG.reload(<%=sBbsSct %>, function() { _Dlg.dialog("close"); });
-        },
-        error: function() {}
+        }
     });
 	
 	$("#uf_file").change(function() {
@@ -76,12 +75,25 @@ ARTICLE_DLG = (function() {
         	_Dlg.dialog({
                 autoOpen: false, 
                 resizable: false, 
-                width: 600,
+                width: 800,
                 modal: true,
+                title: <% if (sBbsSct.equals("1")) { %> "공지사항" <% } else if (sBbsSct.equals("2")) { %> "인수인계" <% } %>,
                 buttons: {
 <% if (!bbsMap.containsKey("bbsId") || (bbsMap.containsKey("bbsId") && StringUtil.convertString(bbsMap.get("regr")).equals(userInfo.getAcct().getAcctId()))) { //수정/상세 %>
                 	
 	<% if (bbsMap.containsKey("bbsId")) { %> "수정" <% } else { %> "등록" <% } %>: function() {
+		
+					  	var flag=false;
+						_Dlg.find(".important:visible").each(function() {
+					        if ($(this).val().length == 0) {
+					            $(this).select();
+					            flag = true;
+					            _alert($(this).attr("alt")+" 필수 입력값입니다.");
+					            return false;
+					        }
+					    });
+					    if (flag) return false;
+		
 						$("#article_form").submit();
                     },
                     "취소": function() {
@@ -113,10 +125,10 @@ ARTICLE_DLG = (function() {
 })();
 
 function delFile(el, id) {
-	if(confirm("첨부파일을 삭제 하시겠습니까?")) {
+	_confirm("삭제 하시겠습니까?", function() {
 		$("#uf_del").val($("#uf_del").val() + id + ",");
 		el.parent('u').remove();
-	}
+	});
 }
 </script>
 
@@ -150,13 +162,13 @@ function delFile(el, id) {
 			<tr>
 				<th>제목</th>
 				<td colspan="3">
-					<input name="uf_title" id="uf_title" type="text" value="<%=StringUtil.convertString(bbsMap.get("bbsTit")) %>">
+					<input class="important" name="uf_title" id="uf_title" type="text" value="<%=StringUtil.convertString(bbsMap.get("bbsTit")) %>"  alt="제목은 ">
 				</td>
 			</tr>
 			<tr>
 				<th>내용</th>
 				<td colspan="3">
-					<textarea id="uf_content" name="uf_content"><%=StringUtil.convertString(bbsMap.get("bbsCont")) %></textarea>
+					<textarea class="important" id="uf_content" name="uf_content" style="height: 200px;" alt="내용은 "><%=StringUtil.convertString(bbsMap.get("bbsCont")) %></textarea>
 				</td>
 			</tr>
 			<tr>
@@ -165,7 +177,7 @@ function delFile(el, id) {
 			<% if (appxFiles != null && appxFiles.size() > 0) { %>
 					<div class="file-list">
 				<% for (AppxFile f : appxFiles) { %>
-						<u style="padding: 5px 5px 5px 16px;background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat 2px;"><a href="javascript:fileDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> <a onclick="javascript:delFile($(this), <%=f.getFileId()%>)" class="del"></a></u>
+						<u style="padding: 5px 5px 5px 16px;background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat 2px;"><a href="javascript:appxDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> <a onclick="javascript:delFile($(this), <%=f.getFileId()%>)" class="del"></a></u>
 				<% } %>
 					</div>
 			<% } %>	
@@ -202,7 +214,7 @@ function delFile(el, id) {
 			</tr>
 			<tr>
 				<th>내용</th>
-				<td colspan="3"><pre style="white-space: pre-wrap;font-family: inherit;"><%=StringUtil.replaceHtml(StringUtil.convertString(bbsMap.get("bbsCont"))) %></pre></td>
+				<td colspan="3"><pre style="min-height:200px;white-space: pre-wrap;font-family: inherit;"><%=StringUtil.replaceHtml(StringUtil.convertString(bbsMap.get("bbsCont"))) %></pre></td>
 			</tr>
 			<tr>
 				<th>첨부파일</th>
@@ -210,7 +222,7 @@ function delFile(el, id) {
 			<% if (appxFiles != null && appxFiles.size() > 0) { %>
 					<div class="file-list">
 				<% for (AppxFile f : appxFiles) { %>
-						<u style="background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat;"><a href="javascript:fileDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> </u>
+						<u style="background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat;"><a href="javascript:appxDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> </u>
 				<% } %>
 					</div>
 			<% } %>	
@@ -228,7 +240,9 @@ function delFile(el, id) {
 
 <div id="register">
 
-<form name="article_form" id="article_form" action="/files/file_register" method="post" enctype="multipart/form-data">
+<form name="article_form" id="article_form" action="/article/article_register" method="post" enctype="multipart/form-data">
+	<input type="hidden" id="uf_sct" name="uf_sct" value="<%=sBbsSct %>">
+
 	<div class="dia-insert">
 		<table class="board-insert">
 			<colgroup>
@@ -246,13 +260,13 @@ function delFile(el, id) {
 			<tr>
 				<th>제목</th>
 				<td colspan="3">
-					<input name="uf_title" id="uf_title" type="text" value="<%=StringUtil.convertString(bbsMap.get("bbsTit")) %>">
+					<input class="important" name="uf_title" id="uf_title" type="text" value="<%=StringUtil.convertString(bbsMap.get("bbsTit")) %>" alt="제목은 ">
 				</td>
 			</tr>
 			<tr>
 				<th>내용</th>
 				<td colspan="3">
-					<textarea id="uf_content" name="uf_content"><%=StringUtil.convertString(bbsMap.get("bbsCont")) %></textarea>
+					<textarea class="important" id="uf_content" name="uf_content" style="height: 200px;" alt="내용은 "><%=StringUtil.convertString(bbsMap.get("bbsCont")) %></textarea>
 				</td>
 			</tr>
 			<tr>
@@ -261,7 +275,7 @@ function delFile(el, id) {
 			<% if (appxFiles != null && appxFiles.size() > 0) { %>
 					<div class="file-list">
 				<% for (AppxFile f : appxFiles) { %>
-						<u style="padding: 5px 5px 5px 16px;background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat 2px;"><a href="javascript:fileDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> <a href="#" class="del"></a></u>
+						<u style="padding: 5px 5px 5px 16px;background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat 2px;"><a href="javascript:appxDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> <a href="#" class="del"></a></u>
 				<% } %>
 					</div>
 			<% } %>	

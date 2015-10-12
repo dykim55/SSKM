@@ -26,15 +26,26 @@ FILE_UPLOAD = (function() {
 	var bProcessing = false;
 	
 	$("#file_upload_form").ajaxForm({
-        success: function(res, status) {
-        	PG.reload(false, function() { _Dlg.dialog("close"); });
+        beforeSubmit: function(data, form, option) {
+        	if ($(".file-add-write .file-list u").length > 0 || $(".file-add-write input").length > 1) return true;
+        	_alert("등록 할 파일을 선택하세요.");
+        	return false;
         },
-        error: function() {}
+        success: function(data, status) {
+        	if (data.status=="success") {
+        		PG.reload(false, function() { _Dlg.dialog("close"); });
+        	} else {
+        		_alert(data.message);
+        	}
+        }
     });
 	
-	$("#uf_file").change(function() {
+	$("#file-data").change(function() {
 		var str = $(this).val().substr($(this).val().lastIndexOf("\\") + 1);
-		$("#uf_title").val(str.substring(0, str.lastIndexOf(".")));
+		if ($("#uf_title").val().length == 0) {
+			$("#uf_title").val(str.substring(0, str.lastIndexOf(".")));
+			$("#uf_title").select();
+		}
 	});
 	
 	
@@ -87,8 +98,12 @@ FILE_UPLOAD = (function() {
 	    		_Dlg.find("#uf_parent").val($(".left-tree .selected").attr('data-tt-id'));
 			<% } %>
 			
-			_Dlg.closest('.ui-dialog').find('.ui-dialog-title').html($('.accordion').find('.accordionHeaders.ac_selected')[0].textContent.trim() + "&nbsp;&nbsp;>&nbsp;&nbsp;" + $(".left-tree .selected").closest("table").treetable('pathName', $(".left-tree .selected").attr('data-tt-id')));
-					
+			<% if (filesMap.containsKey("pId")) { %>
+				_Dlg.closest('.ui-dialog').find('.ui-dialog-title').html('<%=StringUtil.convertString(filesMap.get("pathNm"))%>');
+			<% } else { %>
+				_Dlg.closest('.ui-dialog').find('.ui-dialog-title').html($('.accordion').find('.accordionHeaders.ac_selected')[0].textContent.trim() + "&nbsp;&nbsp;>&nbsp;&nbsp;" + $(".left-tree .selected").closest("table").treetable('pathName', $(".left-tree .selected").attr('data-tt-id')));
+			<% } %>
+			
         	_Dlg.dialog({
                 autoOpen: false, 
                 resizable: false, 
@@ -98,6 +113,17 @@ FILE_UPLOAD = (function() {
 <% if (!filesMap.containsKey("pId") || (filesMap.containsKey("pId") && StringUtil.convertString(filesMap.get("regr")).equals(userInfo.getAcct().getAcctId()))) { //수정/상세 %>
                 	
 	<% if (filesMap.containsKey("pId")) { %> "수정" <% } else { %> "등록" <% } %>: function() {
+					  	var flag=false;
+						_Dlg.find(".important:visible").each(function() {
+					        if ($(this).val().length == 0) {
+					            $(this).select();
+					            flag = true;
+					            _alert($(this).attr("alt")+" 필수 입력값입니다.");
+					            return false;
+					        }
+					    });
+					    if (flag) return false;
+		
 						$("#file_upload_form").submit();
                     },
                     "취소": function() {
@@ -129,10 +155,10 @@ FILE_UPLOAD = (function() {
 })();
 
 function delFile(el, id) {
-	if(confirm("첨부파일을 삭제 하시겠습니까?")) {
+	_confirm("삭제 하시겠습니까?", function() {
 		$("#uf_del").val($("#uf_del").val() + id + ",");
 		el.parent('u').remove();
-	}
+	});
 }
 </script>
 
@@ -163,18 +189,6 @@ function delFile(el, id) {
 				<td><%=StringUtil.convertString(filesMap.get("regrNm")) %></td>
 			</tr>
 			<tr>
-				<th>제목</th>
-				<td colspan="3">
-					<input name="uf_title" id="uf_title" type="text" value="<%=StringUtil.convertString(filesMap.get("title")) %>">
-				</td>
-			</tr>
-			<tr>
-				<th>첨부설명</th>
-				<td colspan="3">
-					<textarea id="uf_content" name="uf_content"><%=StringUtil.convertString(filesMap.get("content")) %></textarea>
-				</td>
-			</tr>
-			<tr>
 				<th>첨부파일</th>
 				<td colspan="3" class="file-add-write">
 			<% if (filesList != null && filesList.size() > 0) { %>
@@ -185,6 +199,18 @@ function delFile(el, id) {
 					</div>
 			<% } %>	
 					<p><input type="file" name="file-data" id="file-data" class="file-data"></p>
+				</td>
+			</tr>
+			<tr>
+				<th>제목</th>
+				<td colspan="3">
+					<input class="important" name="uf_title" id="uf_title" type="text" value="<%=StringUtil.convertString(filesMap.get("title")) %>" alt="제목은 ">
+				</td>
+			</tr>
+			<tr>
+				<th>첨부설명</th>
+				<td colspan="3">
+					<textarea id="uf_content" name="uf_content"><%=StringUtil.convertString(filesMap.get("content")) %></textarea>
 				</td>
 			</tr>
 		</table>
@@ -212,14 +238,6 @@ function delFile(el, id) {
 				<td><%=StringUtil.convertString(filesMap.get("regrNm")) %></td>
 			</tr>
 			<tr>
-				<th>제목</th>
-				<td colspan="3"><%=StringUtil.replaceHtml(StringUtil.convertString(filesMap.get("title"))) %></td>
-			</tr>
-			<tr>
-				<th>첨부설명</th>
-				<td colspan="3"><pre><%=StringUtil.replaceHtml(StringUtil.convertString(filesMap.get("content"))) %></pre></td>
-			</tr>
-			<tr>
 				<th>첨부파일</th>
 				<td colspan="3">
 			<% if (filesList != null && filesList.size() > 0) { %>
@@ -230,6 +248,14 @@ function delFile(el, id) {
 					</div>
 			<% } %>	
 				</td>
+			</tr>
+			<tr>
+				<th>제목</th>
+				<td colspan="3"><%=StringUtil.replaceHtml(StringUtil.convertString(filesMap.get("title"))) %></td>
+			</tr>
+			<tr>
+				<th>첨부설명</th>
+				<td colspan="3"><pre><%=StringUtil.replaceHtml(StringUtil.convertString(filesMap.get("content"))) %></pre></td>
 			</tr>
 		</table>
   	</div>
@@ -260,18 +286,6 @@ function delFile(el, id) {
 				<td><%=userInfo.getAcct().getAcctNm() %></td>
 			</tr>
 			<tr>
-				<th>제목</th>
-				<td colspan="3">
-					<input name="uf_title" id="uf_title" type="text" value="<%=StringUtil.convertString(filesMap.get("title")) %>">
-				</td>
-			</tr>
-			<tr>
-				<th>첨부설명</th>
-				<td colspan="3">
-					<textarea id="uf_content" name="uf_content"><%=StringUtil.convertString(filesMap.get("content")) %></textarea>
-				</td>
-			</tr>
-			<tr>
 				<th>첨부파일</th>
 				<td colspan="3" class="file-add-write">
 			<% if (filesList != null && filesList.size() > 0) { %>
@@ -282,6 +296,18 @@ function delFile(el, id) {
 					</div>
 			<% } %>	
 					<p><input type="file" name="file-data" id="file-data" class="file-data"></p>
+				</td>
+			</tr>
+			<tr>
+				<th>제목</th>
+				<td colspan="3">
+					<input class="important" name="uf_title" id="uf_title" type="text" value="<%=StringUtil.convertString(filesMap.get("title")) %>" alt="제목은 ">
+				</td>
+			</tr>
+			<tr>
+				<th>첨부설명</th>
+				<td colspan="3">
+					<textarea id="uf_content" name="uf_content"><%=StringUtil.convertString(filesMap.get("content")) %></textarea>
 				</td>
 			</tr>
 		</table>

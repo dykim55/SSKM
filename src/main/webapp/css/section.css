@@ -68,13 +68,13 @@ div.header div.ci {
 }
 div.header div.nav div.menu {
 	height:50px;
-	background:url(/images/common/bg_menu.png);
+	background:url(/images/common/bg_nav.png) repeat-x;
 	border-bottom:1px solid #4a5a73;
 	position:relative;
 }
 div.header div.nav div.menu dl {
 	display:table;
-	width:100%; height:50px;
+	height:50px;
 }
 div.header div.nav div.menu dl dt {
 	display:table-cell;
@@ -82,7 +82,7 @@ div.header div.nav div.menu dl dt {
 	height:50px;
 	font-size:14px; color:white; font-weight:bold;
 	text-align:center; vertical-align:middle;
-	border-right:1px solid #777; border-left:1px solid #97c2db;
+	border-right:1px solid #659cbb; border-left:1px solid #97c2db;
 	cursor:pointer;
 }
 div.header div.nav div.menu dl dd {
@@ -91,14 +91,17 @@ div.header div.nav div.menu dl dd {
 	height:50px;
 	font-size:14px; color:#fff17f; font-weight:bold;
 	text-align:center; vertical-align:middle;
-	border-right:1px solid #777; border-left:1px solid #97c2db;
+	border-right:1px solid #659cbb; border-left:1px solid #97c2db;
 	cursor:pointer;
 }
-div.header div.nav div.menu ol {
+div.header div.nav div.menu ol { /* 수정 */
 	display:none;
-	width:100%; height:50px;
-	background:#3b75a2;
-	position:absolute; left:0px; top:50px;
+	/*width:100%;*/ 
+	height:50px;
+	background:url(/images/common/bg_subnav.png) repeat-x;
+	position:absolute; 
+	left:0px; 
+	top:50px;
 }
 div.header div.nav div.menu ol li {
 	float:left;
@@ -106,17 +109,48 @@ div.header div.nav div.menu ol li {
 	font-size:12px; color:white; line-height:50px;
 	cursor:pointer;
 }
+div.header div.nav div.menu div.light-box {
+	width:100%; height:0px;
+	position:relative;
+}
+div.header div.nav div.menu div.light-box img {
+	height:23px;
+	position:absolute; left:-300px; top:-19px;
+}
 div.header div.nav div.location {
-	padding:0 20px;
-	height:49px;
-	font-size:12px; color:white; line-height:49px; text-align:right;
+	display:table;
+	width:100%; height:49px;
 	background:url(/images/common/bg_location.png);
 }
-div.header div.nav div.location span {
+div.header div.nav div.location div.left { /* 수정 */
+	display:table-cell;
+	width:50%; padding:0 20px;
+	font-size:14px; color:white; line-height:49px; text-align:left;
+	background: url(/images/common/icon_area.png) 6px 18px no-repeat;
+}
+div.header div.nav div.location div.left span {
 	display:inline-block;
 	margin:0 5px;
 	width:4px; height:7px;
 	background:url(/images/common/icon_arrow.png) no-repeat;
+}
+div.header div.nav div.location div.right {
+	display:table-cell;
+	padding:12px 20px; /* 수정 */
+	text-align:right;
+}
+div.header div.nav div.location div.right p {
+	display:inline-block;
+	font-size:12px; color:#b2d4e9;
+}
+div.header div.nav div.location div.right p b {
+	font-family:"nanumbold"; color:white;
+}
+div.header div.nav div.location div.right button {
+	margin-left:5px;
+	width:80px; height:24px;
+	font-family:"nanum"; font-size:12px; color:#b2d4e9;
+	background:url(/images/common/bg_btn_login_infor.png) no-repeat;
 }
 
 /* section */
@@ -126,18 +160,19 @@ div.content {
 }
 div.content div.sub {
 	display:table-cell;
-	width:300px; height:850px; min-width:250px;
-	background:url(/images/detail/bg_subnav.png);
+	width:300px;
+	min-width:300px;
+	background:#546a8b;
 	border-right:1px solid #777;
 }
 div.content div.sub div.dir-search {
 	padding:10px;
-	background:url(/images/detail/bg_subnav_search.png);
+	background:#94a6be;
 }
 div.content div.sub div.dir-search input[type="text"] {
 	float:left;
 	padding:2px 5px;
-	width:190px; height:23px;
+	width:85%; height:23px;
 	font-family:"nanum"; font-size:12px; color:white; line-height:23px;
 	background:url(/images/detail/bg_search.png);
 	vertical-align:middle;
@@ -155,11 +190,13 @@ div.content div.sub div.dir-search button img {
 }
 div.content div.section {
 	display:table-cell;
+	padding:0 20px;
 	background:#e8e8e8;
 	vertical-align:top;
 }
 div.content div.section div.detail {
-	margin:20px;
+	max-width:1200px;
+	margin:20px auto 20px auto;
 }
 div.content div.section div.detail div.inner-side {
 	display:table;
@@ -168,18 +205,19 @@ div.content div.section div.detail div.inner-side {
 div.content div.section div.detail div.inner-side div.dual-left {
 	display:table-cell;
 	padding-right:10px;
-	width:250px; min-width:250px;
+	width:300px; min-width:250px;
 	vertical-align:top;
 }
 div.content div.section div.detail div.inner-side div.dual-right {
 	display:table-cell;
+	max-width:900px;
 	vertical-align:top;
 }
 
 /* content head option */
 div.content-head {
-	margin-bottom:10px; padding-left:10px;
-	height:50px;
+	margin:0 auto 10px auto; padding-left:10px;
+	max-width:1200px; height:50px;
 	background:url(/images/detail/bg_content_head.png) no-repeat #d0d0d0;
 }
 div.content-head div.head-end {
@@ -192,15 +230,19 @@ div.content-head div.head-end div.set-table {
 	width:100%; height:50px;
 }
 div.content-head div.head-end div.left-set {
+	display:table-cell;
+	text-align:left; vertical-align:middle;
+	/*
 	padding-left:10px;
 	font-family:"nanumbold"; font-size:18px; color:#555; line-height:50px;
 	text-align:left; vertical-align:middle;
+	*/
 }
 div.content-head div.head-end div.right-set {
 	display:table-cell;
 	text-align:right; vertical-align:middle;
 }
-div.content-head div.head-end div.right-set button {
+div.content-head div.head-end div.left-set button {
 	margin-left:5px;
 	width:93px; height:32px;
 	font-family:"nanum"; font-size:13px; color:white;
@@ -228,7 +270,7 @@ div.content-head div.head-end div.right-set div.list-search button {
 
 /* board */
 table.board {
-	width:100%; min-width:900px;
+	width:100%; min-width:900px; max-width:1200px; margin:0 auto;
 	border-bottom:2px solid #ccc;
 }
 table.board thead th {
@@ -261,15 +303,15 @@ table.board tbody td div a {
 table.board tbody td div.filebox {
 	position:relative;
 }
-table.board tbody td div.filebox ul {
+table.board tbody td div.filebox ul, div.detail ul {
 	padding:10px 50px 10px 15px;
 	background:white;
 	font-size:12px; color:#333; line-height:18px; text-align:left;
 	border:1px solid #bbb;
 	position:absolute; 
-	left:80px; top:-40px;
+	left:80px; top:-15px;
 }
-table.board tbody td div.filebox ul a {
+table.board tbody td div.filebox ul a, div.detail ul a {
 	color:#333333; text-decoration:none;
 }
 table.board tbody td div.filebox ul a:hover {
@@ -277,7 +319,7 @@ table.board tbody td div.filebox ul a:hover {
 }
 div.paging {
 	display:table;
-	margin:40px auto;
+	margin:20px auto;
 }
 div.paging div {
 	display:table-cell;
@@ -291,11 +333,19 @@ div.paging div a, div.paging div u {
 div.paging div a {
 	color:#333;
 }
+div.paging div select {
+	margin-left:10px;
+	padding:2px; height:22px;
+	font-family:"nanum"; font-size:12px; color:#555;
+	border:1px solid #d2d2d2;
+	vertical-align:middle;
+}
 
 /* dialog fix */
 div.diabox {
 	margin:10px; padding:20px;
 	background:white;
+	min-width:225px;
 }
 div.dia-insert {
 	margin:10px;
@@ -316,8 +366,8 @@ div.dia-insert table.board-insert td {
 	border:1px solid #e6e6e6;
 }
 div.dia-insert table.board-insert td input[type="text"],div.dia-insert table.board-insert td input[type="password"] {
-	padding:2px;
-	width:90%; height:16px;
+	padding:2px 2px 2px 6px;
+	width:98%; height:16px;
 	font-family:"nanum"; font-size:12px; color:#333; line-height:16px;
 	border:1px solid #d2d2d2;
 }
@@ -329,7 +379,7 @@ div.dia-insert table.board-insert td select {
 }
 div.dia-insert table.board-insert td textarea {
 	padding:2px;
-	width:90%; height:100px;
+	width:98%; height:100px;
 	font-family:"nanum"; font-size:12px; color:#333; line-height:16px;
 	border:1px solid #d2d2d2;
 }
@@ -350,7 +400,7 @@ div.dia-insert table.board-insert td div.file-list u {
 	border:1px solid #d2d2d2;
 }
 div.dia-insert table.board-insert td div.file-list u a {
-	margin-bottom:2px; margin-left:5px;
+	margin-bottom:2px; margin-left:5px;text-decoration: none;
 }
 div.dia-insert table.board-insert td div.rows1 {
 	display:table;
@@ -405,3 +455,52 @@ div.dia-view table.board-view td div.file-list u {
 div.dia-view table.board-view td div.file-list a:hover {
 	color:#3f80ca;
 }
+
+/* datetimepicker */
+input[type="text"].insertDate {
+	width:80px !important;
+	text-align:center;
+}
+input[type="text"].insertTime {
+	width:50px !important;
+	text-align:center;
+}
+.ui-datepicker { border:1px solid #999; }
+.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+.ui-timepicker-div dl { text-align: left; }
+.ui-timepicker-div dl dt { float: left; clear:left; padding: 0 0 0 5px; }
+.ui-timepicker-div dl dd { margin: 0 10px 10px 40%; }
+.ui-timepicker-div td { font-size: 90%; }
+.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+.ui-timepicker-div .ui_tpicker_unit_hide{ display: none; }
+
+.ui-timepicker-rtl{ direction: rtl; }
+.ui-timepicker-rtl dl { text-align: right; padding: 0 5px 0 0; }
+.ui-timepicker-rtl dl dt{ float: right; clear: right; }
+.ui-timepicker-rtl dl dd { margin: 0 40% 10px 10px; }
+
+/* Shortened version style */
+.ui-timepicker-div.ui-timepicker-oneLine { padding-right: 2px; }
+.ui-timepicker-div.ui-timepicker-oneLine .ui_tpicker_time, 
+.ui-timepicker-div.ui-timepicker-oneLine dt { display: none; }
+.ui-timepicker-div.ui-timepicker-oneLine .ui_tpicker_time_label { display: block; padding-top: 2px; }
+.ui-timepicker-div.ui-timepicker-oneLine dl { text-align: right; }
+.ui-timepicker-div.ui-timepicker-oneLine dl dd, 
+.ui-timepicker-div.ui-timepicker-oneLine dl dd > div { display:inline-block; margin:0; }
+.ui-timepicker-div.ui-timepicker-oneLine dl dd.ui_tpicker_minute:before,
+.ui-timepicker-div.ui-timepicker-oneLine dl dd.ui_tpicker_second:before { content:':'; display:inline-block; }
+.ui-timepicker-div.ui-timepicker-oneLine dl dd.ui_tpicker_millisec:before,
+.ui-timepicker-div.ui-timepicker-oneLine dl dd.ui_tpicker_microsec:before { content:'.'; display:inline-block; }
+.ui-timepicker-div.ui-timepicker-oneLine .ui_tpicker_unit_hide,
+.ui-timepicker-div.ui-timepicker-oneLine .ui_tpicker_unit_hide:before{ display: none; }
+
+.ui_tpicker_hour_label { height:12px; }
+.ui_tpicker_hour { height:12px; }
+.ui_tpicker_minute_label { height:12px; }
+.ui_tpicker_minute { height:12px; }
+.ui_tpicker_hour_slider { margin-top:15px; height:5px; background:#b0bcc9; }
+.ui_tpicker_minute_slider { margin-top:15px; height:5px; background:#b0bcc9; }
+.ui-datepicker-buttonpane {  }
+
+input.important  { background:url(/images/detail/important.png) 0 0px no-repeat #fff; }
+textarea.important  { background:url(/images/detail/important.png) 0 0px no-repeat #fff; }

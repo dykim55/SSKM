@@ -28,8 +28,9 @@ int nPage = (Integer)request.getAttribute("page");
 $(document).ready(function() {
 
 	$(".board").find("tbody").on("click", "tr", function() {
-		console.log("click!");
-		fileUpload($(this).attr("data-tt-id"));
+		if ($(this).attr("data-tt-id")) {
+			fileUpload($(this).attr("data-tt-id"));
+		}
 	});
 
 	$(".board").find("tbody").on("mouseenter", "td", function() {
@@ -42,13 +43,6 @@ $(document).ready(function() {
 		$(this).parent().find("td").removeAttr("style");
 	});
 
-	$(".board").find(".filebox").find(".clip").on("click", function() {
-		$(this).parents(".board").find(".clip").removeAttr("style");
-		$(this).parents(".board").find("ul").hide();
-		$(this).css({background:"url(/images/detail/icon_clip_on.png) no-repeat"});
-		$(this).parent().find("ul").show(200);
-	});
-	
 	$("#pg_selbox").change(function() {
 		PG.rows($(".paging select").val());
 	});
@@ -57,19 +51,27 @@ $(document).ready(function() {
 
 </script>
 
-<div class="detail">
-	<div class="content-head">
+<div class="detail" style="max-width: inherit;">
+	<div class="content-head" style="max-width: inherit;">
 		<div class="head-end">
 			<div class="set-table">				
 		
 				<div class="left-set">
-					<div class="location"></div>
-				</div>
-				<div class="right-set">
 				<% if (!StringUtil.isEmpty(sParent)) { %>
 					<button type="button" onclick="javascript:fileUpload();">파일등록</button>
 				<% } %>
 					<button type="button" onclick="javascript:createFolder();">새 폴더</button>
+				</div>
+				<div class="right-set">
+					<div class="list-search">
+						<select id="nt_selbox" style="float:left;margin-left:10px;padding:2px;height: 26px;font-family:&quot;nanum&quot;;font-size:12px;color:#555;border:1px solid #AAA;vertical-align:middle;margin-top:5px;">
+							<option value="1" <%=StringUtil.convertString(request.getParameter("searchSel")).equals("1") ? "selected" : "" %>>제목</option>
+							<option value="2" <%=StringUtil.convertString(request.getParameter("searchSel")).equals("2") ? "selected" : "" %>>등록자</option>
+						</select>							
+						<input type="text" onclick="this.select()" onKeyDown="if(event.keyCode==13){javascript:search(); return false;}" id="searchWord" name="searchWord" value="<%=StringUtil.convertString(request.getParameter("searchWord"))%>">
+						<button type="button" onclick="javascript:search();"><img src="/images/detail/icon_normal_search.png"></button>
+						<div class="cl"><!-- Clear Fix --></div>
+					</div>
 				</div>
 		
 			</div>
@@ -77,7 +79,7 @@ $(document).ready(function() {
 	</div>
 	
 <% if (productList != null && productList.size() > 0) { %>
-	<table class="board">
+	<table class="board" style="max-width: inherit;">
 		<colgroup>
 			<col width="80">
 			<col width="*">
@@ -104,9 +106,9 @@ $(document).ready(function() {
 				<td><%=((nTotalRecord - ((nPage-1) * nRows))- n) %></td>
 				<td>
 					<div class="subject">
-						<a href="javascript:fileUpload(<%=StringUtil.convertString(map.get("pId")) %>)"><%=StringUtil.convertString(map.get("title")) %></a>
+						<%=StringUtil.convertString(map.get("title")) %>
 						<div class="option">
-							<a href="#" onclick="deleteFile(<%=StringUtil.convertString(map.get("pId")) %>);" class="delete"></a>
+							<a href="#" onclick="deleteFile(<%=StringUtil.convertString(map.get("pId")) %>);" class="delete" title="삭제"></a>
 						</div>
 					</div>
 				</td>
@@ -159,11 +161,36 @@ $(document).ready(function() {
 
 <% } else { %>
 
-	<div id="emptycontent" style="font-size: 16px;    color: #888;    position: absolute;    text-align: center;    top: 30%;    width: 85%;">
-		<div class="icon-folder"></div>
-		<h2>파일이 없습니다.</h2>
-	</div>
-
+	<table class="board" style="max-width: inherit;">
+		<colgroup>
+			<col width="80">
+			<col width="*">
+			<col width="100">
+			<col width="150">
+			<col width="250">
+			<col width="100">
+		</colgroup>
+		<thead>
+			<tr>
+				<th>번호</th>
+				<th>제목</th>
+				<th>첨부파일</th>
+				<th>등록자</th>
+				<th>등록일자</th>
+				<th>조회</th>
+			</tr>
+		</thead>
+		<!-- 
+		<tbody>
+			<tr>
+				<td colspan="6">
+					<h2>파일이 없습니다.</h2>
+				</td>
+			</tr>
+		</tbody>
+		 -->
+	</table>
+			
 <% } %>
 	
 </div>

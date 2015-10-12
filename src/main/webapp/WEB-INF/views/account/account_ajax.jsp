@@ -24,14 +24,11 @@ int nPage = (Integer)request.getAttribute("page");
 
 <script type="text/javascript">
 
-function acctDetail(id) {
-	console.log(id);
-    DIALOG.Open().load("/account/create_account", {id : id}, function() {
-    	CREATE_ACCOUNT.init($(this), undefined);
-    });
-}	
-
 $(document).ready(function() {
+
+	$(".board").find("tbody").on("click", "tr", function() {
+		acctDetail($(this).attr("data-tt-id"));
+	});
 	
 	$(".board").find("tbody").on("mouseenter", "td", function() {
 		$(this).parent().find(".option").show();
@@ -44,7 +41,6 @@ $(document).ready(function() {
 	});
 	
 	$("#pg_selbox").change(function() {
-		console.log('pg_selbox');
 		ACCT_PG.rows($(".paging select").val());
 	});
 	
@@ -59,8 +55,8 @@ $(document).ready(function() {
 			<col width="12%">
 			<col width="15%">
 			<col width="15%">
-			<col width="15%">
-			<col width="15%">
+			<col width="14%">
+			<col width="12%">
 			<col width="*">
 		</colgroup>
 		<thead>
@@ -71,7 +67,7 @@ $(document).ready(function() {
 				<th>접근계정그룹</th>
 				<th>부서</th>
 				<th>직급</th>
-				<th>등록일시</th>
+				<th>등록일</th>
 				<th>최근접속일시</th>
 			</tr>
 		</thead>
@@ -84,7 +80,7 @@ $(document).ready(function() {
                     <span><%=((nPage-1) * nRows) + n++ %></span>
                 </td>
                 <td>
-                    <span><a href="javascript:acctDetail('<%=StringUtil.convertString(map.get("acctId")) %>')"><%=StringUtil.convertString(map.get("acctId")) %></a></span>
+                    <span><a><%=StringUtil.convertString(map.get("acctId")) %></a></span>
                 </td>
                 <td>
                     <span><%=StringUtil.convertString(map.get("acctNm")) %></span>
@@ -99,7 +95,7 @@ $(document).ready(function() {
                     <span><%=StringUtil.convertString(map.get("oflvNm")) %></span>
                 </td>
                 <td>
-                    <span><%=StringUtil.convertDate(map.get("regDtime"),"yyyy-MM-dd HH:mm:ss") %></span>
+                    <span><%=StringUtil.convertDate(map.get("regDtime"),"yyyy-MM-dd") %></span>
                 </td>
                 <td>
                     <span><%=StringUtil.convertDate(map.get("latestDtime"),"yyyy-MM-dd HH:mm:ss") %></span>

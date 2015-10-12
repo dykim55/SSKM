@@ -21,6 +21,7 @@
 		    ,A.telephone
 		    ,A.email
 		    ,A.regr
+		    ,(SELECT acctNm FROM AcctTbl WHERE acctId = A.regr) AS regrNm
 		    ,A.regDtime
 		    ,A.modr
 		    ,A.modDtime
@@ -43,6 +44,17 @@
         </choose>
         <if test="acctNm != null and acctNm != ''">
             AND acctNm LIKE CONCAT('%', #{ acctNm }, '%')
+        </if>
+        <if test="searchWord != null and searchWord != ''">
+        	<if test='searchSel == "1"'>
+        		AND A.acctNm LIKE CONCAT('%', #{ searchWord }, '%')
+            </if>
+        	<if test='searchSel == "2"'>
+        		AND A.deptNm LIKE CONCAT('%', #{ searchWord }, '%')
+            </if>
+            <if test='searchSel == "3"'>
+            	AND A.oflvNm LIKE CONCAT('%', #{ searchWord }, '%')
+            </if>
         </if>
         AND A.acctSt != 9
     </sql>
@@ -73,6 +85,7 @@
 		    ,telephone
 		    ,email
 		    ,regr
+		    ,(SELECT acctNm FROM AcctTbl WHERE acctId = A.regr) AS regrNm
 		    ,regDtime
 		    ,modr
 		    ,modDtime
@@ -98,8 +111,19 @@
     </select>
 	
     <select id="selectAcctGrp" resultType="com.cyberone.scourt.model.AcctGrp">
-        SELECT * FROM AcctGrpTbl
-        WHERE acctGrpCd = #{acctGrpCd}
+        SELECT
+        	A.acctGrpCd
+        	,A.acctGrpNm
+        	,A.acctPrmsMenus
+        	,A.acctGrpDesc
+        	,A.acctPrntCd
+        	,A.regr
+        	,(SELECT acctNm FROM AcctTbl WHERE acctId = A.regr) AS regrNm
+        	,A.regDtime
+        	,A.modr
+        	,A.modDtime
+        FROM AcctGrpTbl A
+        WHERE A.acctGrpCd = #{acctGrpCd}
     </select>
 
     <select id="selectAcctGrpList" resultType="com.cyberone.scourt.model.AcctGrp">

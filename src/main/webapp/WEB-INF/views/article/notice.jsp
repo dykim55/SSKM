@@ -32,6 +32,8 @@
 $(document).ready(function() {
 	
 	ARTICLE_PG.reload(<%=sBbsSct%>, function() {});
+	
+	$(".location .left").html("공지사항");
 
 });
 
@@ -39,6 +41,40 @@ function articleWrite(s, id) {
     DIALOG.Open().load("/article/article_write", {bbsSct : s, id: id ? id : ""}, function() {
     	ARTICLE_DLG.init($(this));
     });
+}
+
+function fileBox(id) {
+
+	if ($(".detail ul").length == 0) {
+		$(".detail").append('<ul style="white-space: nowrap;left:'+event.clientX+'px;top:'+event.clientY+'px;"></ul>');
+		$.get("/article/appx_list", {id: id}, function( data ) {
+			$(".detail ul").append(data);
+		});
+	}
+	event.stopPropagation();
+}
+
+function deleteArticle(id) {
+	
+	_confirm("삭제 하시겠습니까?", function() {
+        $.ajax({
+        	url : "/article/article_delete",
+            data : {id: id},
+            type : "post",
+            success : function(data){
+                if (data.status == 'success') {
+                } else {
+                    _alert(data.message);
+                }
+                ARTICLE_PG.reload(false, function() {});
+            }
+        });
+	});
+    event.stopPropagation();
+}
+
+function search() {
+	ARTICLE_PG.reload(false, function() {});
 }
 
 </script>
@@ -50,11 +86,17 @@ function articleWrite(s, id) {
 			<div class="content-head">
 				<div class="head-end">
 					<div class="set-table">
-						<div class="left-set">공지사항</div>
+						<div class="left-set">
+							<button type="button" onclick="javascript:articleWrite(<%=sBbsSct %>);">등  록</button>
+						</div>
 						<div class="right-set">
 							<div class="list-search">
-								<input type="text">
-								<button type="button"><img src="/images/detail/icon_normal_search.png"></button>
+								<select id="nt_selbox" style="float:left;margin-left:10px;padding:2px;height: 26px;font-family:&quot;nanum&quot;;font-size:12px;color:#555;border:1px solid #AAA;vertical-align:middle;margin-top:5px;">
+									<option value="1" <%=StringUtil.convertString(request.getParameter("searchSel")).equals("1") ? "selected" : "" %>>제목</option>
+									<option value="2" <%=StringUtil.convertString(request.getParameter("searchSel")).equals("2") ? "selected" : "" %>>작성자</option>
+								</select>							
+								<input type="text" onclick="this.select()" onKeyDown="if(event.keyCode==13){javascript:search(); return false;}" id="searchWord" name="searchWord" value="<%=StringUtil.convertString(request.getParameter("searchWord"))%>">
+								<button type="button" onclick="javascript:search();"><img src="/images/detail/icon_normal_search.png"></button>
 								<div class="cl"><!-- Clear Fix --></div>
 							</div>
 						</div>
@@ -69,84 +111,5 @@ function articleWrite(s, id) {
 		</div>
 	</div>
 </div>		
-			
-
-
-
-<div class="board_pane" style="background-color:lightgray;font: 12px 맑은 고딕;padding: 10px 0px;">
-
-    <h1 style="margin: 0px auto 10px auto;width: 200px;text-align: center;">공지사항</h1>
-
-    <div style="text-align: right;">
-    <form name="searchForm" action="/notice" method="post">
-	    <input name="page" type="hidden" value="1">
-        <input name="searchWord" id="searchWord" type="text" style="width: 150px;" value="<%=sSearchWord%>"/>
-        <a href="javascript:searchSub();">검색</a>
-    </form>
-    </div>
-    
-    <table cellpadding="0" cellspacing="0" border="1" style="width: 70%;margin: 0 auto;">
-        <colgroup>
-            <col width="5%">
-            <col width="45%">
-            <col width="25%">
-            <col width="15%">
-            <col width="*">
-        </colgroup>
-        <thead>
-            <tr>
-              <th>번호</th>
-              <th>제목</th>
-              <th>작성일</th>
-              <th>첨부</th>
-              <th>조회</th>
-            </tr>
-         </thead>
-        <tbody>
-    <%  if (bbsList.size() > 0) {
-    	    int m = (nPage - 1) * nRows; 
-            for (HashMap<String, Object> map : bbsList) { %>
-            <tr>
-                <td><%=nTotalRecord - m++ %></td>
-                <td style="font-weight: bold;"><a style="color: #3577c8;" href="/noticeDtl?page=<%=nPage%>&searchWord=<%=sSearchWord%>&bbs=<%=map.get("bbsId")%>"><%=StringUtil.replaceHtml(StringUtil.convertString(map.get("bbsTit"))) %></a></td>
-                <td><%=StringUtil.convertDate(map.get("regDtime"),"yyyy-MM-dd HH:mm:ss") %></td>
-                <td><%=StringUtil.convertString(map.get("fileYn")) %></td>
-                <td><%=StringUtil.convertString(map.get("qryCnt")) %></td>
-            </tr>
-    <%      }
-        } else { %>
-            <tr align="center">
-                <td colspan="6">
-                    <font color="tomato"><b>등록된 데이터가 없습니다!</b></font>
-                </td>
-            </tr>
-    <% } %>
-            
-        </tbody>
-    </table>
-
-<% if (bbsList.size() > 0) { %>
-    <div style="margin: 5px auto 0px auto;text-align: center;">
-        <a class="pre" href="/notice?page=<%=nPrevPageNo%>&searchWord=<%=sSearchWord%>"><img src="/images/btn_page_prev.gif" width="16" height="16" alt="이전"></a>
-<% for (int i=nGroupStartPos; i<=nGroupEndPos; i++) { %>
-    <% if (nPage == i) { %>
-        <strong><span><%=i %></span></strong>
-    <% } else { %>
-        <a href="/notice?page=<%=i %>&searchWord=<%=sSearchWord%>"><span><%=i %></span></a>
-    <% }  %>
-<% } %>
-        <a class="next" href="/notice?page=<%=nNextPageNo%>&searchWord=<%=sSearchWord%>"><img src="/images/btn_page_next.gif" width="16" height="16" alt="다음"></a>
-    </div>
-<% } %>
-
-    <div class="tableBtnBox">
-        <a href="/noticeWrite?page=<%=nPage %>&searchWord=<%=sSearchWord%>">
-            글쓰기
-        </a>
-    </div>
-
-</div>
-  
-
 
 <%@ include file="../include/footer.jsp"%>

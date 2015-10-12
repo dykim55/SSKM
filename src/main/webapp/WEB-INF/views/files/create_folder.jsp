@@ -1,10 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
         import= "java.util.List
         , java.util.HashMap
+        , java.util.Date
+        , com.cyberone.scourt.model.UserInfo
         , com.cyberone.scourt.utils.StringUtil"
 %>
 
 <%
+	UserInfo userInfo = (UserInfo)request.getAttribute("userInfo");
+
     @SuppressWarnings("unchecked")
     HashMap<String, Object> category = (HashMap<String, Object>)request.getAttribute("category");
     if (StringUtil.isEmpty(category)) {
@@ -22,17 +26,33 @@ CREATE_FOLDER = (function() {
         init: function(Dlg, loc) {
         	_Dlg = Dlg;
         	
-        	_Dlg.find("#path_name").html($(".location").html());
+        	_Dlg.find("#path_name").html($(".location .left").html());
+        	
+        	var t = $('.accordion').find('.accordionHeaders.ac_selected')[0].textContent.trim();
+        	if ( $(".left-tree .selected").closest("table").length > 0) {
+        		t += "&nbsp;&nbsp;>&nbsp;&nbsp;" + $(".left-tree .selected").closest("table").treetable('pathName', $(".left-tree .selected").attr('data-tt-id'))
+        	}
+        	_Dlg.closest('.ui-dialog').find('.ui-dialog-title').html(t);
         	
         	_Dlg.dialog({
                 autoOpen: false, 
                 resizable: false, 
                 width: 600,
                 modal: true,
-                title: <% if (!category.containsKey("ctgId")) { %> "폴더 생성" <% } else { %> "폴더 수정" <% } %>,
+                /*title: <% if (!category.containsKey("ctgId")) { %> "폴더 생성" <% } else { %> "폴더 수정" <% } %>,*/
                 buttons: {
 <% if (!category.containsKey("ctgId")) { %> "생성" <% } else { %> "수정" <% } %> : function() {                	
-                    	stop();
+					  	var flag=false;
+						_Dlg.find(".important:visible").each(function() {
+					        if ($(this).val().length == 0) {
+					            $(this).select();
+					            flag = true;
+					            _alert($(this).attr("alt")+" 필수 입력값입니다.");
+					            return false;
+					        }
+					    });
+					    if (flag) return false;
+
                         $.ajax({
                             url: "/files/folder_register",
                             dataType: 'json',
@@ -83,13 +103,23 @@ CREATE_FOLDER = (function() {
 				<col width="*">
 			</colgroup>
 			<tr>
-				<th>폴더명</th>
-				<td colspan="3">
-					<input type="text" name="folder_name" id="folder_name" value="<%=StringUtil.convertString(category.get("ctgNm")) %>">
+				<th>만든 사람</th>
+				<td>
+					<%=category.containsKey("ctgId") ? StringUtil.convertString(category.get("regrNm")) : userInfo.getAcct().getAcctNm() %>
+				</td>
+				<th>만든 날짜</th>
+				<td>
+					<%=category.containsKey("ctgId") ? StringUtil.convertDate(category.get("regDtime"),"yyyy-MM-dd HH:mm:ss") : StringUtil.convertDate(new Date(),"yyyy-MM-dd HH:mm:ss") %>
 				</td>
 			</tr>
 			<tr>
-				<th>폴더설명</th>
+				<th>폴더명</th>
+				<td colspan="3">
+					<input type="text" class="important" name="folder_name" id="folder_name" value="<%=StringUtil.convertString(category.get("ctgNm")) %>" alt="폴더명은 ">
+				</td>
+			</tr>
+			<tr>
+				<th>폴더 설명</th>
 				<td colspan="3">
 					<textarea name="folder_desc" id="folder_desc"><%=StringUtil.convertString(category.get("ctgDesc")) %></textarea>
 				</td>

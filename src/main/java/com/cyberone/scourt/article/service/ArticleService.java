@@ -58,6 +58,10 @@ public class ArticleService {
         articleDao.updateBoard(paramMap);
 	}
 	
+	public void deleteBoard(HashMap<String, Object> paramMap) throws Exception {
+		articleDao.deleteBoard(paramMap);
+	}
+	
 	public int updateAppxFile(HttpServletRequest request, String sFileType, List<MultipartFile> mpfList, int refCd) throws Exception {
 		
 		int fileCount = 0;

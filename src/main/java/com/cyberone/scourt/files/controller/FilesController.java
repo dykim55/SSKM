@@ -310,6 +310,8 @@ public class FilesController {
     	logger.debug(request.getServletPath());
     	
     	String sParent = request.getParameter("parent");
+    	String sSearchWord = request.getParameter("searchWord");
+    	String sSearchSel = request.getParameter("searchSel");
     	
     	if (StringUtil.isEmpty(sParent)) {
     		return "/files/file_ajax";
@@ -317,6 +319,8 @@ public class FilesController {
        	
        	HashMap<String, Object> paramMap = new HashMap<String, Object>();
        	paramMap.put("parent", Integer.valueOf(sParent));
+       	paramMap.put("searchSel", StringUtil.convertString(sSearchSel));
+       	paramMap.put("searchWord", StringUtil.convertString(sSearchWord));
        	
        	Product product = (Product)DataUtil.dtoBuilder(request, Product.class);
        	
@@ -325,6 +329,20 @@ public class FilesController {
     	model.addAllAttributes(product.createModelMap(productList));
     	 
     	return "/files/file_ajax";
+    }
+
+    @RequestMapping("/files/allover_ajax")
+    public String allOverAjax(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+    	logger.debug(request.getServletPath());
+    	
+       	Product product = (Product)DataUtil.dtoBuilder(request, Product.class);
+       	product.setSearchSel("1");
+       	
+    	List<HashMap<String, Object>> productList = filesService.selectProductList(product);
+       	
+    	model.addAllAttributes(product.createModelMap(productList));
+    	 
+    	return "/files/allover_ajax";
     }
     
     @RequestMapping("/files/appx_list")

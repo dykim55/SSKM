@@ -8041,7 +8041,7 @@ Calendar.mixin(Emitter);
 
 function Calendar_constructor(element, overrides) {
 	var t = this;
-
+	var reg;
 
 	t.initOptions(overrides || {});
 	var options = this.options;
@@ -8064,6 +8064,7 @@ function Calendar_constructor(element, overrides) {
 	t.prevYear = prevYear;
 	t.nextYear = nextYear;
 	t.today = today;
+	t.reg = reg;
 	t.gotoDate = gotoDate;
 	t.incrementDate = incrementDate;
 	t.zoomTo = zoomTo;
@@ -8591,6 +8592,10 @@ function Calendar_constructor(element, overrides) {
 		renderView();
 	}
 	
+	function reg() {
+		regSchedule(t.getNow());
+	}
+	
 	
 	function gotoDate(dateInput) {
 		date = t.moment(dateInput);
@@ -8696,7 +8701,7 @@ Calendar.defaults = {
 	defaultTimedEventDuration: '02:00:00',
 	defaultAllDayEventDuration: { days: 1 },
 	forceEventDuration: false,
-	nextDayThreshold: '00:00:00', // 9am
+	nextDayThreshold: '09:00:00', // 9am
 
 	// display
 	defaultView: 'month',
@@ -8735,6 +8740,7 @@ Calendar.defaults = {
 		nextYear: "next year",
 		year: 'year', // TODO: locale files need to specify this
 		today: 'today',
+		reg: 'reg',
 		month: 'month',
 		week: 'week',
 		day: 'day'
@@ -8886,7 +8892,8 @@ var dpComputableOptions = {
 			// the translations sometimes wrongly contain HTML entities
 			prev: stripHtmlEntities(dpOptions.prevText),
 			next: stripHtmlEntities(dpOptions.nextText),
-			today: stripHtmlEntities(dpOptions.currentText)
+			today: stripHtmlEntities(dpOptions.currentText),
+			red: stripHtmlEntities(dpOptions.currentText)
 		};
 	},
 

@@ -9,6 +9,7 @@
     <sql id="sqlProduct">
         SELECT
             A.pId
+            ,category_path(A.parent) AS pathNm
             ,A.title
             ,A.content
             ,A.query
@@ -29,7 +30,12 @@
             AND A.parent = #{parent}
         </if>
         <if test="searchWord != null and searchWord != ''">
-            AND title LIKE CONCAT('%', #{ searchWord }, '%')
+        	<if test='searchSel == "1"'>
+            	AND A.title LIKE CONCAT('%', #{ searchWord }, '%')
+            </if>
+        	<if test='searchSel == "2"'>
+        		AND A.regr IN ( SELECT acctId FROM AcctTbl WHERE acctNm LIKE CONCAT('%', #{ searchWord }, '%') )
+            </if>
         </if>
         AND A.delYn = 'n'
     </sql>
@@ -51,14 +57,24 @@
     </select>
 
 	<select id="selectCategory" resultType="java.util.HashMap">
-		SELECT * 
-		FROM CategoryTbl
+		SELECT
+		A.ctgId
+		,A.ctgNm
+		,A.ctgParent
+		,A.ctgSct
+		,A.ctgDesc
+		,A.regr
+		,(SELECT acctNm FROM AcctTbl WHERE acctId = A.regr) AS regrNm
+		,A.regDtime
+		,A.modr
+		,A.modDtime
+		FROM CategoryTbl A
 		<trim prefix="WHERE" prefixOverrides="AND|OR">
 			<if test="ctgId != null and ctgId > 0">
-				AND ctgId = #{ctgId}
+				AND A.ctgId = #{ctgId}
 			</if>
 			<if test="ctgSct != null and ctgSct > 0">
-				AND ctgSct = #{ctgSct}
+				AND A.ctgSct = #{ctgSct}
 			</if>
 		</trim>
 	</select>

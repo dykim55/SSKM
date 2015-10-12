@@ -1,12 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
         import= "java.util.List
         , java.util.HashMap
+        , java.util.Date
         , com.cyberone.scourt.Common
+        , com.cyberone.scourt.model.UserInfo
         , com.cyberone.scourt.model.Acct
         , com.cyberone.scourt.utils.StringUtil"
 %>
 
 <%
+	UserInfo userInfo = (UserInfo)request.getAttribute("userInfo");
+
 	String sAuthGrp = request.getParameter("auth_grp");
 	String sAcctGrp = request.getParameter("acct_grp");
 	
@@ -22,21 +26,43 @@
 <script type="text/javascript">
 
 CREATE_ACCOUNT = (function() {
-	var _Dlg, _tt_id, _tt_parent_id;
+	var _Dlg;
 	var bProcessing = false;
 	
+	$("#acct_frm").ajaxForm({
+        beforeSubmit: function(data, form, option) {
+            return true;
+        },
+        success: function(data, status) {
+        	if (data.status == "success") {
+        		ACCT_PG.reload(false, false, function() { _Dlg.dialog("close"); });
+        	} else {
+        		_alert(data.message);
+        	}
+        }
+    });
+	
+    $("#acct_del_frm").ajaxForm({
+        success: function(data, status) {
+        	if (data.status == "success") {
+        		ACCT_PG.reload(false, false, function() { _Dlg.dialog("close"); });
+        	} else {
+        		_alert(data.message);
+        	}
+        }
+    });
+	
     return {
-        init: function(Dlg, t) {
+        init: function(Dlg) {
         	_Dlg = Dlg;
 
-        	if (t) {
-	        	_tt_id = t.attr('data-tt-id');
-	        	_tt_parent_id = t.attr('data-tt-parent-id');
-	        	$("#acct_auth_grp").val(_tt_parent_id);
-        	} else {
-        		$("#acct_auth_grp").val(<%=acctInfo.getAuthGrp() %>);
-        		$("#acct_grp").val(<%=acctInfo.getAcctGrpCd() %>);
-        	}
+        	<% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %>
+	    		$("#acct_auth_grp").val(<%=sAuthGrp %>);
+	    		$("#acct_grp").val(<%=sAcctGrp %>);
+        	<% } else { %>
+	    		$("#acct_auth_grp").val(<%=acctInfo.getAuthGrp() %>);
+	    		$("#acct_grp").val(<%=acctInfo.getAcctGrpCd() %>);
+        	<% } %>
         	
         	_Dlg.find("#acct_auth_grp").change(function() {
             	var slctAuth = _Dlg.find("#acct_auth_grp option:selected").val();
@@ -50,37 +76,30 @@ CREATE_ACCOUNT = (function() {
                 modal: true,
                 title: <% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %> "계정 등록" <% } else { %> "계정 수정" <% } %>,
                 buttons: {
-<% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %> "등록" <% } else { %> "수정" <% } %> : function() {                	
-                        $.ajax({
-                       <% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %>                        	
-                            url: "/account/register_account",
-                       <% } else { %>
-                       		url: "/account/modify_account",
-                       <% } %>
-                            dataType: 'json',
-                            data : { 
-                            	id : $("#acct_id").val(),
-                            	name : $("#acct_name").val(),
-                            	pw: $("#acct_pw").val(),
-                            	pw_cf: $("#acct_pw_cf").val(),
-                            	auth_grp: $("#acct_auth_grp").val(),
-                            	acct_grp: $("#acct_grp").val(),
-                            	dept: $("#acct_dept").val(),
-                            	oflv: $("#acct_oflv").val(),
-                            	email: $("#acct_email").val(),
-                            	mobile: $("#acct_mobile").val()
-                            },
-                            success: function(data, text, request) {
-                            	if (data.status == "success") {
-                            		ACCT_PG.reload(false, false, function() { _Dlg.dialog("close"); });
-                            	} else {
-                            		alert(data.message);
-                            	}
-                            }
-                        });
+<% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %> "등록" <% } else { %> "수정" <% } %> : function() {
+	
+					  	var flag=false;
+						_Dlg.find(".important:visible").each(function() {
+					        if ($(this).val().length == 0) {
+					            $(this).select();
+					            flag = true;
+					            _alert($(this).attr("alt")+" 필수 입력값입니다.");
+					            return false;
+					        }
+					    });
+					    if (flag) return false;
+					  
+						$("#acct_frm").submit();
                     	
-                    },
-                    "취소": function() {
+                    }
+                <% if (!StringUtil.isEmpty(acctInfo.getAcctId())) { %>                    
+                    ,"삭제": function() {
+                    	_confirm("삭제 하시겠습니까?", function() {
+                    		$("#acct_del_frm").submit();
+                    	});
+                    }
+				<% } %>                    
+                    ,"취소": function() {
                         $(this).dialog("close");
                     }
                 },
@@ -105,6 +124,11 @@ CREATE_ACCOUNT = (function() {
 
 <div id="account">
 	<div class="dia-insert">
+<% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %>	
+	<form name="acct_frm" id="acct_frm" action="/account/register_account" method="POST">
+<% } else { %>	
+	<form name="acct_frm" id="acct_frm" action="/account/modify_account" method="POST">
+<% } %>
 		<table class="board-insert">
 			<colgroup>
 				<col width="100">
@@ -114,21 +138,25 @@ CREATE_ACCOUNT = (function() {
 				<th>계정 ID</th>
 				<td>
 			<% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %>
-					<input type="text" name="acct_id" id="acct_id" value="<%=StringUtil.convertString(acctInfo.getAcctId()) %>">
+					<input type="text" class="important" name="acct_id" id="acct_id" value="<%=StringUtil.convertString(acctInfo.getAcctId()) %>" alt="계정아이디는">
 			<% } else { %>
 					<%=StringUtil.convertString(acctInfo.getAcctId()) %><input type="hidden" name="acct_id" id="acct_id" value="<%=StringUtil.convertString(acctInfo.getAcctId()) %>">
 			<% }  %>
 				</td>
 				<th>성명</th>
 				<td>
-					<input type="text" name="acct_name" id="acct_name" value="<%=StringUtil.convertString(acctInfo.getAcctNm()) %>">
+					<input type="text" class="important" name="acct_name" id="acct_name" value="<%=StringUtil.convertString(acctInfo.getAcctNm()) %>" alt="계정명은">
 				</td>
 			</tr>
 			<tr>
 				<th>비밀번호</th>
-				<td><input type="password" name="acct_pw" id="acct_pw"></td>
+				<td>
+					<input type="password" <% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %> class="important" <% } %> name="acct_pw" id="acct_pw" alt="비밀번호는">
+				</td>
 				<th>비밀번호 확인</th>
-				<td><input type="password" name="acct_pw_cf" id="acct_pw_cf"></td>
+				<td>
+					<input type="password" <% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %> class="important" <% } %> name="acct_pw_cf" id="acct_pw_cf" alt="비밀번호확인은">
+				</td>
 			</tr>
 			<tr>
 				<th>접근권한그룹</th>
@@ -143,11 +171,11 @@ CREATE_ACCOUNT = (function() {
 			<tr>
 				<th>부서</th>
 				<td>
-					<input type="text" name="acct_dept" id="acct_dept" value="<%=StringUtil.convertString(acctInfo.getDeptNm()) %>">
+					<input type="text" class="important" name="acct_dept" id="acct_dept" value="<%=StringUtil.convertString(acctInfo.getDeptNm()) %>" alt="부서는">
 				</td>
 				<th>직급</th>
 				<td>
-					<input type="text" name="acct_oflv" id="acct_oflv" value="<%=StringUtil.convertString(acctInfo.getOflvNm()) %>">
+					<input type="text" class="important" name="acct_oflv" id="acct_oflv" value="<%=StringUtil.convertString(acctInfo.getOflvNm()) %>" alt="직급은">
 				</td>
 			</tr>
 			<tr>
@@ -160,6 +188,21 @@ CREATE_ACCOUNT = (function() {
 					<input type="text" name="acct_mobile" id="acct_mobile" value="<%=StringUtil.convertString(acctInfo.getMobile()) %>">
 				</td>
 			</tr>
+			<tr>
+				<th>등록자</th>
+				<td>
+					<%=StringUtil.isEmpty(acctInfo.getAcctId()) ? userInfo.getAcct().getAcctNm() : StringUtil.convertString(acctInfo.getRegrNm()) %> 
+				</td>
+				<th>등록 일자</th>
+				<td>
+					<%=StringUtil.isEmpty(acctInfo.getAcctId()) ? StringUtil.convertDate(new Date(),"yyyy-MM-dd HH:mm:ss") : StringUtil.convertDate(acctInfo.getRegDtime(),"yyyy-MM-dd HH:mm:ss") %>
+				</td>
+			</tr>
 		</table>
+	</form>
   	</div>
 </div>
+
+<form name="acct_del_frm" id="acct_del_frm" action="/account/delete_account" method="POST">
+	<input type="hidden" name="acct_id" id="acct_id" value="<%=StringUtil.convertString(acctInfo.getAcctId()) %>">
+</form>

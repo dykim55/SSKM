@@ -13,20 +13,20 @@ List<Files> appxList = (List<Files>)request.getAttribute("appxList");
 %>
 
 <script>
-	listfileview(); //board list for file view
-	function listfileview(){
-		var boxPath = $(".board").find(".filebox");
-		
-		boxPath.find(".close").click(function(){
-			$(this).parents(".board").find(".clip").removeAttr("style");
-			$(this).parents(".board").find("ul").hide();
-		});
-	}
+
+$(".detail ul").on("mouseleave", function() {
+	$(".detail ul").remove();
+});
+
+$(".detail ul").find(".close").click(function(){
+	$(".detail ul").remove();
+});
+
 </script>
 
-<ul style="white-space: nowrap;">
+<!-- ul style="white-space: nowrap;" -->
 <% for (Files f : appxList) { %>
 	<li style="padding: 0px 0px 3px 20px;background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat;"><a href="javascript:fileDownload(<%=f.getFileId() %>)"><%=f.getFileOrgNm() %></a></li>
 <% } %>
 	<a href="#none" class="close"></a>
-</ul>
+<!-- /ul -->

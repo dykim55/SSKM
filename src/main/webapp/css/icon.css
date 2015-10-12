@@ -78,7 +78,7 @@ a.edit {
 a.delete {
 	display:inline-block;
 	width:16px; height:16px;
-	background:url(/images/detail/icon_delete.png) no-repeat;
+	background:url(/images/detail/icon_r_del.png) no-repeat;
 	vertical-align:middle;
 }
 a.first {
@@ -99,7 +99,7 @@ a.last {
 }
 u.selected {
 	background:url(/images/detail/bg_paging_on.png) no-repeat;
-	color:#999;
+	color:white;
 	vertical-align:middle;
 }
 a.page {
@@ -132,13 +132,43 @@ u.area {
 }
 a.addfolder {
 	display:inline-block;
-	width:11px; height:11px;
-	background:url(/images/detail/icon_add_folder.png) no-repeat;
+	width:16px; height:16px;
+	background:url(/images/detail/icon_result_add.png) no-repeat;
+	vertical-align:middle;
+}
+a.editfolder {
+	display:inline-block;
+	width:16px; height:16px;
+	background:url(/images/detail/icon_result_edit.png) no-repeat;
 	vertical-align:middle;
 }
 a.delfolder {
 	display:inline-block;
-	width:11px; height:11px;
-	background:url(/images/detail/icon_del_folder.png) no-repeat;
+	width:16px; height:16px;
+	background:url(/images/detail/icon_result_del.png) no-repeat;
+	vertical-align:middle;
+}
+a.add_r_folder {
+	display:inline-block;
+	width:15px; height:15px;
+	background:url(/images/detail/icon_r_add.png) no-repeat;
+	vertical-align:middle;
+}
+a.edit_r_folder {
+	display:inline-block;
+	width:15px; height:15px;
+	background:url(/images/detail/icon_r_edit.png) no-repeat;
+	vertical-align:middle;
+}
+a.del_r_folder {
+	display:inline-block;
+	width:15px; height:15px;
+	background:url(/images/detail/icon_r_del.png) no-repeat;
+	vertical-align:middle;
+}
+a.add_p_folder {
+	display:inline-block;
+	width:15px; height:15px;
+	background:url(/images/detail/icon_p_add.png) no-repeat;
 	vertical-align:middle;
 }

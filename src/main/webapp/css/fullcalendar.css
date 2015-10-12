@@ -3,7 +3,9 @@
  * Docs & License: http://fullcalendar.io/
  * (c) 2015 Adam Shaw
  */
-
+div.schedule {
+	width:1200px; margin:0 auto;
+}
 
 .fc {
 	direction: ltr;
@@ -14,9 +16,6 @@
 	text-align: right;
 }
 
-body .fc { /* extra precedence to overcome jqui */
-	font-size: 1em;
-}
 
 
 /* Colors
@@ -75,7 +74,6 @@ body .fc { /* extra precedence to overcome jqui */
 	width: 1em;
 	height: 1em;
 	line-height: 1em;
-	font-size: 1em;
 	text-align: center;
 	overflow: hidden;
 	font-family: "Courier New", Courier, monospace;
@@ -102,57 +100,36 @@ NOTE: use percentage font sizes or else old IE chokes
 	margin: 0 -1em; /* ensures character will be centered, regardless of width */
 }
 
-.fc-icon-left-single-arrow:after {
-	content: "\02039";
-	font-weight: bold;
-	font-size: 200%;
-	top: -7%;
-	left: 3%;
-}
-
-.fc-icon-right-single-arrow:after {
-	content: "\0203A";
-	font-weight: bold;
-	font-size: 200%;
-	top: -7%;
-	left: -3%;
-}
 
 .fc-icon-left-double-arrow:after {
 	content: "\000AB";
-	font-size: 160%;
 	top: -7%;
 }
 
 .fc-icon-right-double-arrow:after {
 	content: "\000BB";
-	font-size: 160%;
 	top: -7%;
 }
 
 .fc-icon-left-triangle:after {
 	content: "\25C4";
-	font-size: 125%;
 	top: 3%;
 	left: -2%;
 }
 
 .fc-icon-right-triangle:after {
 	content: "\25BA";
-	font-size: 125%;
 	top: 3%;
 	left: 2%;
 }
 
 .fc-icon-down-triangle:after {
 	content: "\25BC";
-	font-size: 125%;
 	top: 2%;
 }
 
 .fc-icon-x:after {
 	content: "\000D7";
-	font-size: 200%;
 	top: 6%;
 }
 
@@ -172,7 +149,6 @@ NOTE: use percentage font sizes or else old IE chokes
 	padding: 0 .6em;
 
 	/* text & cursor */
-	font-size: 1em; /* normalize */
 	white-space: nowrap;
 	cursor: pointer;
 }
@@ -219,7 +195,6 @@ NOTE: use percentage font sizes or else old IE chokes
 	border-color: #e6e6e6 #e6e6e6 #bfbfbf;
 	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 	color: #333;
-	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
@@ -245,7 +220,7 @@ NOTE: use percentage font sizes or else old IE chokes
 .fc-state-active {
 	background-color: #cccccc;
 	background-image: none;
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+	box-shadow:0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .fc-state-disabled {
@@ -285,10 +260,13 @@ previous button's border...
 .fc-popover {
 	position: absolute;
 	box-shadow: 0 2px 6px rgba(0,0,0,.15);
+	border:1px solid #bbb !important;
 }
 
 .fc-popover .fc-header { /* TODO: be more consistent with fc-head/fc-body */
-	padding: 2px 4px;
+	height:20px;
+	padding:2px 5px;
+	line-height:20px;
 }
 
 .fc-popover .fc-header .fc-title {
@@ -317,7 +295,6 @@ previous button's border...
 }
 
 .fc-unthemed .fc-popover .fc-header .fc-close {
-	font-size: .9em;
 	margin-top: 2px;
 }
 
@@ -375,21 +352,41 @@ hr.fc-divider {
 	table-layout: fixed;
 	border-collapse: collapse;
 	border-spacing: 0;
-	font-size: 1em; /* normalize cross-browser */
+	border-bottom:0px none !important;
+}
+
+.fc-row table {
+	border:0px none !important;
 }
 
 .fc th {
+	padding:5px 0;
 	text-align: center;
+	border-top:1px solid #e4e4e4; border-right:1px solid #e4e4e4; border-left:1px solid #e4e4e4;
 }
 
-.fc th,
+.fc th.fc-day-header {
+	font-family:"nanumbold"; font-size:14px; color:white;
+	background:#9b9b9b;
+}
+
 .fc td {
-	border-style: solid;
-	border-width: 1px;
 	padding: 0;
-	vertical-align: top;
+	font-size:12px; color:#555; vertical-align:top;
+	background:white;
 }
-
+.fc-bg table {
+	border:0px none !important;
+}
+.fc-content-skeleton table {
+	border:0px none !important;
+}
+.fc td.fc-other-month {
+	background:#f6f6f6;
+}
+.fc td.fc-day {
+	border:1px solid #e4e4e4;
+}
 .fc td.fc-today {
 	border-style: double; /* overcome neighboring borders */
 }
@@ -509,11 +506,10 @@ temporary rendered events).
 .fc-event {
 	position: relative; /* for resize handle and other inner positioning */
 	display: block; /* make the <a> tag block */
-	font-size: .85em;
 	line-height: 1.3;
 	border-radius: 3px;
-	border: 1px solid #3a87ad; /* default BORDER color */
-	background-color: #3a87ad; /* default BACKGROUND color */
+	border: 1px solid #6fa9cd; /* default BORDER color */
+	background-color: #6fa9cd; /* default BACKGROUND color */
 	font-weight: normal; /* undo jqui's ui-widget-header bold */
 }
 
@@ -644,7 +640,6 @@ be a descendant of the grid when it is being dragged.
 
 a.fc-more {
 	margin: 1px 3px;
-	font-size: .85em;
 	cursor: pointer;
 	text-decoration: none;
 }
@@ -681,10 +676,12 @@ a.fc-more:hover {
 }
 
 .fc-toolbar .fc-left {
+	width:290px;
 	float: left;
 }
 
 .fc-toolbar .fc-right {
+	width:290px;
 	float: right;
 }
 
@@ -707,12 +704,49 @@ a.fc-more:hover {
 
 .fc-toolbar h2 {
 	margin: 0;
+	font-family:"nanumbold"; font-size:24px; color:#555;
 }
 
 /* button layering (for border precedence) */
 
 .fc-toolbar button {
+	border:0px none;
+	font-family:"nanum"; font-size:12px; color:white;
 	position: relative;
+}
+.fc-toolbar button.fc-prev-button {
+	width:34px; height:32px;
+	background:url(../images/detail/bg_btn_left.png) no-repeat;
+}
+.fc-toolbar button.fc-next-button {
+	margin-left:3px;
+	width:34px; height:32px;
+	background:url(../images/detail/bg_btn_right.png) no-repeat;
+}
+.fc-toolbar button.fc-today-button {
+	width:93px; height:32px;
+	background:url(../images/detail/bg_btn.png) no-repeat;
+}
+.fc-toolbar button.fc-reg-button {
+	width:93px; height:32px;
+	background:url(../images/detail/bg_btn_reg.png) no-repeat;
+}
+.fc-toolbar button.fc-month-button {
+	width:93px; height:32px;
+	background:url(../images/detail/bg_btn.png) no-repeat;
+}
+.fc-toolbar button.fc-basicWeek-button {
+	margin-left:5px;
+	width:93px; height:32px;
+	background:url(../images/detail/bg_btn.png) no-repeat;
+}
+.fc-toolbar button.fc-basicDay-button {
+	margin-left:5px;
+	width:93px; height:32px;
+	background:url(../images/detail/bg_btn.png) no-repeat;
+}
+.fc-toolbar button.fc-state-active {
+	background:url(../images/detail/bg_btn_on.png) no-repeat;
 }
 
 .fc-toolbar .fc-state-hover,
@@ -1014,7 +1048,6 @@ be a descendant of the grid when it is being dragged.
 }
 
 .fc-time-grid-event .fc-time {
-	font-size: .85em;
 	white-space: nowrap;
 }
 
@@ -1045,7 +1078,6 @@ be a descendant of the grid when it is being dragged.
 }
 
 .fc-time-grid-event.fc-short .fc-title {
-	font-size: .85em; /* make the title text the same size as the time */
 	padding: 0; /* undo padding from above */
 }
 
@@ -1058,7 +1090,6 @@ be a descendant of the grid when it is being dragged.
 	height: 8px;
 	overflow: hidden;
 	line-height: 8px;
-	font-size: 11px;
 	font-family: monospace;
 	text-align: center;
 	cursor: s-resize;

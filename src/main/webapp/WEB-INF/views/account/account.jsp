@@ -19,6 +19,11 @@ $(document).ready(function() {
 	
     $(".account-tree").treetable({ expandable: true });
     
+	$('.accordionHeaders').click(function() {
+		$(".account-tree .selected").removeClass("selected");
+		ACCT_PG.reload("", "0", function() {});
+	});
+    
     // Highlight selected row
     $(".account-tree tbody").off("mousedown", "tr");
     $(".account-tree tbody").off("mouseenter", "tr");
@@ -49,6 +54,12 @@ $(document).ready(function() {
 		$(this).find(".option").hide();
 		$(this).removeClass("hover");
     });
+    
+    $(".location .left").html("계정관리");
+    
+    //$(".account-tree").treetable("reveal", $($(".account-tree tr")[0]).attr('data-tt-id'));
+    ACCT_PG.reload("", "0", function() {});
+    
 });
 
 function createAuthGrp() {
@@ -65,21 +76,20 @@ function modifyAuthGrp(t) {
 
 function deleteAuthGrp(t) {
 
-    if(confirm("삭제 하시겠습니까?")) {
+	_confirm("삭제 하시겠습니까?", function() {
         $.ajax({
             url: "/account/delete_auth",
             data : {grp : $(t).closest('tr').attr('data-tt-id')},
             type : "post",
             success : function(data){
                 if (data.status == 'success') {
-					$("#account-tree-div").load("/account/tree_ajax", {}, function() {
-					});
+					$("#account-tree-div").load("/account/tree_ajax", {}, function() {});
                 } else {
-                    alert(data.message);
+                    _alert(data.message);
                 }
             }
         });
-    }
+    });
 
 }
 
@@ -96,8 +106,7 @@ function modifyAcctGrp(t) {
 }
 
 function deleteAcctGrp(t) {
-
-    if(confirm("삭제 하시겠습니까?")) {
+	_confirm("삭제 하시겠습니까?", function() {
         $.ajax({
             url: "/account/delete_group",
             data : {prts : $(t).closest('tr').attr('data-tt-parent-id'), grp : $(t).closest('tr').attr('data-tt-id')},
@@ -108,21 +117,38 @@ function deleteAcctGrp(t) {
                 		$(this).find(".account-tree").treetable("reveal", data.parent);
 					});
                 } else {
-                    alert(data.message);
+                    _alert(data.message);
                 }
             }
         });
-    }
-
-}
-
-function createAcct(t) {
-    DIALOG.Open().load("/account/create_account", {auth_grp : $(t).closest('tr').attr('data-tt-parent-id'), acct_grp : $(t).closest('tr').attr('data-tt-id')}, function() {
-    	CREATE_ACCOUNT.init($(this), $(t).closest('tr'));
     });
 }
 
-function fileUpload(parent) {
+function createAcct(t) {
+	var a=g=0;
+	if ($(".account-tree tr.selected").length) {
+		if ($(".account-tree tr.selected").hasClass("leaf")) {
+			a=$(".account-tree tr.selected").attr('data-tt-parent-id');
+			g=$(".account-tree tr.selected").attr('data-tt-id');
+		} else {
+			a=$(".account-tree tr.selected").attr('data-tt-id');
+			g=0;
+		}
+	} 
+    DIALOG.Open().load("/account/create_account", {auth_grp : a, acct_grp : g}, function() {
+    	CREATE_ACCOUNT.init($(this), undefined);
+    });
+}
+
+
+function acctDetail(id) {
+    DIALOG.Open().load("/account/create_account", {id : id}, function() {
+    	CREATE_ACCOUNT.init($(this), undefined);
+    });
+}
+
+function search() {
+	ACCT_PG.reload();
 }
 
 </script>
@@ -135,11 +161,18 @@ function fileUpload(parent) {
 			<div class="content-head">
 				<div class="head-end">
 					<div class="set-table">
-						<div class="left-set">계정관리</div>
+						<div class="left-set">
+							<button type="button" onclick="javascript:createAcct();">계정 등록</button>
+						</div>
 						<div class="right-set">
 							<div class="list-search">
-								<input type="text">
-								<button type="button"><img src="/images/detail/icon_normal_search.png"></button>
+								<select id="ac_selbox" style="float:left;margin-left:10px;padding:2px;height: 26px;font-family:&quot;nanum&quot;;font-size:12px;color:#555;border:1px solid #AAA;vertical-align:middle;margin-top:5px;">
+									<option value="1" selected>성명</option>
+									<option value="2" >부서</option>
+									<option value="3" >직급</option>
+								</select>							
+								<input type="text" onclick="this.select()" onKeyDown="if(event.keyCode==13){javascript:search(); return false;}" id="searchWord" name="searchWord" value="<%=StringUtil.convertString(request.getParameter("searchWord"))%>">
+								<button type="button" onclick="javascript:search();"><img src="/images/detail/icon_normal_search.png"></button>
 								<div class="cl"><!-- Clear Fix --></div>
 							</div>
 						</div>
@@ -154,7 +187,7 @@ function fileUpload(parent) {
 						<div class="membership">
 							<div class="accordionHeaders selected">접근권한그룹
 								<div class="option">
-									<a href="#" onclick="javascript:createAuthGrp();" class="add_r_folder" title="권한그룹추가"><i class="fa fa-plus-square-o"></i></a>
+									<a href="#" onclick="javascript:createAuthGrp();" class="addfolder" title="권한그룹추가"></a>
 								</div>
 							</div>
 							<div id="account-tree-div" class="contentHolder" style="display: block;">
@@ -168,13 +201,13 @@ function fileUpload(parent) {
 									                    <span class=''><%=StringUtil.convertString(map.get("acctGrpNm")) %></span>
 									                    <div class="option">
 									                 <% if ((Long)map.get("level") == 2) { %>
-									                    	<a href="#" onclick="javascript:createAcctGrp(this);" title="계정그룹추가"><i class="fa fa-users"></i></a>
-									                    	<a href="#" onclick="javascript:modifyAuthGrp(this);" title="권한그룹수정"><i class="fa fa-pencil-square-o"></i></a>
-															<a href="#" onclick="javascript:deleteAuthGrp(this);" title="권한그룹삭제"><i class="fa fa-trash-o"></i></a>
+									                    	<a class="add_r_folder" href="#" onclick="javascript:createAcctGrp(this);" title="계정그룹추가"></a>
+									                    	<a class="edit_r_folder" href="#" onclick="javascript:modifyAuthGrp(this);" title="권한그룹수정"></a>
+															<a class="del_r_folder" href="#" onclick="javascript:deleteAuthGrp(this);" title="권한그룹삭제"></a>
 													 <% } else { %>
-									                    	<a href="#" onclick="javascript:createAcct(this);" title="계정추가"><i class="fa fa-user-plus"></i></a>
-									                    	<a href="#" onclick="javascript:modifyAcctGrp(this);" title="계정그룹수정"><i class="fa fa-pencil-square-o"></i></a>
-															<a href="#" onclick="javascript:deleteAcctGrp(this);" title="계정그룹삭제"><i class="fa fa-trash-o"></i></a>
+									                    	<a class="add_p_folder" href="#" onclick="javascript:createAcct();" title="계정추가"></a>
+									                    	<a class="edit_r_folder" href="#" onclick="javascript:modifyAcctGrp(this);" title="계정그룹수정"></a>
+															<a class="del_r_folder" href="#" onclick="javascript:deleteAcctGrp(this);" title="계정그룹삭제"></a>
 													 <% } %>
 									                    </div>
 									                </td>
@@ -198,8 +231,8 @@ function fileUpload(parent) {
 							<col width="12%">
 							<col width="15%">
 							<col width="15%">
-							<col width="15%">
-							<col width="15%">
+							<col width="14%">
+							<col width="12%">
 							<col width="*">
 						</colgroup>
 						<thead>
@@ -210,7 +243,7 @@ function fileUpload(parent) {
 								<th>접근계정그룹</th>
 								<th>부서</th>
 								<th>직급</th>
-								<th>등록일시</th>
+								<th>등록일</th>
 								<th>최근접속일시</th>
 							</tr>
 						</thead>

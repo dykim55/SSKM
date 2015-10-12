@@ -21,7 +21,8 @@ public class Acct extends Paging {
 	private Date modDtime;
 	
 	private int authGrp;
-
+	private String regrNm;
+	
 	public String getAcctId() {
 		return acctId;
 	}
@@ -117,6 +118,12 @@ public class Acct extends Paging {
 	}
 	public void setOflvNm(String oflvNm) {
 		this.oflvNm = oflvNm;
+	}
+	public String getRegrNm() {
+		return regrNm;
+	}
+	public void setRegrNm(String regrNm) {
+		this.regrNm = regrNm;
 	}	
 	
 }

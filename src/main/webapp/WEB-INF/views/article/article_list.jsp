@@ -7,6 +7,8 @@
 %>
 
 <%
+	UserInfo userInfo = (UserInfo)request.getAttribute("userInfo");
+
 	String sBbsSct = StringUtil.convertString(request.getParameter("bbsSct"));
 
     @SuppressWarnings("unchecked")
@@ -30,15 +32,16 @@
 $(document).ready(function() {
 
 	$(".board").find("tbody").on("click", "tr", function() {
-		console.log("click!");
 		articleWrite(<%=sBbsSct%>, $(this).attr("data-tt-id"));
 	});
 
 	$(".board").find("tbody").on("mouseenter", "td", function() {
+		$(this).parent().find(".option").show();
 		$(this).parent().find("td").css({background:"#f2f2f2"});
 	});
 
 	$(".board").find("tbody").on("mouseleave", "td", function() {
+		$(this).parent().find(".option").hide();
 		$(this).parent().find("td").css({background:"#ffffff"});
 	});
 	
@@ -52,10 +55,10 @@ $(document).ready(function() {
 
 	<table class="board">
         <colgroup>
-            <col width="5%">
+            <col width="7%">
             <col width="*">
             <col width="8%">
-            <col width="20%">
+            <col width="18%">
             <col width="10%">
             <col width="8%">
         </colgroup>
@@ -75,12 +78,23 @@ $(document).ready(function() {
             for (HashMap<String, Object> map : bbsList) { %>
             <tr data-tt-id='<%=map.get("bbsId") %>'>
                 <td><%=nTotalRecord - m++ %></td>
-                <td style="text-align: left;padding-left: 10px;"><%=StringUtil.replaceHtml(StringUtil.convertString(map.get("bbsTit"))) %></td>
+                <td style="text-align: left;padding-left: 10px;">
+                	<div class="subject">
+	                	<%=StringUtil.replaceHtml(StringUtil.convertString(map.get("bbsTit"))) %>
+	                	
+	                <% /*if (StringUtil.convertString(map.get("regr")).equals(userInfo.getAcct().getAcctId())) { */ %>
+						<div class="option">
+							<a href="#" onclick="deleteArticle(<%=StringUtil.convertString(map.get("bbsId")) %>);" class="delete"></a>
+						</div>
+					<% /*} */ %>
+					
+					</div>
+                </td>
                 <td>
 					<% if (StringUtil.convertString(map.get("fileYn")).equals("y")) { %>
 							<!-- file list -->
 							<div class="filebox">
-								<a href="#" onclick="javascript:fileBox(24)" class="clip"></a>
+								<a href="#" onclick="javascript:fileBox(<%=StringUtil.convertString(map.get("bbsId")) %>)" class="clip"></a>
 							</div>
 					<% } %>
                 </td>
@@ -92,7 +106,7 @@ $(document).ready(function() {
         } else { %>
             <tr align="center">
                 <td colspan="6">
-                    <font color="tomato"><b>등록된 데이터가 없습니다!</b></font>
+                    <h2>검색 결과가 없습니다.</h2>
                 </td>
             </tr>
     <% } %>

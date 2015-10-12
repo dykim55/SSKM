@@ -14,6 +14,8 @@ public class AcctGrp extends Paging {
 	private String modr;
 	private Date modDtime;
 	
+	private String regrNm;
+	
 	public int getAcctGrpCd() {
 		return acctGrpCd;
 	}
@@ -67,6 +69,12 @@ public class AcctGrp extends Paging {
 	}
 	public void setAcctPrntCd(int acctPrntCd) {
 		this.acctPrntCd = acctPrntCd;
+	}
+	public String getRegrNm() {
+		return regrNm;
+	}
+	public void setRegrNm(String regrNm) {
+		this.regrNm = regrNm;
 	} 
 
 	

@@ -34,7 +34,12 @@
             AND A.bbsSct = #{bbsSct}
         </if>
         <if test="searchWord != null and searchWord != ''">
-            AND bbsTit LIKE CONCAT('%', #{ searchWord }, '%')
+        	<if test='searchSel == "1"'>
+            	AND A.bbsTit LIKE CONCAT('%', #{ searchWord }, '%')
+            </if>
+        	<if test='searchSel == "2"'>
+        		AND A.regr IN ( SELECT acctId FROM AcctTbl WHERE acctNm LIKE CONCAT('%', #{ searchWord }, '%') )
+            </if>
         </if>
         AND A.delYn = 'n'
         
@@ -56,11 +61,11 @@
     </select>
 	
     <insert id="insertBoard">
-        INSERT INTO BoardTbl(bbsId, bbsSct, bbsTit, bbsCont, 
+        INSERT INTO BoardTbl(bbsSct, bbsTit, bbsCont, 
         <if test="fileYn != null">fileYn,</if> 
         <if test="delYn != null">delYn,</if>
         regr, regDtime, modr, modDtime)
-        VALUES (#{bbsId}, #{bbsSct}, #{bbsTit}, #{bbsCont},
+        VALUES (#{bbsSct}, #{bbsTit}, #{bbsCont},
         <if test="fileYn != null">#{fileYn},</if> 
         <if test="delYn != null">#{delYn},</if>
         #{regr}, #{regDtime}, #{modr}, #{modDtime})
@@ -81,6 +86,11 @@
             bbsId = #{bbsId}
         WHERE bbsId = #{bbsId}
     </update>
+	
+	<delete id="deleteBoard">
+		DELETE FROM BoardTbl
+		WHERE bbsId = #{bbsId}
+	</delete>
 	
     <insert id="insertAppxFile">
         INSERT INTO AppxFileTbl(refCd, fileTp, fileLoc, fileOrgNm, fileSavNm, regr, regDtime, modr, modDtime)

@@ -43,16 +43,20 @@ $(function(){
 			}
 		});
 	}
-	
+
 	navUi(); //top depth Ui
 	function navUi(){
 		var menuPath = $(".menu").find("dl");
 		var depth2path = $(".menu").find("ol");
+		var lightPath = $(".light-box").find("img");
 		
-		menuPath.find("dt").bind({
+		menuPath.find("dt,dd").bind({
 			mouseenter : function(){
+				lightPath.animate({width:$(this).outerWidth(),left:$(this).position().left},50);
 				depth2path.hide();
+				$(".location .left").hide();
 				depth2path.eq($(this).index()).show();
+				depth2path.eq($(this).index()).css({"margin-left":$(this).position().left-10});
 			}, click : function(){
 				window.location.href = $(this).attr("href");
 			}
@@ -60,6 +64,9 @@ $(function(){
 		
 		depth2path.find("li").bind({
 			mouseenter : function(){
+				$(this).css({background:"url(/images/common/bg_subnav_on.png)","color":"#f5f487"});
+			}, mouseleave : function(){
+				$(this).removeAttr("style");
 			}, click : function(){
 				window.location.href = $(this).attr("href");
 			}
@@ -67,6 +74,39 @@ $(function(){
 		
 		$(".nav").mouseleave(function(){
 			depth2path.hide();
+			$(".location .left").show();
+		});		
+	}
+
+	listHover(); //board list for mouse focus
+	function listHover(){
+		var thisPath = $(".board").find("tbody").find("td");
+		
+		thisPath.bind({
+			mouseenter : function(){
+				$(this).parent().find(".option").show();
+				$(this).parent().find("td").css({background:"#f2f2f2"});
+			}, mouseleave : function(){
+				$(this).parent().find(".option").hide();
+				$(this).parent().find("td").removeAttr("style");
+			}
+		});
+	}
+	
+	listfileview(); //board list for file view
+	function listfileview(){
+		var boxPath = $(".board").find(".filebox");
+		
+		boxPath.find(".clip").click(function(){
+			$(this).parents(".board").find(".clip").removeAttr("style");
+			$(this).parents(".board").find("ul").hide();
+			$(this).css({background:"url(/images/detail/icon_clip_on.png) no-repeat"});
+			$(this).parent().find("ul").show(200);
+		});
+		
+		boxPath.find(".close").click(function(){
+			$(this).parents(".board").find(".clip").removeAttr("style");
+			$(this).parents(".board").find("ul").hide(100);
 		});
 	}
 	
@@ -79,7 +119,7 @@ $(function(){
 				$(this).find(".option").hide();
 			}
 		});
-
+		
 		/*
 		$(".accordionContent").bind({
 			mouseenter : function(){
@@ -92,4 +132,6 @@ $(function(){
 		});
 		*/
 	}
+	
+	$.ui.dialog.prototype._focusTabbable = function(){};	//dialog focus bug path
 });

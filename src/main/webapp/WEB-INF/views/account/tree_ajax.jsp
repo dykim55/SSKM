@@ -62,13 +62,13 @@ $(document).ready(function() {
                   <span class=''><%=StringUtil.convertString(map.get("acctGrpNm")) %></span>
                   <div class="option">
                <% if ((Long)map.get("level") == 2) { %>
-                  	<a href="#" onclick="javascript:createAcctGrp(this);" title="계정그룹추가"><i class="fa fa-users"></i></a>
-                  	<a href="#" onclick="javascript:modifyAuthGrp(this);" title="권한그룹수정"><i class="fa fa-pencil-square-o"></i></a>
-				<a href="#" onclick="javascript:deleteAuthGrp(this);" title="권한그룹삭제"><i class="fa fa-trash-o"></i></a>
+                   	<a class="add_r_folder" href="#" onclick="javascript:createAcctGrp(this);" title="계정그룹추가"></a>
+                   	<a class="edit_r_folder" href="#" onclick="javascript:modifyAuthGrp(this);" title="권한그룹수정"></a>
+					<a class="del_r_folder" href="#" onclick="javascript:deleteAuthGrp(this);" title="권한그룹삭제"></a>
 		 <% } else { %>
-                  	<a href="#" onclick="javascript:createAcct(this);" title="계정추가"><i class="fa fa-user-plus"></i></a>
-                  	<a href="#" onclick="javascript:modifyAcctGrp(this);" title="계정그룹수정"><i class="fa fa-pencil-square-o"></i></a>
-				<a href="#" onclick="javascript:deleteAcctGrp(this);" title="계정그룹삭제"><i class="fa fa-trash-o"></i></a>
+					<a class="add_p_folder" href="#" onclick="javascript:createAcct();" title="계정추가"></a>
+					<a class="edit_r_folder" href="#" onclick="javascript:modifyAcctGrp(this);" title="계정그룹수정"></a>
+					<a class="del_r_folder" href="#" onclick="javascript:deleteAcctGrp(this);" title="계정그룹삭제"></a>
 		 <% } %>
                   </div>
               </td>

@@ -30,6 +30,7 @@ public class Constants {
 	public static final String	AUDIT_LOGIN = "1";		//로그인
 	public static final String	AUDIT_ACCOUNT = "2";	//계정관리
 	public static final String	AUDIT_FILES = "3";		//산출물관리
+	public static final String	AUDIT_ARTICLE = "4";	//게시판
 	
 	
 	/** 게시판타입 */

@@ -38,6 +38,7 @@ $(document).ready(function(){
     //if ($("#loginId").val().length == 0 || $("#loginPw").val().length == 0) return;
     
         document.loginFrm.submit();
+        $(".post").remove();
         $(".insert").children().remove();
         $(".insert").append("<p style=\"padding: 20px;\"><span style=\"font-size: 12px;color: rgb(0, 0, 0);\">접속중입니다...</span></p>");
     });

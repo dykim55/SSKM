@@ -29,16 +29,12 @@ if (StringUtil.isEmpty(sSubMenu)) {
 
 $(document).ready(function() {
 	
-	$('#btn_test').click(function() {
-		console.log(location.href);
-		location.href="/files/security_control?A=1&B=2";
-	});
-	
 	$('.accordionHeaders').click(function() {
-		$(".location").html($(this)[0].textContent.trim());
+		$(".location .left").html($(".menu dt[code=<%=subMenuList.get(0).get("prtsCd")%>]")[0].textContent.trim() + "&nbsp;&nbsp;>&nbsp;&nbsp;" + $(this)[0].textContent.trim());
+		
 		$(".left-tree .selected").not(this).removeClass("selected");
 
-		if ($(".content-head").find("button").length > 1) $(".content-head").find("button")[0].remove();
+		if ($(".content-head .left-set").find("button").length > 1) $(".content-head").find("button").eq(0).remove();
 		
 		if ($(this).hasClass('ac_selected')) {
 			return;
@@ -58,13 +54,15 @@ $(document).ready(function() {
     
     $(".left-tree tbody").on("mousedown", "tr", function() {
     	if (!$(this).hasClass("selected")) {
+    		$(this).removeClass("hover");
     	    $(".left-tree .selected").not(this).removeClass("selected");
     	    $(this).toggleClass("selected");
     	}
-    	
+
     	PG.reload($(this).attr('data-tt-id'), function() {
-    		$(".location").html($('.accordion').find('.accordionHeaders.ac_selected')[0].textContent.trim() + "&nbsp;&nbsp;>&nbsp;&nbsp;" + $(".left-tree:visible").treetable('pathName', $(".left-tree:visible").find(".selected").attr('data-tt-id')));	
+    		$(".location .left").html($(".menu dt[code=<%=subMenuList.get(0).get("prtsCd")%>]")[0].textContent.trim() + "&nbsp;&nbsp;>&nbsp;&nbsp;" + $('.accordion').find('.accordionHeaders.ac_selected')[0].textContent.trim() + "&nbsp;&nbsp;>&nbsp;&nbsp;" + $(".left-tree:visible").treetable('pathName', $(".left-tree:visible").find(".selected").attr('data-tt-id')));	
     	});
+
     });
     
     $(".left-tree tbody").on("mouseenter", "tr", function() {
@@ -77,8 +75,14 @@ $(document).ready(function() {
 		$(this).removeClass("hover");
     });
     
-    $(".location").html($('.accordion').find('.accordionHeaders.ac_selected')[0].textContent.trim());
+    $(".location .left").html($(".menu dt[code=<%=subMenuList.get(0).get("prtsCd")%>]")[0].textContent.trim() + "&nbsp;&nbsp;>&nbsp;&nbsp;" + $('.accordion').find('.accordionHeaders.ac_selected')[0].textContent.trim());
     
+    $("#searchWord").keydown(function(e) {
+        if (e.keyCode==13) {
+        	search();
+            return false;
+        }
+    });
 });
 
 function createFolder() { //folder create
@@ -94,8 +98,7 @@ function modifyFolder() {
 }
 
 function deleteFolder(tr) {
-
-	if(confirm("삭제 하시겠습니까?")) {
+	_confirm("삭제 하시겠습니까?", function() {
 	    $.ajax({
 	        url: "/files/delete_folder",
 	        data : {id:  $(".left-tree .selected").attr('data-tt-id')},
@@ -107,12 +110,11 @@ function deleteFolder(tr) {
                 		$(this).find(".left-tree").treetable("node", data.parent).expand();
 					});
 	            } else {
-	                alert(data.message);
+	                _alert(data.message);
 	            }
 	        }
 	    });
-	}
-
+	});
 }
 
 function fileUpload(id) {
@@ -122,7 +124,8 @@ function fileUpload(id) {
 }
 
 function deleteFile(id) {
-    if(confirm("삭제 하시겠습니까?")) {
+	
+	_confirm("삭제 하시겠습니까?", function() {
         $.ajax({
         	url : "/files/file_delete",
             data : {id: id},
@@ -130,22 +133,31 @@ function deleteFile(id) {
             success : function(data){
                 if (data.status == 'success') {
                 } else {
-                    alert(data.message);
+                    _alert(data.message);
                 }
                 PG.reload(false, function() {});
             }
         });
-    }
+	});
     event.stopPropagation();
 }
 
 function fileBox(id) {
-	if ($('[data-tt-id=' + id + ']').find(".filebox ul").length == 0) {
+	if ($(".detail ul").length == 0) {
+		$(".detail").append('<ul style="white-space: nowrap;left:'+event.clientX+'px;top:'+event.clientY+'px;"></ul>');
 		$.get("/files/appx_list", {id: id}, function( data ) {
-			$('[data-tt-id=' + id + ']').find(".filebox").append(data);
+			$(".detail ul").append(data);
 		});
 	}
 	event.stopPropagation();
+}
+
+function search() {
+	PG.reload(false, function() {});
+}
+
+function allOverSearch() {
+	ALL_PG.reload(false, function() {});
 }
 
 </script>
@@ -159,8 +171,8 @@ function fileBox(id) {
 
 		<!-- depth 3. sub menu search -->
 		<div class="dir-search">
-			<input type="text">
-			<button type="button"><img src="/images/detail/icon_search.png"></button>
+			<input type="text" onclick="this.select()" onKeyDown="if(event.keyCode==13){javascript:allOverSearch(); return false;}">
+			<button type="button" onclick="javascript:allOverSearch();"><img src="/images/detail/icon_search.png"></button>
 			<div class="cl"><!-- clear fix --></div>
 		</div>
 
@@ -177,9 +189,9 @@ function fileBox(id) {
 					if ((Integer)ctgMap.get("ctgParent") == 0) {
 			%>
 						<div ref-sct="<%=StringUtil.convertString(ctgMap.get("ctgSct")) %>" ref-id="<%=(Integer)ctgMap.get("ctgId") %>" class="accordionHeaders <%= (sSubMenu.equals(StringUtil.convertString(ctgMap.get("ctgSct"))) ? "ac_selected" : "") %>">
-							<%=StringUtil.convertString(ctgMap.get("ctgNm")) %>
+							<span><%=StringUtil.convertString(ctgMap.get("ctgNm")) %></span>
 							<div class="option">
-								<a href="javascript:createFolder();"><i class="fa fa-plus-square-o"></i></a>
+								<a href="javascript:createFolder();" class="addfolder" title="추가"></a>
 							</div>
 						</div>
 						<div class="contentHolder" style="display: <%= (sSubMenu.equals(StringUtil.convertString(ctgMap.get("ctgSct"))) ? "block" : "none") %>;">
@@ -190,11 +202,11 @@ function fileBox(id) {
 	           		if ((Integer)ctgMap.get("ctgParent") > 0) { %>
 						            <tr class="accordionContent" level='<%=ctgMap.get("level") %>' ref-sct='<%=ctgMap.get("ctgSct") %>' data-tt-id='<%=ctgMap.get("ctgId") %>' <% if ((Integer)ctgMap.get("ctgParent") > 0) { %> data-tt-parent-id='<%=ctgMap.get("ctgParent") %>' <% } %> style="display: none;">
 						                <td>
-						                    <span class='folder'><%=StringUtil.convertString(ctgMap.get("ctgNm")) %></span>
+						                    <span><%=StringUtil.convertString(ctgMap.get("ctgNm")) %></span>
 						                    <div class="option">
-						                    	<a href="javascript:createFolder();"><i class="fa fa-plus-square-o"></i></a>
-						                    	<a href="javascript:modifyFolder();"><i class="fa fa-pencil-square-o"></i></a>
-												<a href="javascript:deleteFolder();"><i class="fa fa-trash-o"></i></a>
+						                    	<a href="javascript:createFolder();" class="addfolder" title="추가"></a>
+						                    	<a href="javascript:modifyFolder();" class="editfolder" title="수정"></a>
+												<a href="javascript:deleteFolder();" class="delfolder" title="삭제"></a>
 						                    </div>
 						                </td>
 						            </tr>
@@ -214,25 +226,59 @@ function fileBox(id) {
 
 	<!-- depth 2. section -->
 	<div class="section" id="files-grid-div" onselectstart="return false" ondragstart="return false">
-		<div class="detail">
-			<div class="content-head">
+		<div class="detail" style="max-width: inherit;">
+			<div class="content-head" style="max-width: inherit;">
 				<div class="head-end">
 					<div class="set-table">				
 				
 						<div class="left-set">
+							<button type="button" onclick="javascript:createFolder();">새 폴더</button>
 						</div>
 						<div class="right-set">
-							<button type="button" onclick="javascript:createFolder();">새 폴더</button>
+							<div class="list-search">
+								<select id="nt_selbox" style="float:left;margin-left:10px;padding:2px;height: 26px;font-family:&quot;nanum&quot;;font-size:12px;color:#555;border:1px solid #AAA;vertical-align:middle;margin-top:5px;">
+									<option value="1" <%=StringUtil.convertString(request.getParameter("searchSel")).equals("1") ? "selected" : "" %>>제목</option>
+									<option value="2" <%=StringUtil.convertString(request.getParameter("searchSel")).equals("2") ? "selected" : "" %>>등록자</option>
+								</select>							
+								<input type="text" onclick="this.select()" onKeyDown="if(event.keyCode==13){javascript:search(); return false;}" id="searchWord" name="searchWord" value="<%=StringUtil.convertString(request.getParameter("searchWord"))%>">
+								<button type="button" onclick="javascript:search();"><img src="/images/detail/icon_normal_search.png"></button>
+								<div class="cl"><!-- Clear Fix --></div>
+							</div>
 						</div>
 				
 					</div>
 				</div>
 			</div>
 	
-			<div id="emptycontent" style="font-size: 16px;    color: #888;    position: absolute;    text-align: center;    top: 30%;    width: 85%;">
-				<div class="icon-folder"></div>
-				<h2>파일이 없습니다.</h2>
-			</div>
+			<table class="board" style="max-width: inherit;">
+				<colgroup>
+					<col width="80">
+					<col width="*">
+					<col width="100">
+					<col width="150">
+					<col width="250">
+					<col width="100">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>첨부파일</th>
+						<th>등록자</th>
+						<th>등록일자</th>
+						<th>조회</th>
+					</tr>
+				</thead>
+				<!-- 
+				<tbody>
+					<tr>
+						<td colspan="6">
+							<h2>파일이 없습니다.</h2>
+						</td>
+					</tr>
+				</tbody>
+				 -->
+			</table>
 	
 		</div>	
 
