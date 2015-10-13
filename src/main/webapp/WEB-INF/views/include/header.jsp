@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
     import = "java.util.List
             , java.util.HashMap
-            , com.cyberone.scourt.model.UserInfo
-            , com.cyberone.scourt.utils.StringUtil
-    		, com.cyberone.scourt.Common"
+            , com.cyberone.sskm.model.UserInfo
+            , com.cyberone.sskm.utils.StringUtil
+    		, com.cyberone.sskm.Common"
 %>
 
 <%
@@ -25,7 +25,6 @@ List<HashMap<String, Object>> menuList = Common.selectMenu();
 <link rel="stylesheet" href="/css/icon.css">
 <link rel="stylesheet" href="/css/jquery.treetable.fix.css">
 <link rel="stylesheet" href="/css/jquery-ui-1.10.2.custom.css">
-<link rel="stylesheet" href="/css/font-awesome.min.css">
 <link rel="stylesheet" href="/css/fullcalendar.css">
 
 <script type="text/javascript" src="/js/jquery/jquery-1.7.2.js"></script>
@@ -86,7 +85,7 @@ function membermodify() {
 					if ("0".equals(StringUtil.convertString(hMap.get("prtsCd"))) && userInfo.isMenuAuth(StringUtil.convertString(hMap.get("menuCd")))) { %>
 						<ol class="sub<%=StringUtil.convertString(hMap.get("menuCd"))%>">
 						<% for (HashMap<String, Object> sMap : menuList) { 
-								if (StringUtil.convertString(sMap.get("prtsCd")).equals(StringUtil.convertString(hMap.get("menuCd")))) { %>
+								if (StringUtil.convertString(sMap.get("prtsCd")).equals(StringUtil.convertString(hMap.get("menuCd"))) && userInfo.isMenuAuth(StringUtil.convertString(sMap.get("menuCd")))) { %>
 						
 									<li href="<%=StringUtil.convertString(sMap.get("execUrl")) %>"><%=StringUtil.convertString(sMap.get("menuNm")) %></li>
 						

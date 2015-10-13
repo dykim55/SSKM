@@ -1,11 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
         import= "java.util.List
         , java.util.HashMap
-        , com.cyberone.scourt.model.UserInfo
-        , com.cyberone.scourt.Constants
-        , com.cyberone.scourt.model.Files
-        , com.cyberone.scourt.utils.DateUtil
-        , com.cyberone.scourt.utils.StringUtil"
+        , com.cyberone.sskm.model.UserInfo
+        , com.cyberone.sskm.Constants
+        , com.cyberone.sskm.model.Files
+        , com.cyberone.sskm.utils.DateUtil
+        , com.cyberone.sskm.utils.StringUtil"
 %>
 
 <%
@@ -23,11 +23,12 @@
 
 FILE_UPLOAD = (function() {
 	var _Dlg;
-	var bProcessing = false;
+	var _bProcessing = false;
 	
 	$("#file_upload_form").ajaxForm({
         beforeSubmit: function(data, form, option) {
         	if ($(".file-add-write .file-list u").length > 0 || $(".file-add-write input").length > 1) return true;
+        	_bProcessing = false;
         	_alert("등록 할 파일을 선택하세요.");
         	return false;
         },
@@ -35,6 +36,7 @@ FILE_UPLOAD = (function() {
         	if (data.status=="success") {
         		PG.reload(false, function() { _Dlg.dialog("close"); });
         	} else {
+        		_bProcessing = false;
         		_alert(data.message);
         	}
         }
@@ -48,19 +50,9 @@ FILE_UPLOAD = (function() {
 		}
 	});
 	
-	
-	/*
-		$("#in-add").click(function(){
-			$(".file-add-write").append(' <p><input type="file"> <a href="#none" class="remove"></a></p> ');
-		});
-		
-		$(".file-add-write").on("click",".remove",function(){
-			$(this).parents("p").remove();
-		});
-	*/
-	
     return {
         init: function(Dlg) {
+        	_bProcessing = false;
         	_Dlg = Dlg;
 
             file_data();
@@ -124,7 +116,10 @@ FILE_UPLOAD = (function() {
 					    });
 					    if (flag) return false;
 		
-						$("#file_upload_form").submit();
+						if (!_bProcessing) {
+							_bProcessing = true;
+							$("#file_upload_form").submit();
+						}
                     },
                     "취소": function() {
                         $(this).dialog("close");
@@ -138,7 +133,6 @@ FILE_UPLOAD = (function() {
 <% } %>
                 },
                 close: function( event, ui ) {
-                	bProcessing = false;
                     $(this).children().remove();
                 },
                 open: function( event, ui ) {
@@ -194,7 +188,7 @@ function delFile(el, id) {
 			<% if (filesList != null && filesList.size() > 0) { %>
 					<div class="file-list">
 				<% for (Files f : filesList) { %>
-						<u style="padding: 5px 5px 5px 16px;background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat 2px;"><a href="javascript:fileDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> <a onclick="javascript:delFile($(this), <%=f.getFileId()%>)" class="del"></a></u>
+						<u style="padding: 5px 5px 5px 16px;background:url(/images/detail/fileicon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat 2px;"><a href="javascript:fileDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> <a onclick="javascript:delFile($(this), <%=f.getFileId()%>)" class="del"></a></u>
 				<% } %>
 					</div>
 			<% } %>	
@@ -243,7 +237,7 @@ function delFile(el, id) {
 			<% if (filesList != null && filesList.size() > 0) { %>
 					<div class="file-list">
 				<% for (Files f : filesList) { %>
-						<u style="background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat;"><a href="javascript:fileDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> </u>
+						<u style="background:url(/images/detail/fileicon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat;"><a href="javascript:fileDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> </u>
 				<% } %>
 					</div>
 			<% } %>	
@@ -291,7 +285,7 @@ function delFile(el, id) {
 			<% if (filesList != null && filesList.size() > 0) { %>
 					<div class="file-list">
 				<% for (Files f : filesList) { %>
-						<u style="padding: 5px 5px 5px 16px;background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat 2px;"><a href="javascript:fileDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> <a href="#" class="del"></a></u>
+						<u style="padding: 5px 5px 5px 16px;background:url(/images/detail/fileicon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat 2px;"><a href="javascript:fileDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> <a href="#" class="del"></a></u>
 				<% } %>
 					</div>
 			<% } %>	

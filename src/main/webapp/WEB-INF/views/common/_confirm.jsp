@@ -4,10 +4,11 @@
 
 _CONFIRM = (function() {
 	var _Dlg;
-	var bProcessing = false;
+	var _bProcessing = false;
 	
     return {
         init: function(Dlg, msg, func) {
+        	_bProcessing = false;
         	_Dlg = Dlg;
 
         	_Dlg.find(".diabox pre").html(msg);
@@ -20,7 +21,10 @@ _CONFIRM = (function() {
                 title: "알림",
                 buttons: {
                     "확인": function() {
-                    	func();
+						if (!_bProcessing) {
+							_bProcessing = true;
+	                    	func();
+						}
                         $(this).dialog("close");
                     },
 		            "취소": function() {
@@ -28,7 +32,6 @@ _CONFIRM = (function() {
 		            }
                 },
                 close: function( event, ui ) {
-                	bProcessing = false;
                     $(this).children().remove();
                 },
                 open: function( event, ui ) {

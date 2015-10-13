@@ -2,10 +2,10 @@
         import= "java.util.List
         , java.util.HashMap
         , java.util.Date
-        , com.cyberone.scourt.Common
-        , com.cyberone.scourt.model.UserInfo
-        , com.cyberone.scourt.model.Acct
-        , com.cyberone.scourt.utils.StringUtil"
+        , com.cyberone.sskm.Common
+        , com.cyberone.sskm.model.UserInfo
+        , com.cyberone.sskm.model.Acct
+        , com.cyberone.sskm.utils.StringUtil"
 %>
 
 <%
@@ -27,7 +27,9 @@
 
 CREATE_ACCOUNT = (function() {
 	var _Dlg;
-	var bProcessing = false;
+	var _bProcessing = false;
+	
+	$("#acct_mobile").toPhone();
 	
 	$("#acct_frm").ajaxForm({
         beforeSubmit: function(data, form, option) {
@@ -37,6 +39,7 @@ CREATE_ACCOUNT = (function() {
         	if (data.status == "success") {
         		ACCT_PG.reload(false, false, function() { _Dlg.dialog("close"); });
         	} else {
+        		_bProcessing = false;
         		_alert(data.message);
         	}
         }
@@ -47,6 +50,7 @@ CREATE_ACCOUNT = (function() {
         	if (data.status == "success") {
         		ACCT_PG.reload(false, false, function() { _Dlg.dialog("close"); });
         	} else {
+        		_bProcessing = false;
         		_alert(data.message);
         	}
         }
@@ -54,6 +58,7 @@ CREATE_ACCOUNT = (function() {
 	
     return {
         init: function(Dlg) {
+        	_bProcessing = false;
         	_Dlg = Dlg;
 
         	<% if (StringUtil.isEmpty(acctInfo.getAcctId())) { %>
@@ -89,13 +94,18 @@ CREATE_ACCOUNT = (function() {
 					    });
 					    if (flag) return false;
 					  
-						$("#acct_frm").submit();
-                    	
+						if (!_bProcessing) {
+							_bProcessing = true;
+							$("#acct_frm").submit();
+						}
                     }
                 <% if (!StringUtil.isEmpty(acctInfo.getAcctId())) { %>                    
                     ,"삭제": function() {
                     	_confirm("삭제 하시겠습니까?", function() {
-                    		$("#acct_del_frm").submit();
+    						if (!_bProcessing) {
+    							_bProcessing = true;
+                    			$("#acct_del_frm").submit();
+    						}
                     	});
                     }
 				<% } %>                    
@@ -104,7 +114,6 @@ CREATE_ACCOUNT = (function() {
                     }
                 },
                 close: function( event, ui ) {
-                	bProcessing = false;
                     $(this).children().remove();
                 },
                 open: function( event, ui ) {
@@ -183,9 +192,9 @@ CREATE_ACCOUNT = (function() {
 				<td>
 					<input type="text" name="acct_email" id="acct_email" value="<%=StringUtil.convertString(acctInfo.getEmail()) %>"> 
 				</td>
-				<th>모바일 번호</th>
+				<th>휴대폰</th>
 				<td>
-					<input type="text" name="acct_mobile" id="acct_mobile" value="<%=StringUtil.convertString(acctInfo.getMobile()) %>">
+					<input type="text" name="acct_mobile" id="acct_mobile" placeholder="000-0000-0000" value="<%=StringUtil.convertString(acctInfo.getMobile()) %>">
 				</td>
 			</tr>
 			<tr>

@@ -3,9 +3,9 @@
         , java.util.HashMap
         , java.util.Date
         , java.lang.Integer
-        , com.cyberone.scourt.model.UserInfo
-        , com.cyberone.scourt.model.AcctGrp
-        , com.cyberone.scourt.utils.StringUtil"
+        , com.cyberone.sskm.model.UserInfo
+        , com.cyberone.sskm.model.AcctGrp
+        , com.cyberone.sskm.utils.StringUtil"
 %>
 
 <%
@@ -22,7 +22,7 @@ List<HashMap<String, Object>> menuList = (List<HashMap<String, Object>>)request.
 
 CREATE_GROUP = (function() {
 	var _Dlg, _Parent;
-	var bProcessing = false;
+	var _bProcessing = false;
 	
     return {
     	auth: function() {
@@ -33,6 +33,7 @@ CREATE_GROUP = (function() {
 			return menuCodes;    		
     	},
         init: function(Dlg, t) {
+        	_bProcessing = false;
         	_Dlg = Dlg;
 
         	_Parent = t.attr('data-tt-id');
@@ -57,34 +58,37 @@ CREATE_GROUP = (function() {
 					    });
 					    if (flag) return false;
 
-                        $.ajax({
-                            url: "/account/register_acct_group",
-                            dataType: 'json',
-                            data : { 
-                            	id : <%=acctGrpInfo.getAcctGrpCd()%>,
-                            	prts : _Parent,
-                            	name : $("#group_name").val(), 
-                            	desc : $("#group_desc").val(),
-                            	auth : CREATE_GROUP.auth()
-                            },
-                            success: function(data, text, request) {
-                            	if (data.status=="success") {
-									$("#account-tree-div").load("/account/tree_ajax", {}, function() {
-										$(this).find(".account-tree").treetable("reveal", data.id);
-									});
-									_Dlg.dialog("close");
-                            	} else {
-                            		_alert(data.message);	
-                            	}
-                            }
-                        });
+						if (!_bProcessing) {
+							_bProcessing = true;
+	                        $.ajax({
+	                            url: "/account/register_acct_group",
+	                            dataType: 'json',
+	                            data : { 
+	                            	id : <%=acctGrpInfo.getAcctGrpCd()%>,
+	                            	prts : _Parent,
+	                            	name : $("#group_name").val(), 
+	                            	desc : $("#group_desc").val(),
+	                            	auth : CREATE_GROUP.auth()
+	                            },
+	                            success: function(data, text, request) {
+	                            	if (data.status=="success") {
+										$("#account-tree-div").load("/account/tree_ajax", {}, function() {
+											$(this).find(".account-tree").treetable("reveal", data.id);
+										});
+										_Dlg.dialog("close");
+	                            	} else {
+	                            		_bProcessing = false;
+	                            		_alert(data.message);	
+	                            	}
+	                            }
+	                        });
+						}
                     },
                     "취소": function() {
                         $(this).dialog("close");
                     }
                 },
                 close: function( event, ui ) {
-                	bProcessing = false;
                     $(this).children().remove();
                 },
                 open: function( event, ui ) {

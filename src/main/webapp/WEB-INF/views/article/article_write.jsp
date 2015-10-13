@@ -1,11 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
         import= "java.util.List
         , java.util.HashMap
-        , com.cyberone.scourt.model.UserInfo
-        , com.cyberone.scourt.Constants
-        , com.cyberone.scourt.model.AppxFile
-        , com.cyberone.scourt.utils.DateUtil
-        , com.cyberone.scourt.utils.StringUtil"
+        , com.cyberone.sskm.model.UserInfo
+        , com.cyberone.sskm.Constants
+        , com.cyberone.sskm.model.AppxFile
+        , com.cyberone.sskm.utils.DateUtil
+        , com.cyberone.sskm.utils.StringUtil"
 %>
 
 <%
@@ -25,11 +25,12 @@
 
 ARTICLE_DLG = (function() {
 	var _Dlg;
-	var bProcessing = false;
+	var _bProcessing = false;
 	
 	$("#article_form").ajaxForm({
         success: function(res, status) {
         	ARTICLE_PG.reload(<%=sBbsSct %>, function() { _Dlg.dialog("close"); });
+        	_bProcessing = false;
         }
     });
 	
@@ -40,6 +41,7 @@ ARTICLE_DLG = (function() {
 	
     return {
         init: function(Dlg) {
+        	_bProcessing = false;
         	_Dlg = Dlg;
 
             file_data();
@@ -94,7 +96,10 @@ ARTICLE_DLG = (function() {
 					    });
 					    if (flag) return false;
 		
-						$("#article_form").submit();
+						if (!_bProcessing) {
+							_bProcessing = true;
+							$("#article_form").submit();
+						}
                     },
                     "취소": function() {
                         $(this).dialog("close");
@@ -108,7 +113,6 @@ ARTICLE_DLG = (function() {
 <% } %>
                 },
                 close: function( event, ui ) {
-                	bProcessing = false;
                     $(this).children().remove();
                 },
                 open: function( event, ui ) {
@@ -177,7 +181,7 @@ function delFile(el, id) {
 			<% if (appxFiles != null && appxFiles.size() > 0) { %>
 					<div class="file-list">
 				<% for (AppxFile f : appxFiles) { %>
-						<u style="padding: 5px 5px 5px 16px;background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat 2px;"><a href="javascript:appxDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> <a onclick="javascript:delFile($(this), <%=f.getFileId()%>)" class="del"></a></u>
+						<u style="padding: 5px 5px 5px 16px;background:url(/images/detail/fileicon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat 2px;"><a href="javascript:appxDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> <a onclick="javascript:delFile($(this), <%=f.getFileId()%>)" class="del"></a></u>
 				<% } %>
 					</div>
 			<% } %>	
@@ -222,7 +226,7 @@ function delFile(el, id) {
 			<% if (appxFiles != null && appxFiles.size() > 0) { %>
 					<div class="file-list">
 				<% for (AppxFile f : appxFiles) { %>
-						<u style="background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat;"><a href="javascript:appxDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> </u>
+						<u style="background:url(/images/detail/fileicon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat;"><a href="javascript:appxDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> </u>
 				<% } %>
 					</div>
 			<% } %>	
@@ -275,7 +279,7 @@ function delFile(el, id) {
 			<% if (appxFiles != null && appxFiles.size() > 0) { %>
 					<div class="file-list">
 				<% for (AppxFile f : appxFiles) { %>
-						<u style="padding: 5px 5px 5px 16px;background:url(/images/file_icon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat 2px;"><a href="javascript:appxDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> <a href="#" class="del"></a></u>
+						<u style="padding: 5px 5px 5px 16px;background:url(/images/detail/fileicon/<%=Constants.getFileExtension(f.getFileOrgNm()) %>.png) no-repeat 2px;"><a href="javascript:appxDownload(<%=f.getFileId()%>)"><%=f.getFileOrgNm() %></a> <a href="#" class="del"></a></u>
 				<% } %>
 					</div>
 			<% } %>	

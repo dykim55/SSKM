@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
     import= "java.util.List
             , java.util.HashMap
-            , com.cyberone.scourt.model.UserInfo
-            , com.cyberone.scourt.utils.StringUtil"
+            , com.cyberone.sskm.model.UserInfo
+            , com.cyberone.sskm.utils.StringUtil"
     
 %>
 
@@ -104,11 +104,13 @@ $(document).ready(function() {
             </tr>
     <%      }
         } else { %>
+        	<% if (!StringUtil.isEmpty(sSearchWord)) { %>
             <tr align="center">
                 <td colspan="6">
                     <h2>검색 결과가 없습니다.</h2>
                 </td>
             </tr>
+            <% } %>
     <% } %>
             
         </tbody>

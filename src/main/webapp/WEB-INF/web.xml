@@ -19,7 +19,7 @@
 	</listener>
 	
 	<listener>
-		<listener-class>com.cyberone.scourt.interceptor.SessionMonitorListener</listener-class>
+		<listener-class>com.cyberone.sskm.interceptor.SessionMonitorListener</listener-class>
 	</listener>
 
 	<!-- Processes application requests -->

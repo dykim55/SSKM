@@ -10,26 +10,41 @@
 		</layout>
 	</appender>
 	
+    <!-- Default Appender -->
+    <appender name="DEFAULT-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="${catalina.home}/logs/sskm.log"/>
+        <param name="append" value="true"/>
+        <param name="encoding" value="UTF-8"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%d{yyyy-MM-dd HH:mm:ss}] [%c{1}] [%L] [%p] %m %n"/>
+        </layout>
+    </appender>
+	
 	<!-- Application Loggers -->
-	<logger name="com.cyberone.scourt">
+	<logger name="com.cyberone.sskm">
 		<level value="debug" />
+		<appender-ref ref="DEFAULT-APPENDER"/>
 	</logger>
 	
 	<!-- 3rdparty Loggers -->
 	<logger name="org.springframework.core">
 		<level value="info" />
+		<appender-ref ref="DEFAULT-APPENDER"/>
 	</logger>
 	
 	<logger name="org.springframework.beans">
 		<level value="info" />
+		<appender-ref ref="DEFAULT-APPENDER"/>
 	</logger>
 	
 	<logger name="org.springframework.context">
 		<level value="info" />
+		<appender-ref ref="DEFAULT-APPENDER"/>
 	</logger>
 
 	<logger name="org.springframework.web">
 		<level value="info" />
+		<appender-ref ref="DEFAULT-APPENDER"/>
 	</logger>
 
 	<!-- Root Logger -->

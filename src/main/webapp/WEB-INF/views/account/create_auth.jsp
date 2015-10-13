@@ -2,9 +2,9 @@
         import= "java.util.List
         , java.util.HashMap
         , java.util.Date
-        , com.cyberone.scourt.model.UserInfo
-        , com.cyberone.scourt.model.AcctGrp
-        , com.cyberone.scourt.utils.StringUtil"
+        , com.cyberone.sskm.model.UserInfo
+        , com.cyberone.sskm.model.AcctGrp
+        , com.cyberone.sskm.utils.StringUtil"
 %>
 
 <%
@@ -17,7 +17,7 @@ authInfo = StringUtil.isEmpty(authInfo) || authInfo.getAcctPrntCd() == 0 ? new A
 
 CREATE_AUTH_GROUP = (function() {
 	var _Dlg;
-	var bProcessing = false;
+	var _bProcessing = false;
 	
 	$("#auth_frm").ajaxForm({
         beforeSubmit: function(data, form, option) {
@@ -36,6 +36,7 @@ CREATE_AUTH_GROUP = (function() {
 				});
 				_Dlg.dialog("close");
         	} else {
+        		_bProcessing = false;
         		_alert(data.message);	
         	}
         }
@@ -43,6 +44,7 @@ CREATE_AUTH_GROUP = (function() {
 	
     return {
         init: function(Dlg, t) {
+        	_bProcessing = false;
         	_Dlg = Dlg;
 
         	_Dlg.dialog({
@@ -65,14 +67,16 @@ CREATE_AUTH_GROUP = (function() {
 					    });
 					    if (flag) return false;
 					  
-						$("#auth_frm").submit();
+						if (!_bProcessing) {
+							_bProcessing = true;
+							$("#auth_frm").submit();
+						}
                     },
                     "취소": function() {
                         $(this).dialog("close");
                     }
                 },
                 close: function( event, ui ) {
-                	bProcessing = false;
                     $(this).children().remove();
                 },
                 open: function( event, ui ) {

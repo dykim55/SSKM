@@ -2,8 +2,8 @@
         import= "java.util.List
         , java.util.HashMap
         , java.util.Date
-        , com.cyberone.scourt.model.UserInfo
-        , com.cyberone.scourt.utils.StringUtil"
+        , com.cyberone.sskm.model.UserInfo
+        , com.cyberone.sskm.utils.StringUtil"
 %>
 
 <%
@@ -20,10 +20,11 @@
 
 CREATE_FOLDER = (function() {
 	var _Dlg;
-	var bProcessing = false;
+	var _bProcessing = false;
 	
     return {
         init: function(Dlg, loc) {
+        	_bProcessing = false;
         	_Dlg = Dlg;
         	
         	_Dlg.find("#path_name").html($(".location .left").html());
@@ -53,31 +54,32 @@ CREATE_FOLDER = (function() {
 					    });
 					    if (flag) return false;
 
-                        $.ajax({
-                            url: "/files/folder_register",
-                            dataType: 'json',
-                            data : {
-                            	id: '<%=StringUtil.convertString(category.get("ctgId")) %>',
-                            	gubun: $('.accordion').find('.accordionHeaders.ac_selected').attr("ref-sct"), 
-                            	parent: $(".left-tree .selected").attr('data-tt-id') ? $(".left-tree .selected").attr('data-tt-id') : $('.accordion').find('.accordionHeaders.ac_selected').attr("ref-id"), 
-                            	name: $("#folder_name").val(),
-                            	desc: $("#folder_desc").val()
-                            },
-                            success: function(data, text, request) {
-                            	$('.accordion').find('.accordionHeaders.ac_selected').next().load("/files/tree_ajax", {"gubun": data.gubun}, function() {
-                            		$(this).find(".left-tree").treetable("reveal", data.parent);
-								});
-								_Dlg.dialog("close");
-                            }
-                        });
-                    	
+					    if (!_bProcessing) {
+					    	_bProcessing = true;
+	                        $.ajax({
+	                            url: "/files/folder_register",
+	                            dataType: 'json',
+	                            data : {
+	                            	id: '<%=StringUtil.convertString(category.get("ctgId")) %>',
+	                            	gubun: $('.accordion').find('.accordionHeaders.ac_selected').attr("ref-sct"), 
+	                            	parent: $(".left-tree .selected").attr('data-tt-id') ? $(".left-tree .selected").attr('data-tt-id') : $('.accordion').find('.accordionHeaders.ac_selected').attr("ref-id"), 
+	                            	name: $("#folder_name").val(),
+	                            	desc: $("#folder_desc").val()
+	                            },
+	                            success: function(data, text, request) {
+	                            	$('.accordion').find('.accordionHeaders.ac_selected').next().load("/files/tree_ajax", {"gubun": data.gubun}, function() {
+	                            		$(this).find(".left-tree").treetable("reveal", data.parent);
+									});
+									_Dlg.dialog("close");
+	                            }
+	                        });
+					    }                    	
                     },
                     "취소": function() {
                         $(this).dialog("close");
                     }
                 },
                 close: function( event, ui ) {
-                	bProcessing = false;
                     $(this).children().remove();
                 },
                 open: function( event, ui ) {

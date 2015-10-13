@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Account">
+	
+    <sql id="countQueryTop">
+        SELECT COUNT(*) as records FROM (
+    </sql>
+
+    <sql id="sqlAccount">
+        SELECT
+		    A.acctId
+		    ,A.acctNm
+		    ,A.acctGrpCd
+		    ,(SELECT acctGrpNm FROM AcctGrpTbl WHERE acctGrpCd = A.acctGrpCd) as acctGrpNm
+		    ,A.acctSt
+		    ,A.deptNm
+		    ,A.oflvNm
+		    ,A.acctPw
+		    ,A.mobile
+		    ,A.telephone
+		    ,A.email
+		    ,A.regr
+		    ,(SELECT acctNm FROM AcctTbl WHERE acctId = A.regr) AS regrNm
+		    ,A.regDtime
+		    ,A.modr
+		    ,A.modDtime
+		    ,A.latestDtime
+		    ,(SELECT acctPrntCd FROM AcctGrpTbl WHERE acctGrpCd = A.acctGrpCd) as authGrp
+        FROM AcctTbl A
+        WHERE 1 = 1
+        <if test="acctId != null and acctId > 0">
+            AND A.acctId = #{acctId}
+        </if>
+        <choose>
+            <when test="acctGrpCd == 0">
+          	AND A.acctGrpCd IN (SELECT acctGrpCd FROM AcctGrpTbl WHERE acctPrntCd = #{authGrp})
+            </when>
+            <when test="acctGrpCd > 0">
+            AND A.acctGrpCd = #{acctGrpCd}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+        <if test="acctNm != null and acctNm != ''">
+            AND acctNm LIKE CONCAT('%', #{ acctNm }, '%')
+        </if>
+        <if test="searchWord != null and searchWord != ''">
+        	<if test='searchSel == "1"'>
+        		AND A.acctNm LIKE CONCAT('%', #{ searchWord }, '%')
+            </if>
+        	<if test='searchSel == "2"'>
+        		AND A.deptNm LIKE CONCAT('%', #{ searchWord }, '%')
+            </if>
+            <if test='searchSel == "3"'>
+            	AND A.oflvNm LIKE CONCAT('%', #{ searchWord }, '%')
+            </if>
+        </if>
+        AND A.acctSt != 9
+    </sql>
+
+	<select id="selectAccountList" resultType="java.util.HashMap">
+        <include refid="sqlAccount"/>
+        ORDER BY A.acctNm ASC
+        LIMIT #{limit}, #{rows}
+    </select>
+
+    <select id="selectAccountList-Count" resultType="com.cyberone.sskm.model.Acct">
+        <include refid="countQueryTop" />
+        <include refid="sqlAccount"/>
+        ) B
+    </select>
+
+    <select id="selectAcct" resultType="com.cyberone.sskm.model.Acct">
+        SELECT
+		    acctId
+		    ,acctNm
+		    ,acctGrpCd
+		    ,acctSt
+		    ,deptNm
+		    ,oflvNm
+		    ,acctPw
+		    ,mobile
+		    ,telephone
+		    ,email
+		    ,regr
+		    ,(SELECT acctNm FROM AcctTbl WHERE acctId = A.regr) AS regrNm
+		    ,regDtime
+		    ,modr
+		    ,modDtime
+		    ,latestDtime
+		    ,(SELECT acctPrntCd FROM AcctGrpTbl WHERE acctGrpCd = A.acctGrpCd) as authGrp
+        FROM AcctTbl A
+        WHERE 1 = 1
+        <if test="acctId != null and acctId != ''">
+            AND A.acctId = #{acctId}
+        </if>
+        <if test="acctPw != null and acctPw != ''">
+            AND A.acctPw = #{acctPw}
+        </if>
+        <if test="deptNm != null and deptNm != ''">
+            AND A.deptNm = #{deptNm}
+        </if>
+        <if test="oflvNm != null and oflvNm != ''">
+            AND A.oflvNm = #{oflvNm}
+        </if>
+        <if test="acctSt != null and acctSt != ''">
+            AND A.acctSt = #{acctSt}
+        </if>
+    </select>
+	
+    <select id="selectAcctGrp" resultType="com.cyberone.sskm.model.AcctGrp">
+        SELECT
+        	A.acctGrpCd
+        	,A.acctGrpNm
+        	,A.acctPrmsMenus
+        	,A.acctGrpDesc
+        	,A.acctPrntCd
+        	,A.regr
+        	,(SELECT acctNm FROM AcctTbl WHERE acctId = A.regr) AS regrNm
+        	,A.regDtime
+        	,A.modr
+        	,A.modDtime
+        FROM AcctGrpTbl A
+        WHERE A.acctGrpCd = #{acctGrpCd}
+    </select>
+
+    <select id="selectAcctGrpList" resultType="com.cyberone.sskm.model.AcctGrp">
+        SELECT * FROM AcctGrpTbl
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="acctPrntCd != null">
+                AND acctPrntCd = #{acctPrntCd}
+            </if>
+        </trim>
+        ORDER BY acctGrpNm ASC 
+    </select>
+
+    <insert id="insertAcctGrp">
+        INSERT INTO AcctGrpTbl(
+        <if test="acctGrpNm != null">acctGrpNm,</if>
+        <if test="acctGrpDesc != null">acctGrpDesc,</if>
+        <if test="acctPrmsMenus != null">acctPrmsMenus,</if>
+        <if test="acctPrntCd != null">acctPrntCd,</if>
+        regr, regDtime, modr, modDtime)
+        VALUES (
+        <if test="acctGrpNm != null">#{acctGrpNm},</if> 
+        <if test="acctGrpDesc != null">#{acctGrpDesc},</if>
+        <if test="acctPrmsMenus != null">#{acctPrmsMenus},</if>
+        <if test="acctPrntCd != null">#{acctPrntCd},</if>
+        #{regr}, #{regDtime}, #{modr}, #{modDtime})
+        <selectKey keyProperty="acctGrpCd" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID() AS acctGrpCd
+        </selectKey>
+    </insert>
+
+	<update id="updateAcctGrp">
+        UPDATE AcctGrpTbl SET
+            <if test="acctGrpNm != null"> acctGrpNm = #{acctGrpNm}, </if>
+            <if test="acctGrpDesc != null"> acctGrpDesc = #{acctGrpDesc}, </if>
+            <if test="acctPrmsMenus != null"> acctPrmsMenus = #{acctPrmsMenus}, </if>
+            <if test="acctPrntCd != null"> acctPrntCd = #{acctPrntCd}, </if>
+            modr = #{modr},
+            modDtime = #{modDtime}          
+        WHERE acctGrpCd = #{acctGrpCd}
+    </update>
+    
+    <delete id="deleteAcctGrp">
+    	DELETE FROM AcctGrpTbl
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="acctGrpCd != null">
+                AND acctGrpCd = #{acctGrpCd}
+            </if>
+            <if test="acctPrntCd != null">
+                AND acctPrntCd = #{acctPrntCd}
+            </if>
+        </trim>
+    </delete>
+
+    <select id="selectMenu" resultType="com.cyberone.sskm.model.Menu">
+        SELECT * FROM MenuTbl
+        WHERE useYn = 'y'
+        ORDER BY prtsCd ASC, menuCd ASC
+    </select>
+
+    <select id="selectMenuAuth" resultType="com.cyberone.sskm.model.MenuAuth">
+        SELECT * FROM MenuAuthTbl
+        WHERE acctId = #{acctId}
+    </select>
+    
+    <select id="selectAcctGrpTree" resultType="java.util.HashMap">
+    
+		SELECT ag.acctGrpCd, ag.acctGrpNm, ag.acctPrntCd, level
+		FROM (
+		    SELECT connect_by_acctGrp() AS id, @level AS level, @inclause AS inclause
+		    FROM (
+		        SELECT 
+		            @start_with := 0,
+		            @id := @start_with,
+		            @level := 0,
+		            @inclause := ''
+		    ) vars, AcctGrpTbl
+		    WHERE @id IS NOT NULL
+		) A
+		LEFT JOIN AcctGrpTbl ag ON ag.acctGrpCd = A.id
+		WHERE A.id IS NOT NULL
+    
+    </select>
+    
+    <insert id="insertAcct">
+        INSERT INTO AcctTbl(
+        <if test="acctId != null">acctId,</if>
+        <if test="acctNm != null">acctNm,</if>
+        <if test="acctGrpCd != null">acctGrpCd,</if>
+        <if test="deptNm != null">deptNm,</if>
+        <if test="oflvNm != null">oflvNm,</if>
+        <if test="acctPw != null">acctPw,</if>
+        <if test="mobile != null">mobile,</if>
+        <if test="email != null">email,</if>
+        regr, regDtime, modr, modDtime)
+        VALUES (
+        <if test="acctId != null">#{acctId},</if>
+        <if test="acctNm != null">#{acctNm},</if>
+        <if test="acctGrpCd != null">#{acctGrpCd},</if>
+        <if test="deptNm != null">#{deptNm},</if>
+        <if test="oflvNm != null">#{oflvNm},</if>
+        <if test="acctPw != null">#{acctPw},</if>
+        <if test="mobile != null">#{mobile},</if>
+        <if test="email != null">#{email},</if>
+        #{regr}, #{regDtime}, #{modr}, #{modDtime})
+    </insert>
+	
+	<update id="updateAcct">
+        UPDATE AcctTbl SET
+            <if test="acctNm != null"> acctNm = #{acctNm}, </if>
+            <if test="acctGrpCd != null"> acctGrpCd = #{acctGrpCd}, </if>
+            <if test="deptNm != null"> deptNm = #{deptNm}, </if>
+            <if test="oflvNm != null"> oflvNm = #{oflvNm}, </if>
+            <if test="acctPw != null"> acctPw = #{acctPw}, </if>
+            <if test="acctSt != null"> acctSt = #{acctSt}, </if>
+            <if test="mobile != null"> mobile = #{mobile}, </if>
+            <if test="email != null"> email = #{email}, </if>
+            <if test="latestDtime != null"> latestDtime = #{latestDtime}, </if>
+			<if test="modr != null"> modr = #{modr}, </if>
+			<if test="modDtime != null"> modDtime = #{modDtime}, </if>
+			acctId = #{acctId}
+        WHERE acctId = #{acctId}
+    </update>
+	
+</mapper>

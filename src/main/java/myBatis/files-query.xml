@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Files">
+
+    <sql id="countQueryTop">
+        SELECT COUNT(*) as records FROM (
+    </sql>
+
+    <sql id="sqlProduct">
+        SELECT
+            A.pId
+            ,category_path(A.parent) AS pathNm
+            ,A.title
+            ,A.content
+            ,A.query
+            ,A.parent
+            ,A.fileYn
+            ,A.delYn
+            ,A.regr
+            ,(SELECT acctNm FROM AcctTbl WHERE acctId = A.regr) AS regrNm
+            ,A.modr
+            ,A.regDtime
+            ,A.modDtime
+        FROM ProductTbl A
+        WHERE 1 = 1
+        <if test="pId != null and pId > 0">
+            AND A.pId = #{pId}
+        </if>
+        <if test="parent != null and parent != ''">
+            AND A.parent = #{parent}
+        </if>
+        <if test="searchWord != null and searchWord != ''">
+        	<if test='searchSel == "1"'>
+            	AND A.title LIKE CONCAT('%', #{ searchWord }, '%')
+            </if>
+        	<if test='searchSel == "2"'>
+        		AND A.regr IN ( SELECT acctId FROM AcctTbl WHERE acctNm LIKE CONCAT('%', #{ searchWord }, '%') )
+            </if>
+        </if>
+        AND A.delYn = 'n'
+    </sql>
+
+	<select id="selectProductList" resultType="java.util.HashMap">
+        <include refid="sqlProduct"/>
+        ORDER BY A.pId DESC
+        LIMIT #{limit}, #{rows}
+    </select>
+
+    <select id="selectProductList-Count" resultType="com.cyberone.sskm.model.Product">
+        <include refid="countQueryTop" />
+        <include refid="sqlProduct"/>
+        ) B
+    </select>
+
+	<select id="selectProduct" resultType="java.util.HashMap">
+        <include refid="sqlProduct"/>
+    </select>
+
+	<select id="selectCategory" resultType="java.util.HashMap">
+		SELECT
+		A.ctgId
+		,A.ctgNm
+		,A.ctgParent
+		,A.ctgSct
+		,A.ctgDesc
+		,A.regr
+		,(SELECT acctNm FROM AcctTbl WHERE acctId = A.regr) AS regrNm
+		,A.regDtime
+		,A.modr
+		,A.modDtime
+		FROM CategoryTbl A
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="ctgId != null and ctgId > 0">
+				AND A.ctgId = #{ctgId}
+			</if>
+			<if test="ctgSct != null and ctgSct > 0">
+				AND A.ctgSct = #{ctgSct}
+			</if>
+		</trim>
+	</select>
+
+	<select id="selectCategoryList" resultType="java.util.HashMap">
+		SELECT * 
+		FROM CategoryTbl
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="ctgParent != null and ctgParent > 0">
+				AND ctgParent = #{ctgParent}
+			</if>
+			<if test="ctgSct != null and ctgSct != ''">
+				AND ctgSct = #{ctgSct}
+			</if>
+		</trim>
+	</select>
+	
+    <select id="selectCategoryTree" resultType="java.util.HashMap">
+    
+		SELECT ctg.ctgId, ctg.ctgNm, ctg.ctgParent, level, ctg.ctgSct
+		FROM (
+		    SELECT connect_by_category() AS id, @level AS level, @inclause AS inclause
+		    FROM (
+		        SELECT 
+		            @start_with := 0,
+		            @id := @start_with,
+		            @level := 0,
+		            @ctgSct := #{ctgSct},
+		            @inclause := ''
+		    ) vars, CategoryTbl
+		    WHERE @id IS NOT NULL
+		) A
+		LEFT JOIN CategoryTbl ctg ON ctg.ctgId = A.id
+		WHERE A.id IS NOT NULL    
+    
+    </select>
+    	
+	<insert id="insertCategory">
+        INSERT INTO CategoryTbl(ctgNm, ctgSct, ctgParent, ctgDesc, regr, regDtime, modr, modDtime)
+        VALUES(#{ctgNm}, #{ctgSct}, #{ctgParent}, #{ctgDesc}, #{regr}, #{regDtime}, #{modr}, #{modDtime})
+        <selectKey keyProperty="ctgId" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID() AS ctgId
+        </selectKey>
+    </insert>	
+    	
+	<update id="updateCategory">
+        UPDATE CategoryTbl SET
+            <if test="ctgNm != null"> ctgNm = #{ctgNm}, </if>
+            <if test="ctgSct != null"> ctgSct = #{ctgSct}, </if>
+            <if test="ctgParent != null"> ctgParent = #{ctgParent}, </if>
+            <if test="ctgDesc != null"> ctgDesc = #{ctgDesc}, </if>
+            modr = #{modr},
+            modDtime = #{modDtime}          
+        WHERE ctgId = #{ctgId}
+    </update>
+
+    <delete id="deleteCategory">
+    	DELETE FROM CategoryTbl
+		WHERE ctgId = #{ctgId}
+    </delete>
+    	
+	<insert id="insertProduct">
+        INSERT INTO ProductTbl(title, content, parent, fileYn, delYn, regr, regDtime, modr, modDtime)
+        VALUES(#{title}, #{content}, #{parent}, #{fileYn}, #{delYn}, #{regr}, #{regDtime}, #{modr}, #{modDtime})
+        <selectKey keyProperty="pId" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID() AS pId
+        </selectKey>
+    </insert>	
+
+	<update id="updateProduct">
+        UPDATE ProductTbl SET
+            <if test="title != null"> title = #{title}, </if>
+            <if test="content != null"> content = #{content}, </if>
+            <if test="parent != null"> parent = #{parent}, </if>
+            <if test="query != null"> query = query + 1, </if>
+            <if test="fileYn != null"> fileYn = #{fileYn}, </if>
+            <if test="delYn != null"> delYn = #{delYn}, </if>
+            modr = #{modr},
+            modDtime = #{modDtime}          
+        WHERE pId = #{pId}
+    </update>
+
+    <delete id="deleteProduct">
+    	DELETE FROM ProductTbl
+		WHERE pId = #{pId}
+    </delete>
+
+    <insert id="insertFiles">
+        INSERT INTO FilesTbl(pId, fileSct, fileSize, fileLoc, fileOrgNm, fileSavNm, regr, regDtime, modr, modDtime)
+        VALUES (#{pId}, #{fileSct}, #{fileSize}, #{fileLoc}, #{fileOrgNm}, #{fileSavNm}, #{regr}, #{regDtime}, #{modr}, #{modDtime})
+    </insert>
+
+    <update id="updateFiles">
+        UPDATE FilesTbl
+           SET 
+               <if test="pId != null"> pId = #{pId},</if>
+               <if test="fileSct != null"> fileSct = #{fileSct},</if>
+               <if test="delYn != null"> delYn = #{delYn},</if>
+               <if test="fileLoc != null"> fileLoc = #{fileLoc},</if>
+               <if test="fileOrgNm != null"> fileOrgNm = #{fileOrgNm},</if>
+               <if test="fileSavNm != null"> fileSavNm = #{fileSavNm},</if>
+               <if test="regr != null"> regr = #{regr},</if>
+               <if test="regDtime != null"> regDtime = #{regDtime},</if>
+               <if test="modr != null"> modr = #{modr},</if>
+               <if test="modDtime != null"> modDtime = #{modDtime},</if>
+               fileId = fileId
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="fileId != null and fileId > 0">
+                AND fileId = #{fileId}
+            </if>        
+            <if test="pId != null and pId > 0">
+                AND pId = #{pId}
+            </if>
+        </trim>        
+           
+    </update>
+
+	<delete id="deleteFilesById">
+		DELETE FROM FilesTbl
+		WHERE fileId = #{fileId}
+	</delete>
+
+	<delete id="deleteFilesByRef">
+		DELETE FROM FilesTbl
+		WHERE pId = #{pId}
+	</delete>
+
+	<select id="selectMenu" resultType="java.util.HashMap">
+		SELECT * FROM MenuTbl
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="menuCd != null and menuCd != ''">
+                AND menuCd = #{menuCd}
+            </if>        
+            <if test="prtsCd != null and prtsCd != ''">
+                AND prtsCd = #{prtsCd}
+            </if>
+        </trim>        
+    	ORDER BY menuCd ASC
+    </select>
+	
+	<select id="selectFiles" resultType="com.cyberone.sskm.model.Files">
+		SELECT * FROM FilesTbl
+        <trim prefix="WHERE" prefixOverrides="AND|OR">
+            <if test="fileId != null and fileId > 0">
+                AND fileId = #{fileId}
+            </if>        
+            <if test="pId != null and pId > 0">
+                AND pId = #{pId}
+            </if>
+        </trim>        
+ 
+		
+	</select>
+    	
+</mapper>
+
+
+

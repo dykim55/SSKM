@@ -396,7 +396,7 @@ div.dia-insert table.board-insert td div.file-list u {
 	padding:5px 5px 5px 5px; 
 	margin-bottom:5px;
 	text-decoration:none;
-	/*background:url(/images/detail/fileicon/icon_no.png) no-repeat 5px 50%;*/
+	/*background:url(/images/detail/fileicon/none.png) no-repeat 5px 50%;*/
 	border:1px solid #d2d2d2;
 }
 div.dia-insert table.board-insert td div.file-list u a {
@@ -449,7 +449,7 @@ div.dia-view table.board-view td div.file-list u {
 	padding:0px 5px 5px 20px; 
 	margin-right:5px;
 	text-decoration:none;
-	/*background:url(/images/detail/fileicon/icon_no.png) no-repeat 5px 50%;*/
+	/*background:url(/images/detail/fileicon/none.png) no-repeat 5px 50%;*/
 	/*border:1px solid #d2d2d2;*/
 }
 div.dia-view table.board-view td div.file-list a:hover {

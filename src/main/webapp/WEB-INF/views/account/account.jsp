@@ -1,19 +1,29 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
     import= "java.util.List
             , java.util.HashMap
-            , com.cyberone.scourt.model.UserInfo
-            , com.cyberone.scourt.utils.StringUtil"
+            , com.cyberone.sskm.model.UserInfo
+            , com.cyberone.sskm.utils.StringUtil"
     
 %>
 
 <%@ include file="../include/header.jsp"%>
 
 <%
+//계정그룹 트리 데이타
 @SuppressWarnings("unchecked")
 List<HashMap<String, Object>> acctGrpList = (List<HashMap<String, Object>>)request.getAttribute("acctGrpList");
 %>
 
 <script type="text/javascript">
+
+ACCT_PG = (function() {
+	var rows=15, page=1, parent, group;
+	return {
+		reload : function(g, p, func) { if(g) group = g; if(p) parent = p; $("#account-grid-div").load("/account/account_ajax", { rows: rows, grp: group, prts: parent, page: page, searchSel: $("#ac_selbox").val(), searchWord: $("#searchWord").val() }, func); },
+		move : function(p) { if(p) page = p; this.reload(); },
+		rows : function(r) { if(r) { rows = r; page = 1; } this.reload(); }
+	};
+})();
 
 $(document).ready(function() {
 	
@@ -57,7 +67,6 @@ $(document).ready(function() {
     
     $(".location .left").html("계정관리");
     
-    //$(".account-tree").treetable("reveal", $($(".account-tree tr")[0]).attr('data-tt-id'));
     ACCT_PG.reload("", "0", function() {});
     
 });

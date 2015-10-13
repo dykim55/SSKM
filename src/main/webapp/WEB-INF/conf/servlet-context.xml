@@ -26,7 +26,7 @@
     <!-- Enables the Spring MVC @Controller programming model -->
     <mvc:annotation-driven/>
     <mvc:interceptors>        
-        <bean id="SessionChkInterceptor" class="com.cyberone.scourt.interceptor.SessionCheckInterceptor" />
+        <bean id="SessionChkInterceptor" class="com.cyberone.sskm.interceptor.SessionCheckInterceptor" />
     </mvc:interceptors>
 
 
@@ -47,18 +47,18 @@
         <property name="suffix" value=".jsp" />
     </bean>
 	
-    <bean id="exceptionResolver" class ="com.cyberone.scourt.exception.JsonExceptionResolver" >
+    <bean id="exceptionResolver" class ="com.cyberone.sskm.exception.JsonExceptionResolver" >
         <property name="order" value = "-1"/>
     </bean>
 	
     <!-- multipartResolver -->
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
 	
-	<context:component-scan base-package="com.cyberone.scourt" />
+	<context:component-scan base-package="com.cyberone.sskm" />
 	
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="org.mariadb.jdbc.Driver" />
-        <property name="url" value="jdbc:mariadb://211.236.179.203:3306/scourt" />
+        <property name="url" value="jdbc:mariadb://211.236.179.203:3306/SSKM" />
         <property name="username" value="root" />
         <property name="password" value="cyberone" />
         <property name="testOnBorrow" value="true" />
@@ -73,7 +73,7 @@
 
     <aop:config>
         <aop:pointcut id="serviceMethods" 
-        expression="execution(* com.cyberone.scourt.*.service.*Service.*(..))" />
+        expression="execution(* com.cyberone.sskm.*.service.*Service.*(..))" />
         <aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethods" />
     </aop:config>
 	
@@ -99,32 +99,8 @@
         <constructor-arg index="0" ref="sqlSessionFactory" />
     </bean>
 
-    <bean id="codeSelect" class="com.cyberone.scourt.Common" >
+    <bean id="codeSelect" class="com.cyberone.sskm.Common" >
         <property name="sqlSession" ref="sqlSession" />
     </bean>
 
-<!-- 
-    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-        <property name="triggers">
-            <list>
-                <ref bean="rssWriterTrigger"/>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="rssWriterTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-        <property name="jobDetail" ref="rssWriterDetail" />
-        <property name="cronExpression" value="0 0/1 * * * ?" />
-    </bean>
-
-    <bean id="rssWriterDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="rssWriterJob" />
-        <property name="targetMethod" value="run"  />
-    </bean>
-
-    <bean id="rssWriterJob" class="com.cyberone.scourt.batch.RSSWriterBatchJob">
-        <property name="sqlSession" ref="sqlSession" />
-    </bean>
- -->
- 	
 </beans>

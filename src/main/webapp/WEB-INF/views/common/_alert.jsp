@@ -4,7 +4,6 @@
 
 _ALERT = (function() {
 	var _Dlg;
-	var bProcessing = false;
 	
     return {
         init: function(Dlg, msg) {
@@ -24,7 +23,6 @@ _ALERT = (function() {
                     }
                 },
                 close: function( event, ui ) {
-                	bProcessing = false;
                     $(this).children().remove();
                 },
                 open: function( event, ui ) {

@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
         import= "java.util.List
         , java.util.HashMap
-        , com.cyberone.scourt.utils.StringUtil"
+        , com.cyberone.sskm.utils.StringUtil"
 %>
 
 <%
@@ -16,7 +16,7 @@
 
 REG_SCHEDULE = (function() {
 	var _Dlg;
-	var bProcessing = false;
+	var _bProcessing = false;
 	
 	$("#schd_frm").ajaxForm({
         beforeSubmit: function(data, form, option) {
@@ -26,6 +26,9 @@ REG_SCHEDULE = (function() {
         	if (data.status=="success") {
 	        	$("#calendar").fullCalendar("refetchEvents");
 	        	_Dlg.dialog("close");
+        	} else {
+        		_bProcessing = false;
+        		_alert(data.message);
         	}
         }
     });
@@ -38,12 +41,8 @@ REG_SCHEDULE = (function() {
     });
 	
     return {
-        done: function(Dlg) {
-            if (bProcessing) return;    
-            bProcessing = true;
-            return new FormData(Dlg.find("#schd_frm")[0]);
-        },
         init: function(Dlg, date) {
+        	_bProcessing = false;
         	_Dlg = Dlg;
 
         	_Dlg.find("#schd_sdate, #schd_edate").datepicker({
@@ -88,12 +87,18 @@ REG_SCHEDULE = (function() {
 					    });
 					    if (flag) return false;
 
-                    	$("#schd_frm").submit();
+						if (!_bProcessing) {
+							_bProcessing = true;
+	                    	$("#schd_frm").submit();
+						}
                     }
 <% if (!StringUtil.isEmpty(schedule.get("schdSeq"))) { %>                    
                     ,"삭제": function() {
                     	_confirm("삭제 하시겠습니까?", function() {
-                    		$("#schd_del_frm").submit();
+    						if (!_bProcessing) {
+    							_bProcessing = true;
+                    			$("#schd_del_frm").submit();
+    						}
                     	});
                     }
 <% } %>                    
@@ -102,7 +107,6 @@ REG_SCHEDULE = (function() {
                     }
                 },
                 close: function( event, ui ) {
-                	bProcessing = false;
                     $(this).children().remove();
                 },
                 open: function( event, ui ) {

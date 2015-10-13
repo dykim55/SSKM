@@ -1,122 +1,23 @@
-function stop() {
-	return;
-}
-PG = (function() {
-	var rows=15, page=1, parent, searchSel=1, searchWord="";
-	
-	return {
-		reload : function(p, func) {
-			if(p) {
-				parent = p;
-				searchSel=1;
-				searchWord="";
-			} else {
-        		searchSel = $("#nt_selbox").val(); 
-        		searchWord = $("#searchWord").val();
-			}
-        	$("#files-grid-div").load("/files/file_ajax", {
-        		rows: rows,
-        		parent: parent,
-        		searchSel : searchSel, 
-        		searchWord : searchWord,
-        		page : page
-        	}, func);
-		},
-		move : function(p) {
-			if(p) page = p;
-			this.reload();
-		},
-		rows : function(r) {
-			if(r) { rows = r; page = 1; }
-			this.reload();
-		}
-		
-	};
-})();
+function stop() { return; }
 
-ALL_PG = (function() {
-	var rows=15, page=1, parent, searchWord="";
-	
-	return {
-		reload : function(p, s, func) {
-			if(p) parent = p;
-			if(s) searchWord = s;
-        	$("#files-grid-div").load("/files/allover_ajax", {
-        		rows: rows,
-        		searchWord : $(".dir-search input").val(),
-        		page : page
-        	}, func);
-		},
-		move : function(p) {
-			if(p) page = p;
-			this.reload();
-		},
-		rows : function(r) {
-			if(r) { rows = r; page = 1; }
-			this.reload();
-		}
-		
-	};
-})();
-
-ACCT_PG = (function() {
-	var rows=15, page=1, parent, group;
-	
-	return {
-		reload : function(g, p, func) {
-			if(g) group = g;
-			if(p) parent = p;
-        	$("#account-grid-div").load("/account/account_ajax", {
-        		rows: rows,
-        		grp: group,
-        		prts: parent,
-        		page: page,
-	    		searchSel: $("#ac_selbox").val(), 
-        		searchWord: $("#searchWord").val(),
-        	}, func);
-		},
-		move : function(p) {
-			if(p) page = p;
-			this.reload();
-		},
-		rows : function(r) {
-			if(r) { rows = r; page = 1; }
-			this.reload();
-		}
-	};
-})();
-
-ARTICLE_PG = (function() {
-	var rows=15, page=1, bbsSct, searchSel=1, searchWord="";
-	
-	return {
-		reload : function(b, func) {
-			if(b) {
-				bbsSct = b;
-				searchSel=1;
-				searchWord="";
-			} else {
-	    		searchSel = $("#nt_selbox").val(); 
-	    		searchWord = $("#searchWord").val();
-			}
-        	$(".dual-right").load("/article/article_list", {
-        		rows: rows,
-        		bbsSct: bbsSct,
-        		searchSel : searchSel, 
-        		searchWord : searchWord,
-        		page : page
-        	}, func);
-		},
-		move : function(p) {
-			if(p) page = p;
-			this.reload();
-		},
-		rows : function(r) {
-			if(r) { rows = r; page = 1; }
-			this.reload();
-		}
-	};
-})();
+$.fn.toPhone = function() {
+	return this.each(function() {
+		$(this).keydown(function(e) {
+			var key = e.charCode || e.keyCode || 0;
+			console.log(key);
+			return ((!e.shiftKey) && (
+				key == 36 || 				//home
+				key == 35 || 				//end
+				key == 8 || 				//backspace
+				key == 46 ||				//delete
+				key == 109 ||				
+				key == 189 ||				
+				(key >= 37 && key <= 40) || //arrows
+				(key >= 48 && key <= 57) || //number
+				(key >= 96 && key <= 105))) ;
+		});
+	});
+};
 
 DIALOG = (function() { 
     return {
@@ -166,24 +67,6 @@ function appxDownload(t) {
 	.fail(function () { 
 	    alert('파일을 찾을 수가 없습니다.'); 
 	});
-}
-
-function removeAppxFile(p,t,r,s) {
-	stop();
-	if(confirm("첨부파일을 삭제 하시겠습니까?")) {
-	    $.ajax({
-	        url : "/files/removeAppxFile",
-	        type : 'POST',
-	        data : {"type":t, "ref":r, "seq":s},
-	        success : function(data){
-	        	if (data.status == 'success') {
-	        		p.parent('u').remove();
-	        	} else {
-	        		alert(data.message);
-	        	}
-	        }
-	    });
-	}
 }
 
 function yyyymmdd(time) {

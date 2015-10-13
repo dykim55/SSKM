@@ -12,49 +12,49 @@ a.clip {
 a.doc {
 	display:inline-block;
 	width:16px; height:16px;
-	background:url(/images/detail/fileicon/icon_doc.png) no-repeat;
+	background:url(/images/detail/fileicon/doc.png) no-repeat;
 	vertical-align:middle;
 }
 a.hwp {
 	display:inline-block;
 	width:16px; height:16px;
-	background:url(/images/detail/fileicon/icon_hwp.png) no-repeat;
+	background:url(/images/detail/fileicon/hwp.png) no-repeat;
 	vertical-align:middle;
 }
 a.img {
 	display:inline-block;
 	width:16px; height:16px;
-	background:url(/images/detail/fileicon/icon_img.png) no-repeat;
+	background:url(/images/detail/fileicon/img.png) no-repeat;
 	vertical-align:middle;
 }
 a.no {
 	display:inline-block;
 	width:16px; height:16px;
-	background:url(/images/detail/fileicon/icon_no.png) no-repeat;
+	background:url(/images/detail/fileicon/none.png) no-repeat;
 	vertical-align:middle;
 }
 a.pdf {
 	display:inline-block;
 	width:16px; height:16px;
-	background:url(/images/detail/fileicon/icon_pdf.png) no-repeat;
+	background:url(/images/detail/fileicon/pdf.png) no-repeat;
 	vertical-align:middle;
 }
 a.ppt {
 	display:inline-block;
 	width:16px; height:16px;
-	background:url(/images/detail/fileicon/icon_ppt.png) no-repeat;
+	background:url(/images/detail/fileicon/ppt.png) no-repeat;
 	vertical-align:middle;
 }
 a.xls {
 	display:inline-block;
 	width:16px; height:16px;
-	background:url(/images/detail/fileicon/icon_xls.png) no-repeat;
+	background:url(/images/detail/fileicon/xls.png) no-repeat;
 	vertical-align:middle;
 }
 a.zip {
 	display:inline-block;
 	width:16px; height:16px;
-	background:url(/images/detail/fileicon/icon_zip.png) no-repeat;
+	background:url(/images/detail/fileicon/zip.png) no-repeat;
 	vertical-align:middle;
 }
 a.close {

@@ -1,15 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
     import= "java.util.List
             , java.util.HashMap
-            , com.cyberone.scourt.model.UserInfo
-            , com.cyberone.scourt.utils.StringUtil"
+            , com.cyberone.sskm.model.UserInfo
+            , com.cyberone.sskm.utils.StringUtil"
     
 %>
 
 <%
+//계정 목록 리스트
 @SuppressWarnings("unchecked")
 List<HashMap<String, Object>> acctList = (List<HashMap<String, Object>>)request.getAttribute("list");
 
+//페이징 
 int nRows =  (Integer)request.getAttribute("rows");
 int nTotalRecord =  (Integer)request.getAttribute("record");
 int nTotalPage = (Integer)request.getAttribute("total");

@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
     import= "java.util.List
             , java.util.HashMap
-            , com.cyberone.scourt.model.UserInfo
-            , com.cyberone.scourt.utils.StringUtil"
+            , com.cyberone.sskm.model.UserInfo
+            , com.cyberone.sskm.utils.StringUtil"
     
 %>
 
@@ -29,12 +29,18 @@
 
 <script type="text/javascript">
 
-$(document).ready(function() {
-	
-	ARTICLE_PG.reload(<%=sBbsSct%>, function() {});
-	
-	$(".location .left").html("공지사항");
+ARTICLE_PG = (function() {
+	var rows=15, page=1, bbsSct, searchSel=1, searchWord="";
+	return {
+		reload : function(b, func) { if(b) { bbsSct = b; searchSel=1; searchWord=""; } else { searchSel = $("#nt_selbox").val(); searchWord = $("#searchWord").val(); } $(".dual-right").load("/article/article_list", { rows: rows, bbsSct: bbsSct, searchSel : searchSel, searchWord : searchWord, page : page }, func); },
+		move : function(p) { if(p) page = p; this.reload(); },
+		rows : function(r) { if(r) { rows = r; page = 1; } this.reload(); }
+	};
+})();
 
+$(document).ready(function() {
+	ARTICLE_PG.reload(<%=sBbsSct%>, function() {});
+	$(".location .left").html("공지사항");
 });
 
 function articleWrite(s, id) {
@@ -44,7 +50,6 @@ function articleWrite(s, id) {
 }
 
 function fileBox(id) {
-
 	if ($(".detail ul").length == 0) {
 		$(".detail").append('<ul style="white-space: nowrap;left:'+event.clientX+'px;top:'+event.clientY+'px;"></ul>');
 		$.get("/article/appx_list", {id: id}, function( data ) {
@@ -55,7 +60,6 @@ function fileBox(id) {
 }
 
 function deleteArticle(id) {
-	
 	_confirm("삭제 하시겠습니까?", function() {
         $.ajax({
         	url : "/article/article_delete",

@@ -1,10 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
-    import= "com.cyberone.scourt.utils.StringUtil"
+    import= "com.cyberone.sskm.utils.StringUtil"
 %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<title>대법원 지식관리솔루션</title>
+<title>대법원 지식관리 홈페이지</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">

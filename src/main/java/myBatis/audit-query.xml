@@ -57,7 +57,7 @@
         <include refid="whereOrderLimit"/>
     </select>
 
-    <select id="selectAuditHist-Count" resultType="com.cyberone.scourt.model.AuditHist">
+    <select id="selectAuditHist-Count" resultType="com.cyberone.sskm.model.AuditHist">
         <include refid="countQueryTop" />
         <include refid="sqlAuditHist"/>
         ) B

@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
     import= "java.util.List
             , java.util.HashMap
-            , com.cyberone.scourt.model.UserInfo
-            , com.cyberone.scourt.utils.StringUtil"
+            , com.cyberone.sskm.model.UserInfo
+            , com.cyberone.sskm.utils.StringUtil"
     
 %>
 
@@ -26,6 +26,24 @@ if (StringUtil.isEmpty(sSubMenu)) {
 %>
 
 <script type="text/javascript">
+
+PG = (function() {
+	var rows=15, page=1, parent, searchSel=1, searchWord="";
+	return {
+		reload : function(p, func) { if(p) { parent = p; searchSel=1; searchWord=""; } else { searchSel = $("#nt_selbox").val(); searchWord = $("#searchWord").val(); } $("#files-grid-div").load("/files/file_ajax", { rows: rows, parent: parent, searchSel : searchSel, searchWord : searchWord, page : page }, func); },
+		move : function(p) { if(p) page = p; this.reload(); },
+		rows : function(r) { if(r) { rows = r; page = 1; } this.reload(); }
+	};
+})();
+
+ALL_PG = (function() {
+	var rows=15, page=1, parent, searchWord="";
+	return {
+		reload : function(p, s, func) { if(p) parent = p; if(s) searchWord = s; $("#files-grid-div").load("/files/allover_ajax", { rows: rows, searchWord : $(".dir-search input").val(), page : page }, func); },
+		move : function(p) { if(p) page = p; this.reload(); },
+		rows : function(r) { if(r) { rows = r; page = 1; } this.reload(); }
+	};
+})();
 
 $(document).ready(function() {
 	
@@ -124,7 +142,6 @@ function fileUpload(id) {
 }
 
 function deleteFile(id) {
-	
 	_confirm("삭제 하시겠습니까?", function() {
         $.ajax({
         	url : "/files/file_delete",

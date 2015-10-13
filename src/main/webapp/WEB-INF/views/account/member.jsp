@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
         import= "java.util.List
         , java.util.HashMap
-        , com.cyberone.scourt.Common
-        , com.cyberone.scourt.model.Acct
-        , com.cyberone.scourt.utils.StringUtil"
+        , com.cyberone.sskm.Common
+        , com.cyberone.sskm.model.Acct
+        , com.cyberone.sskm.utils.StringUtil"
 %>
 
 <%
@@ -14,8 +14,10 @@
 
 MEMBER_DLG = (function() {
 	var _Dlg;
-	var bProcessing = false;
+	var _bProcessing = false;
 
+	$("#acct_mobile").toPhone();
+	
 	$("#member_frm").ajaxForm({
         beforeSubmit: function(data, form, option) {
             return true;
@@ -25,6 +27,7 @@ MEMBER_DLG = (function() {
 	        	$(".location .right").find('b').html(data.name);
 	        	_Dlg.dialog("close");
         	} else {
+        		_bProcessing = false;
         		_alert(data.message);	
         	}
         }
@@ -32,6 +35,7 @@ MEMBER_DLG = (function() {
 	
     return {
     	init: function(Dlg) {
+    		_bProcessing = false;
     		_Dlg = Dlg;
     		
         	_Dlg.dialog({
@@ -53,14 +57,16 @@ MEMBER_DLG = (function() {
 					    });
 					    if (flag) return false;
                 	  
-						$("#member_frm").submit();
+						if (!_bProcessing) {
+							_bProcessing = true;
+							$("#member_frm").submit();
+						}
                     },
                     "취소": function() {
                         $(this).dialog("close");
                     }
                 },
                 close: function( event, ui ) {
-                	bProcessing = false;
                     $(this).children().remove();
                 },
                 open: function( event, ui ) {
@@ -120,7 +126,7 @@ MEMBER_DLG = (function() {
 			<tr>
 				<th>휴대폰</th>
 				<td>
-					<input type="text" name="acct_mobile" id="acct_mobile" value="<%=StringUtil.convertString(acctInfo.getMobile()) %>">
+					<input type="text" style="width:50%" name="acct_mobile" id="acct_mobile" value="<%=StringUtil.convertString(acctInfo.getMobile()) %>">&nbsp;예)&nbsp;000-0000-0000
 				</td>
 			</tr>
 			<tr>
