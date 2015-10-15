@@ -11,8 +11,6 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,7 +23,6 @@ import com.cyberone.sskm.account.service.AccountService;
 import com.cyberone.sskm.exception.BizException;
 import com.cyberone.sskm.model.Acct;
 import com.cyberone.sskm.model.AcctGrp;
-import com.cyberone.sskm.model.Product;
 import com.cyberone.sskm.model.UserInfo;
 import com.cyberone.sskm.utils.DataUtil;
 import com.cyberone.sskm.utils.Encryption;
@@ -35,8 +32,6 @@ import com.cyberone.sskm.utils.StringUtil;
 @Controller
 public class AccountController {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
-    
     @Autowired
     private AccountService accountService;
 
@@ -45,13 +40,12 @@ public class AccountController {
      */
     @RequestMapping("/account")
     public String account(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    	
        	HashMap<String, Object> paramMap = new HashMap<String, Object>();
-    	List<HashMap<String, Object>> acctGrpList = accountService.selectAcctGrpTree(paramMap);
-    	model.addAttribute("acctGrpList", acctGrpList);
 
-        return "/account/account";
+       	List<HashMap<String, Object>> acctGrpList = accountService.selectAcctGrpTree(paramMap);
+    	model.addAttribute("acctGrpList", acctGrpList);
+        
+    	return "/account/account";
     }
 
     /**
@@ -59,14 +53,12 @@ public class AccountController {
      */
     @RequestMapping(value = {"/account/create_auth", "/account/modify_auth"})
     public String createAuthGrp(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    	
     	String sAuthGrp = request.getParameter("grp");
-    	
+
     	HashMap<String, Object> paramMap = new HashMap<String, Object>();
     	paramMap.put("acctGrpCd", sAuthGrp);
-    	AcctGrp authInfo = accountService.selectAcctGrp(paramMap);
     	
+    	AcctGrp authInfo = accountService.selectAcctGrp(paramMap);
     	model.addAttribute("authInfo", authInfo);
     	
     	return "/account/create_auth";
@@ -77,8 +69,6 @@ public class AccountController {
      */
     @RequestMapping("/account/delete_auth")
     public ModelAndView deleteAuthGrp(HttpServletRequest request) throws Exception {
-    	logger.debug(request.getServletPath());
-
     	String sAuthGrp = request.getParameter("grp");
 
     	HashMap<String, Object> paramMap = new HashMap<String, Object>();
@@ -118,7 +108,6 @@ public class AccountController {
      */
     @RequestMapping(value = {"/account/create_group", "/account/modify_group"})
     public String createAcctGrp(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
 
     	List<HashMap<String, Object>> menuList = new ArrayList<HashMap<String, Object>>();
     	HashMap<String, Object> paramMap = new HashMap<String, Object>();
@@ -155,7 +144,6 @@ public class AccountController {
      */
     @RequestMapping("/account/delete_group")
     public ModelAndView deleteAcctGrp(HttpServletRequest request) throws Exception {
-    	logger.debug(request.getServletPath());
 
     	String sAcctGrp = request.getParameter("grp");
     	String sPrtsCd= StringUtil.nullToStr(request.getParameter("prts"), "0");
@@ -191,7 +179,6 @@ public class AccountController {
      */
     @RequestMapping("/account/member")
     public String member(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
     	
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
@@ -209,7 +196,6 @@ public class AccountController {
      */
     @RequestMapping("/account/create_account")
     public String createAccount(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
     	
     	String sAcctId = request.getParameter("id");
 
@@ -231,7 +217,6 @@ public class AccountController {
      */
     @RequestMapping("/account/register_auth_group")
     public ModelAndView registerAuthGrp(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
     	    	
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
@@ -268,8 +253,7 @@ public class AccountController {
      */
     @RequestMapping("/account/register_acct_group")
     public ModelAndView registerAcctGrp(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    	    	
+    	
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
     	String sAuthGrpId = request.getParameter("id");
@@ -325,7 +309,6 @@ public class AccountController {
      */
     @RequestMapping(value = {"/account/register_account", "/account/modify_account"})
     public ModelAndView registerAccount(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
 
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
@@ -443,7 +426,6 @@ public class AccountController {
      */
     @RequestMapping("/account/delete_account")
     public ModelAndView deleteAccount(HttpServletRequest request) throws Exception {
-    	logger.debug(request.getServletPath());
 
     	String sAcctId = request.getParameter("acct_id");
 
@@ -470,7 +452,6 @@ public class AccountController {
      */
     @RequestMapping("/account/modify_member")
     public ModelAndView modifyMember(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
 
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
@@ -576,7 +557,6 @@ public class AccountController {
      */
     @RequestMapping("/account/account_ajax")
     public String accountAjax(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
     	
     	String sGrpCd = request.getParameter("grp");
     	String sPrtsCd= StringUtil.nullToStr(request.getParameter("prts"), "0");
@@ -604,7 +584,6 @@ public class AccountController {
      */
     @RequestMapping("/account/tree_ajax")
     public String treeAjax(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
     	
        	HashMap<String, Object> paramMap = new HashMap<String, Object>();
     	List<HashMap<String, Object>> acctList = accountService.selectAcctGrpTree(paramMap);
@@ -631,7 +610,6 @@ public class AccountController {
     
     @RequestMapping(value = {"/common/_alert", "/common/_confirm"})
     public String _alert(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
         return request.getServletPath();
     }
    

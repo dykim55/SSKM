@@ -68,7 +68,7 @@ CREATE_FOLDER = (function() {
 	                            },
 	                            success: function(data, text, request) {
 	                            	$('.accordion').find('.accordionHeaders.ac_selected').next().load("/files/tree_ajax", {"gubun": data.gubun}, function() {
-	                            		$(this).find(".left-tree").treetable("reveal", data.parent);
+	                            		try { $(this).find(".left-tree").treetable("reveal", data.parent); } catch(e) {}
 									});
 									_Dlg.dialog("close");
 	                            }

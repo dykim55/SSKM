@@ -3,6 +3,8 @@ package com.cyberone.sskm.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.cyberone.sskm.exception.BizException;
@@ -10,12 +12,16 @@ import com.cyberone.sskm.model.UserInfo;
 
 public class SessionCheckInterceptor extends HandlerInterceptorAdapter {
 
-	private static int contextNameLength	= -1;
+	private static int contextNameLength = -1;
+	
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request,
     		HttpServletResponse response, Object handler) throws Exception {
 
+		logger.debug(request.getServletPath());
+		
 		if (contextNameLength == -1) {
 			contextNameLength = request.getContextPath().length();
 		}

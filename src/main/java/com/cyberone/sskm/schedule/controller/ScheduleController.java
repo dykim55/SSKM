@@ -12,8 +12,6 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,8 +26,6 @@ import com.cyberone.sskm.utils.StringUtil;
 @Controller
 public class ScheduleController {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
-    
     @Autowired
     private ScheduleService scheduleService;
 
@@ -38,8 +34,6 @@ public class ScheduleController {
      */
     @RequestMapping("schedule")
     public ModelAndView schedule(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    	
     	ModelAndView modelAndView = new ModelAndView("/schedule/schedule");
     	return modelAndView.addObject("status", "success");
     }
@@ -49,7 +43,6 @@ public class ScheduleController {
      */
     @RequestMapping("/schedule/schedule_write")
     public ModelAndView scheduleWrite(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
     	
     	String schdSeq = request.getParameter("schd_seq");
     	String schdSct = request.getParameter("schd_sct");
@@ -71,7 +64,6 @@ public class ScheduleController {
      */
     @RequestMapping("/schedule/schedule_list")
     public ModelAndView scheduleList(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
     	
     	ModelAndView modelAndView = new ModelAndView("jsonView");
     	
@@ -92,7 +84,6 @@ public class ScheduleController {
      */
     @RequestMapping("/schedule/schedule_register")
     public ModelAndView scheduleRegister(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
     	
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
@@ -164,7 +155,6 @@ public class ScheduleController {
      */
     @RequestMapping("/schedule/schedule_delete")
     public ModelAndView scheduleDelete(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
 
     	String schdSeq = request.getParameter("schd_seq");
     	String schdSct = request.getParameter("schd_sct");

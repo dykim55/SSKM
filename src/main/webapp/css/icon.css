@@ -132,20 +132,20 @@ u.area {
 }
 a.addfolder {
 	display:inline-block;
-	width:16px; height:16px;
-	background:url(/images/detail/icon_result_add.png) no-repeat;
+	width:18px; height:15px;
+	background:url(/images/detail/icon_r_add2.png) no-repeat;
 	vertical-align:middle;
 }
 a.editfolder {
 	display:inline-block;
-	width:16px; height:16px;
-	background:url(/images/detail/icon_result_edit.png) no-repeat;
+	width:15px; height:15px;
+	background:url(/images/detail/icon_r_edit2.png) no-repeat;
 	vertical-align:middle;
 }
 a.delfolder {
 	display:inline-block;
-	width:16px; height:16px;
-	background:url(/images/detail/icon_result_del.png) no-repeat;
+	width:15px; height:15px;
+	background:url(/images/detail/icon_r_del2.png) no-repeat;
 	vertical-align:middle;
 }
 a.add_r_folder {

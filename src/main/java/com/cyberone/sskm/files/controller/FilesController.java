@@ -46,8 +46,7 @@ public class FilesController {
      */
     @RequestMapping(value = {"/files/security_control", "/files/security_diagnosis", "/files/info_protection_manage", "/files/info_protection_policy", "/files/info_protection_trend", "/files/security_news"})
     public String files(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    	
+    	    	
        	String sPrtsCd = "";
        	if (request.getServletPath().equals("/files/security_control")) {
        		sPrtsCd = "1000";
@@ -89,8 +88,7 @@ public class FilesController {
      */
     @RequestMapping("/files/create_folder")
     public String createFolder(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    	
+    	    	
     	String sCtgId = request.getParameter("id");
 
     	if (!StringUtil.isEmpty(sCtgId)) {
@@ -107,8 +105,7 @@ public class FilesController {
      */
     @RequestMapping("/files/folder_register")
     public ModelAndView folderRegister(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    	
+    	    	
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
     	String sId = request.getParameter("id");
@@ -117,23 +114,28 @@ public class FilesController {
     	String sName = StringUtil.replaceHtml(request.getParameter("name"));
     	String sDesc = StringUtil.replaceHtml(request.getParameter("desc"));
     	
-       	HashMap<String, Object> paramMap = new HashMap<String, Object>();
+    	HashMap<String, Object> paramMap = new HashMap<String, Object>();
        	paramMap.put("ctgNm", sName);
        	paramMap.put("ctgDesc", sDesc);
        	paramMap.put("modr", userInfo.getAcct().getAcctId());
        	paramMap.put("modDtime", new Date());
 
        	if (StringUtil.isEmpty(sId)) {
+       		logger.info("폴더를 생성했습니다.");
            	paramMap.put("ctgSct", Integer.valueOf(sSct));
            	paramMap.put("ctgParent", Integer.valueOf(sParent));
            	paramMap.put("regr", userInfo.getAcct().getAcctId());
            	paramMap.put("regDtime", new Date());
        		filesService.insertCategory(paramMap);
        	} else {
+       		logger.info("폴더를 수정했습니다.");
        		paramMap.put("ctgId", sId);
        		filesService.updateCategory(paramMap);
        	}
-       	
+    	logger.info("폴더명 : {}", sName);
+    	logger.info("폴더설명 : {}", sDesc);
+    	logger.info("만든사람 : {}({})", userInfo.getAcct().getAcctId(), userInfo.getAcct().getAcctNm());
+    	
     	ModelAndView modelAndView = new ModelAndView("jsonView");
     	modelAndView.addObject("gubun", Integer.valueOf(sSct));
     	modelAndView.addObject("id", paramMap.get("ctgId"));
@@ -148,8 +150,7 @@ public class FilesController {
      */
     @RequestMapping("/files/delete_folder")
     public ModelAndView deleteFolder(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-
+    	
     	String sId = request.getParameter("id");
     	
     	HashMap<String, Object> paramMap = new HashMap<String, Object>();
@@ -172,12 +173,8 @@ public class FilesController {
     		throw new BizException("하위 업무폴더나 파일이 존재하는 폴더는 삭제할 수 없습니다");
     	}
 
-    	paramMap.clear();
-   		paramMap.put("ctgId", (Integer)ctgMap.get("ctgParent"));    	
-   		HashMap<String, Object> prntMap = filesService.selectCategory(paramMap);
-    	
 		StringBuffer sMemo = new StringBuffer();
-		sMemo = sMemo.append("위치:").append(StringUtil.convertString(prntMap.get("pathNm"))).append("\n");
+		sMemo = sMemo.append("위치:").append(StringUtil.convertString(ctgMap.get("pathNm"))).append("\n");
 		sMemo = sMemo.append("폴더:").append(StringUtil.convertString(ctgMap.get("ctgNm"))).append("\n");
    		
     	paramMap.clear();
@@ -187,6 +184,11 @@ public class FilesController {
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
         Common.insertAuditHist(Constants.AUDIT_FILES, "폴더가 삭제되었습니다.", "S", sMemo.toString(), userInfo.getAcct().getAcctId());
     	
+        logger.info("폴더를 삭제했습니다.");
+        logger.info("폴더경로 : {}", StringUtil.convertString(ctgMap.get("pathNm")));
+        logger.info("폴더명 : {}", StringUtil.convertString(ctgMap.get("ctgNm")));
+        logger.info("삭제자 : {}({})", userInfo.getAcct().getAcctId(), userInfo.getAcct().getAcctNm());
+        
         ModelAndView modelAndView = new ModelAndView("jsonView");
         modelAndView.addObject("parent", ctgMap.get("ctgParent"));
         return modelAndView.addObject("status", "success"); 
@@ -197,8 +199,7 @@ public class FilesController {
      */
     @RequestMapping("/files/tree_ajax")
     public String treePane(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    	
+    	    	
     	String sSct = request.getParameter("gubun");
        	
        	HashMap<String, Object> paramMap = new HashMap<String, Object>();
@@ -215,8 +216,7 @@ public class FilesController {
      */
     @RequestMapping("/files/file_upload")
     public String fileUpload(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    	
+    	    	
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
     	String sId = request.getParameter("id");
@@ -248,8 +248,7 @@ public class FilesController {
      */
     @RequestMapping("/files/file_register")
     public ModelAndView fileRegister(MultipartHttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    
+    	    
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
         List<MultipartFile> mpfList = request.getFiles("file-data");					//첨부파일 리스트
@@ -281,6 +280,7 @@ public class FilesController {
     			}
     		}
     		
+    		logger.info("산출물을 수정했습니다.");
     	} else {
         	paramMap.put("fileYn", "n");
         	paramMap.put("delYn", "n");
@@ -289,7 +289,14 @@ public class FilesController {
     		
         	filesService.insertProduct(request, paramMap, mpfList);
     		sId = StringUtil.convertString(paramMap.get("pId"));
+    		
+    		logger.info("산출물을 등록했습니다.");
     	}
+    	
+        
+        logger.info("제목 : {}", sTitle);
+        logger.info("내용 : {}", sContent);
+        logger.info("등록자 : {}({})", userInfo.getAcct().getAcctId(), userInfo.getAcct().getAcctNm());
     	
         ModelAndView modelAndView = new ModelAndView("jsonView");
         modelAndView.addObject("parent", paramMap.get("parent"));
@@ -301,8 +308,7 @@ public class FilesController {
      */
     @RequestMapping("/files/file_delete")
     public ModelAndView fileDelete(HttpServletRequest request) throws Exception {
-    	logger.debug(request.getServletPath());
-
+    	
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
     	String sId = request.getParameter("id");
@@ -332,7 +338,12 @@ public class FilesController {
 		sMemo = sMemo.append("제목:").append(StringUtil.convertString(filesMap.get("title"))).append("\n");
 		
 		Common.insertAuditHist(Constants.AUDIT_FILES, "산출물이 삭제되었습니다.", "S", sMemo.toString(), userInfo.getAcct().getAcctId());
-		
+
+        logger.info("산출물을 삭제했습니다.");
+        logger.info("산출물 경로 : {}", StringUtil.convertString(filesMap.get("pathNm")));
+        logger.info("산출물 제목 : {}", StringUtil.convertString(filesMap.get("title")));
+        logger.info("삭제자 : {}({})", userInfo.getAcct().getAcctId(), userInfo.getAcct().getAcctNm());
+        
         ModelAndView modelAndView = new ModelAndView("jsonView");
         return modelAndView.addObject("status", "success"); 
     }
@@ -342,22 +353,15 @@ public class FilesController {
      */
     @RequestMapping("/files/file_ajax")
     public String fileAjax(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    	
+    	    	
     	String sParent = request.getParameter("parent");
-    	String sSearchWord = request.getParameter("searchWord");
-    	String sSearchSel = request.getParameter("searchSel");
-    	
+
+       	Product product = (Product)DataUtil.dtoBuilder(request, Product.class);
+
     	if (StringUtil.isEmpty(sParent)) {
+    		model.addAllAttributes(product.createModelMap(null));
     		return "/files/file_ajax";
     	}
-       	
-       	HashMap<String, Object> paramMap = new HashMap<String, Object>();
-       	paramMap.put("parent", Integer.valueOf(sParent));
-       	paramMap.put("searchSel", StringUtil.convertString(sSearchSel));
-       	paramMap.put("searchWord", StringUtil.convertString(sSearchWord));
-       	
-       	Product product = (Product)DataUtil.dtoBuilder(request, Product.class);
        	
     	List<HashMap<String, Object>> productList = filesService.selectProductList(product);
        	
@@ -371,8 +375,7 @@ public class FilesController {
      */
     @RequestMapping("/files/allover_ajax")
     public String allOverAjax(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    	
+    	    	
        	Product product = (Product)DataUtil.dtoBuilder(request, Product.class);
        	product.setSearchSel("1");
        	
@@ -388,8 +391,7 @@ public class FilesController {
      */
     @RequestMapping("/files/appx_list")
     public String appxList(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
- 
+    	 
     	String sId = request.getParameter("id");
     	
     	if (!StringUtil.isEmpty(sId)) {

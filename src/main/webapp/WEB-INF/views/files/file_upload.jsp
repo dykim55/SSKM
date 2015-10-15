@@ -34,7 +34,11 @@ FILE_UPLOAD = (function() {
         },
         success: function(data, status) {
         	if (data.status=="success") {
-        		PG.reload(false, function() { _Dlg.dialog("close"); });
+        		if ($(".detail .left-set button").length > 0) {
+        			PG.reload("NaN", function() { _Dlg.dialog("close"); });
+        		} else {
+        			ALL_PG.reload(false, function() { _Dlg.dialog("close"); });
+        		}
         	} else {
         		_bProcessing = false;
         		_alert(data.message);

@@ -35,17 +35,66 @@ $(document).ready(function(){
     });
   	
     $("#login_btn").button().click(function(e) {
-    //if ($("#loginId").val().length == 0 || $("#loginPw").val().length == 0) return;
-    
+    if ($("#loginId").val().length == 0 || $("#loginPw").val().length == 0) return;
         document.loginFrm.submit();
         $(".post").remove();
         $(".insert").children().remove();
         $(".insert").append("<p style=\"padding: 20px;\"><span style=\"font-size: 12px;color: rgb(0, 0, 0);\">접속중입니다...</span></p>");
     });
 
+    $("#idSaveCheck").change(function() {
+        if ($("#idSaveCheck").is(":checked")) {
+            var userId = $("input[name='loginId']").val();
+            setCookie("userId", userId, 7);
+        } else {
+            deleteCookie("userId");
+        }
+    });
+    $("input[name='loginId']").keyup(function() {
+        if($("#idSaveCheck").is(":checked")) {
+            var userId = $("input[name='loginId']").val();
+            setCookie("userId", userId, 7);
+        }
+    });
+    
+    var userId = getCookie("userId");
+    $("input[name='loginId']").val(userId);
+    
+    if ($("input[name='loginId']").val() != "") {
+    	$("input[name='loginId']").css({background:"url(/images/login/input_id_on.png) no-repeat",color:"white"});
+    	$("input[name='loginPw']").focus();
+        $("#idSaveCheck").attr("checked", true);
+    }
+    
 });
 
-  </script>
+function setCookie(cookieName, value, exdays){
+    var exdate = new Date();
+    exdate.setDate(exdate.getDate() + exdays);
+    var cookieValue = escape(value) + ((exdays==null) ? "" : "; expires=" + exdate.toGMTString());
+    document.cookie = cookieName + "=" + cookieValue;
+}
+
+function deleteCookie(cookieName){
+    var expireDate = new Date();
+    expireDate.setDate(expireDate.getDate() - 1);
+    document.cookie = cookieName + "= " + "; expires=" + expireDate.toGMTString();
+}
+
+function getCookie(cookieName) {
+    cookieName = cookieName + '=';
+    var cookieData = document.cookie;
+    var start = cookieData.indexOf(cookieName);
+    var cookieValue = '';
+    if(start != -1){
+        start += cookieName.length;
+        var end = cookieData.indexOf(';', start);
+        if(end == -1)end = cookieData.length;
+        cookieValue = cookieData.substring(start, end);
+    }
+    return unescape(cookieValue);
+}
+</script>
 
 </head>
 <body>
@@ -61,6 +110,9 @@ $(document).ready(function(){
 				</form>
 				<div class="post">
 					<button id="login_btn" type="button">로그인</button>
+				</div>
+				<div class="post">
+					<input type="checkbox" id="idSaveCheck"><label for="idSaveCheck" style="font-size: 12px;">아이디 저장</label>
 				</div>
 			<% if (!StringUtil.isEmpty(sMessage)) { %>
 				<div class="msg"><%=StringUtil.convertString(sMessage) %></div>

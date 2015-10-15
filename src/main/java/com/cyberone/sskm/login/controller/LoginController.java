@@ -43,8 +43,7 @@ public class LoginController {
      */
     @RequestMapping("/login")
     public String login(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-        return "/login/auth";
+    	return "/login/auth";
     }
 
     /**
@@ -52,7 +51,6 @@ public class LoginController {
      */
     @RequestMapping(value="/verify", method=RequestMethod.POST)
     public String verifyAccount(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
 
     	String sAcctId = request.getParameter("loginId");
     	String sAcctPw = request.getParameter("loginPw");
@@ -65,6 +63,7 @@ public class LoginController {
 		HashMap<String, Object> paramMap = new HashMap<String, Object>();
 		paramMap.put("acctId", sAcctId);
 		paramMap.put("acctPw", sAcctPw);
+		paramMap.put("acctSt", 1);
 		
     	Acct acct = loginService.selectAcct(paramMap);
     	
@@ -92,9 +91,35 @@ public class LoginController {
     	
     	Common.insertAuditHist(Constants.AUDIT_LOGIN, userInfo.getAcct().getAcctNm() + "님이 로그인하셨습니다.", "S", "", userInfo.getAcct().getAcctId());
     	
-    	logger.info("접속 아이디: " + userInfo.getAcct().getAcctId() + "(" + userInfo.getAcct().getAcctNm() + ")");
+    	logger.info("{}({})님이 접속하셨습니다.", userInfo.getAcct().getAcctId(), userInfo.getAcct().getAcctNm());
     	
-		return "redirect:/files/security_control";
+    	String prmsMenus = userInfo.getAcctGrp().getAcctPrmsMenus();
+    	String[] arrayMenus = prmsMenus.split(",");
+    	
+       	String sViewName = "";
+       	if ("1000".equals(arrayMenus[1])) {
+       		sViewName = "/files/security_control";
+       	} else if ("2000".equals(arrayMenus[1])) {
+       		sViewName = "/files/security_diagnosis";
+       	} else if ("3000".equals(arrayMenus[1])) {
+       		sViewName = "/files/info_protection_manage";
+       	} else if ("4000".equals(arrayMenus[1])) {
+       		sViewName = "/files/info_protection_policy";
+       	} else if ("5000".equals(arrayMenus[1])) {
+       		sViewName = "/files/info_protection_trend";
+       	} else if ("6000".equals(arrayMenus[1])) {
+       		sViewName = "/files/security_news";
+       	} else if ("A000".equals(arrayMenus[1])) {
+       		sViewName = "/article/notice";
+       	} else if ("B000".equals(arrayMenus[1])) {
+       		sViewName = "/article/transfer";
+       	} else if ("C000".equals(arrayMenus[1])) {
+       		sViewName = "/schedule";
+       	} else if ("Z000".equals(arrayMenus[1])) {
+       		sViewName = "/account";
+       	}
+    	
+		return "redirect:" + sViewName;
     }
 
     /**
@@ -102,7 +127,6 @@ public class LoginController {
      */
     @RequestMapping("logout")
     public String logout(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
         
         try { request.getSession(true).invalidate(); } catch(Exception e) {}
 

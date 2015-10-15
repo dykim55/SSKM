@@ -61,6 +61,7 @@
 		A.ctgId
 		,A.ctgNm
 		,A.ctgParent
+		,category_path(A.ctgParent) AS pathNm
 		,A.ctgSct
 		,A.ctgDesc
 		,A.regr

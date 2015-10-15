@@ -20,7 +20,14 @@ String sCtgSct = StringUtil.convertString(request.getAttribute("gubun"));
 
 String sSubMenu = StringUtil.convertString(request.getParameter("subMenu"));
 if (StringUtil.isEmpty(sSubMenu)) {
-	sSubMenu = StringUtil.convertString(subMenuList.get(0).get("menuCd"));
+	if (subMenuList.size() > 0) {
+		for (HashMap<String, Object> map : subMenuList) { 
+			List<HashMap<String, Object>> ctgList = (List<HashMap<String, Object>>)sideMap.get(StringUtil.convertString(map.get("menuCd")));
+			if (!userInfo.isMenuAuth(StringUtil.convertString(map.get("menuCd")))) continue;
+			sSubMenu = StringUtil.convertString(map.get("menuCd"));
+			break;
+		}
+	}
 }
 
 %>
@@ -28,18 +35,36 @@ if (StringUtil.isEmpty(sSubMenu)) {
 <script type="text/javascript">
 
 PG = (function() {
-	var rows=15, page=1, parent, searchSel=1, searchWord="";
+	var rows=15, page=1, parent, searchSel=1, searchWord="", wait=false;
 	return {
-		reload : function(p, func) { if(p) { parent = p; searchSel=1; searchWord=""; } else { searchSel = $("#nt_selbox").val(); searchWord = $("#searchWord").val(); } $("#files-grid-div").load("/files/file_ajax", { rows: rows, parent: parent, searchSel : searchSel, searchWord : searchWord, page : page }, func); },
-		move : function(p) { if(p) page = p; this.reload(); },
-		rows : function(r) { if(r) { rows = r; page = 1; } this.reload(); }
+		reload : function(p, func) { 
+			if (wait) return;
+			
+			wait=true;
+			if(!isNaN(p)) { 
+				parent = p; 
+				searchSel=1; 
+				searchWord=""; 
+			} else { 
+				searchSel = $("#nt_selbox").val(); 
+				searchWord = $("#searchWord").val(); 
+			} 
+			$("#files-grid-div").load("/files/file_ajax", 
+					{ rows: rows, parent: parent, searchSel : searchSel, searchWord : searchWord, page : page }, 
+					function () {
+						wait=false;
+						func(); 
+					}); 
+		},
+		move : function(p) { if(p) page = p; this.reload("NaN", function() {}); },
+		rows : function(r) { if(r) { rows = r; page = 1; } this.reload("NaN", function() {}); }
 	};
 })();
 
 ALL_PG = (function() {
 	var rows=15, page=1, parent, searchWord="";
 	return {
-		reload : function(p, s, func) { if(p) parent = p; if(s) searchWord = s; $("#files-grid-div").load("/files/allover_ajax", { rows: rows, searchWord : $(".dir-search input").val(), page : page }, func); },
+		reload : function(p, func) { if(p) parent = p; $("#files-grid-div").load("/files/allover_ajax", { rows: rows, searchWord : $(".dir-search input").val(), page : page }, func); },
 		move : function(p) { if(p) page = p; this.reload(); },
 		rows : function(r) { if(r) { rows = r; page = 1; } this.reload(); }
 	};
@@ -54,13 +79,12 @@ $(document).ready(function() {
 
 		if ($(".content-head .left-set").find("button").length > 1) $(".content-head").find("button").eq(0).remove();
 		
-		if ($(this).hasClass('ac_selected')) {
-			return;
-		}
+		//if ($(this).hasClass('ac_selected')) { return; }
+		
 		$('.accordionHeaders').removeClass('ac_selected');
 		$('.contentHolder').slideUp();
 		$(this).addClass('ac_selected').next('.contentHolder').slideToggle();
-		
+		PG.reload("", function() {  console.log("aaaa"); });
 	});
 	
     $(".left-tree").treetable({ expandable: true });
@@ -124,8 +148,10 @@ function deleteFolder(tr) {
 	        success : function(data){
 	            if (data.status == 'success') {
                 	$('.accordion').find('.accordionHeaders.ac_selected').next().load("/files/tree_ajax", {"gubun": $('.accordion').find('.accordionHeaders.ac_selected').attr("ref-sct")}, function() {
-                		$(this).find(".left-tree").treetable("reveal", data.parent);
-                		$(this).find(".left-tree").treetable("node", data.parent).expand();
+                		try {
+                			$(this).find(".left-tree").treetable("reveal", data.parent);
+                			$(this).find(".left-tree").treetable("node", data.parent).expand();
+                		} catch(e){}
 					});
 	            } else {
 	                _alert(data.message);
@@ -152,7 +178,7 @@ function deleteFile(id) {
                 } else {
                     _alert(data.message);
                 }
-                PG.reload(false, function() {});
+                PG.reload("NaN", function() {});
             }
         });
 	});
@@ -170,7 +196,7 @@ function fileBox(id) {
 }
 
 function search() {
-	PG.reload(false, function() {});
+	PG.reload("NaN", function() {});
 }
 
 function allOverSearch() {
@@ -202,13 +228,14 @@ function allOverSearch() {
 			int idx=0;
 			for (HashMap<String, Object> map : subMenuList) { 
 				List<HashMap<String, Object>> ctgList = (List<HashMap<String, Object>>)sideMap.get(StringUtil.convertString(map.get("menuCd")));
+				if (!userInfo.isMenuAuth(StringUtil.convertString(map.get("menuCd")))) continue;
 				for (HashMap<String, Object> ctgMap : ctgList) {
 					if ((Integer)ctgMap.get("ctgParent") == 0) {
 			%>
 						<div ref-sct="<%=StringUtil.convertString(ctgMap.get("ctgSct")) %>" ref-id="<%=(Integer)ctgMap.get("ctgId") %>" class="accordionHeaders <%= (sSubMenu.equals(StringUtil.convertString(ctgMap.get("ctgSct"))) ? "ac_selected" : "") %>">
 							<span><%=StringUtil.convertString(ctgMap.get("ctgNm")) %></span>
 							<div class="option">
-								<a href="javascript:createFolder();" class="addfolder" title="추가"></a>
+								<a href="javascript:createFolder();" class="addfolder" title="폴더생성"></a>
 							</div>
 						</div>
 						<div class="contentHolder" style="display: <%= (sSubMenu.equals(StringUtil.convertString(ctgMap.get("ctgSct"))) ? "block" : "none") %>;">
@@ -221,9 +248,9 @@ function allOverSearch() {
 						                <td>
 						                    <span><%=StringUtil.convertString(ctgMap.get("ctgNm")) %></span>
 						                    <div class="option">
-						                    	<a href="javascript:createFolder();" class="addfolder" title="추가"></a>
-						                    	<a href="javascript:modifyFolder();" class="editfolder" title="수정"></a>
-												<a href="javascript:deleteFolder();" class="delfolder" title="삭제"></a>
+						                    	<a href="javascript:createFolder();" class="addfolder" title="폴더생성"></a>
+						                    	<a href="javascript:modifyFolder();" class="editfolder" title="폴더수정"></a>
+												<a href="javascript:deleteFolder();" class="delfolder" title="폴더삭제"></a>
 						                    </div>
 						                </td>
 						            </tr>
@@ -242,7 +269,7 @@ function allOverSearch() {
 
 
 	<!-- depth 2. section -->
-	<div class="section" id="files-grid-div" onselectstart="return false" ondragstart="return false">
+	<div class="section" id="files-grid-div">
 		<div class="detail" style="max-width: inherit;">
 			<div class="content-head" style="max-width: inherit;">
 				<div class="head-end">

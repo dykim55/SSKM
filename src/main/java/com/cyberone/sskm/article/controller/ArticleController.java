@@ -11,8 +11,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,8 +34,6 @@ import com.cyberone.sskm.utils.StringUtil;
 @Controller
 public class ArticleController {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
-    
     @Autowired
     private ArticleService articleService;
 
@@ -46,7 +42,6 @@ public class ArticleController {
      */
     @RequestMapping(value = {"/article/notice", "/article/transfer"})
     public String article(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
     	
        	String sBbsSct = "";
        	if (request.getServletPath().equals("/article/notice")) {
@@ -71,7 +66,7 @@ public class ArticleController {
      */
     @RequestMapping("/article/article_list")
     public String articleList(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
+    	
     	
         List<HashMap<String, Object>> articleList = null;
         Board board = (Board) DataUtil.dtoBuilder(request, Board.class);
@@ -88,7 +83,6 @@ public class ArticleController {
      */
     @RequestMapping("/article/article_write")
     public String articleWrite(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
     	
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
@@ -119,8 +113,7 @@ public class ArticleController {
      */
     @RequestMapping("/article/article_register")
     public ModelAndView articleRegister(MultipartHttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
-    
+    	
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
         List<MultipartFile> mpfList = request.getFiles("file-data");
@@ -173,7 +166,6 @@ public class ArticleController {
      */
     @RequestMapping("/article/article_delete")
     public ModelAndView fileDelete(HttpServletRequest request) throws Exception {
-    	logger.debug(request.getServletPath());
 
     	UserInfo userInfo = (UserInfo)request.getSession().getAttribute("userInfo");
     	
@@ -202,7 +194,6 @@ public class ArticleController {
      */
     @RequestMapping("/article/appx_list")
     public String appxList(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-    	logger.debug(request.getServletPath());
  
     	String sId = request.getParameter("id");
     	
@@ -300,6 +291,5 @@ public class ArticleController {
 			articleService.updateBoard(paramMap);
 		}
 	}
- 
 	
 }
